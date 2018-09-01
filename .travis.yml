@@ -26,8 +26,7 @@ install:
 before_script:
     - go get -t ./src/server
     - chmod +x addons/sourcemod/scripting/spcomp
-    - chmod +x addons/sourcemod/scripting/compile.sh
 
 script:
     - go build ./src/server
-    - ./addons/sourcemod/scripting/compile.sh $TRAVIS_BUILD_DIR/src/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/Source-Chat-Relay.smx
+    - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/src/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/Source-Chat-Relay.smx
