@@ -1,0 +1,23 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Client",
+            "type": "shell",
+            "command": "D:/MegaSync/Projects/Sourcemod/scripting/spcomp.exe src/client/Source-Chat-Relay.sp -o src/client/Source-Chat-Relay.smx",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Server",
+            "type": "shell",
+            "command": "go build ./src/server",
+            "group": "build"
+        }
+    ]
+}
