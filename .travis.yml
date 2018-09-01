@@ -1,4 +1,37 @@
 language: go
 
+env:
+  - SMVERSION=1.9
+
 go:
   - "1.11.x"
+  - master
+
+env:
+    - SMVERSION=1.8
+
+matrix:
+    fast_finish: true
+
+before_install:
+    - sudo apt-get update
+    - sudo apt-get install gcc-multilib
+    - sudo apt-get install lynx
+    - sudo apt-get install lib32stdc++6
+
+install:
+    - SMLATEST=`curl "https://www.sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux"`
+    - SMPACKAGE="https://www.sourcemod.net/smdrop/$SMVERSION/$SMLATEST"
+    - wget $SMPACKAGE
+    - tar -xzf $(basename "$SMPACKAGE")
+    - cp src/client/Source-Chat-Relay.sp addons/sourcemod/scripting/
+    - cp src/client/include/socket.inc addons/sourcemod/scripting/include
+
+before_script:
+    - go get -t src/server
+    - chmod +x addons/sourcemod/scripting/spcomp
+    - chmod +x addons/sourcemod/scripting/compile.sh
+
+script:
+    - go build src/server
+    - addons/sourcemod/scripting/compile.sh addons/sourcemod/scripting/Source-Chat-Relay.sp
