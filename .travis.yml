@@ -25,10 +25,10 @@ install:
     - cp src/client/include/socket.inc addons/sourcemod/scripting/include
 
 before_script:
-    - go get -t ./src/server
+    - env GO111MODULE=on go get -t ./src/server
     - chmod +x addons/sourcemod/scripting/spcomp
     - chmod +x addons/sourcemod/scripting/compile.sh
 
 script:
-    - go build ./src/server
+    - env GO111MODULE=on go build ./src/server
     - addons/sourcemod/scripting/compile.sh addons/sourcemod/scripting/Source-Chat-Relay.sp
