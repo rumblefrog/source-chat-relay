@@ -8,8 +8,8 @@ import (
 
 // Config - Data scheme for config file
 type Config struct {
-	Token string
-	Port  int
+	Token string `toml:"Token"`
+	Port  int    `toml:"Port"`
 }
 
 // Conf - Loaded config
