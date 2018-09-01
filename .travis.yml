@@ -1,20 +1,22 @@
-language: go
+sudo: false
+
+language: sourcepawn
 
 env:
   - SMVERSION=1.9
 
 go:
   - "1.11.x"
-  - master
 
 matrix:
     fast_finish: true
 
+addons:
+    apt_packages:
+      - lib32stdc++6
+
 before_install:
-    - sudo apt-get update
-    - sudo apt-get install gcc-multilib
-    - sudo apt-get install lynx
-    - sudo apt-get install lib32stdc++6
+    - echo go version
 
 install:
     - SMLATEST=`curl "https://www.sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux"`
@@ -25,10 +27,10 @@ install:
     - cp src/client/include/socket.inc addons/sourcemod/scripting/include
 
 before_script:
-    - env GO111MODULE=on go get -t ./src/server
+    - go get -t ./src/server
     - chmod +x addons/sourcemod/scripting/spcomp
     - chmod +x addons/sourcemod/scripting/compile.sh
 
 script:
-    - env GO111MODULE=on go build ./src/server
+    - go build ./src/server
     - addons/sourcemod/scripting/compile.sh addons/sourcemod/scripting/Source-Chat-Relay.sp
