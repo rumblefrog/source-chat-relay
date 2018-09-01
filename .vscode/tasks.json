@@ -17,7 +17,8 @@
             "label": "Build Server",
             "type": "shell",
             "command": "go build ./src/server",
-            "group": "build"
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }

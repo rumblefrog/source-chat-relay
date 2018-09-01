@@ -15,9 +15,6 @@ addons:
     apt_packages:
       - lib32stdc++6
 
-before_install:
-    - echo go version
-
 install:
     - SMLATEST=`curl "https://www.sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux"`
     - SMPACKAGE="https://www.sourcemod.net/smdrop/$SMVERSION/$SMLATEST"
@@ -32,5 +29,5 @@ before_script:
     - chmod +x addons/sourcemod/scripting/compile.sh
 
 script:
-    - go build ./src/server -o ./src/server
-    - ./addons/sourcemod/scripting/compile.sh ./src/client/Source-Chat-Relay -o Source-Chat-Relay.smx
+    - go build ./src/server
+    - ./addons/sourcemod/scripting/compile.sh $TRAVIS_BUILD_DIR/src/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/Source-Chat-Relay.smx
