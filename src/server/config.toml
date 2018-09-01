@@ -1,1 +1,2 @@
 Token = "BotToken" # The Bot's Token
+Port = 57452 # Port to start the socket server on
