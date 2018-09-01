@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"./bot"
-	"./helper"
-	"./socket"
+	"github.com/rumblefrog/source-chat-relay/src/server/bot"
+	"github.com/rumblefrog/source-chat-relay/src/server/helper"
+	"github.com/rumblefrog/source-chat-relay/src/server/socket"
 )
 
 func main() {

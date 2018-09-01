@@ -1,6 +1,6 @@
 sudo: false
 
-language: sourcepawn
+language: go
 
 env:
   - SMVERSION=1.9
@@ -14,12 +14,9 @@ matrix:
 addons:
     apt_packages:
       - lib32stdc++6
-<<<<<<< HEAD
 
 before_install:
     - echo go version
-=======
->>>>>>> 2e0ff11e49d9fa37a94585e6f1082f11fb31aed0
 
 install:
     - SMLATEST=`curl "https://www.sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux"`

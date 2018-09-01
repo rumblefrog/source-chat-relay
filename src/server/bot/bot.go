@@ -3,8 +3,8 @@ package bot
 import (
 	"log"
 
-	"../helper"
 	"github.com/bwmarrin/discordgo"
+	"github.com/rumblefrog/source-chat-relay/src/server/helper"
 )
 
 // Session - Initiated session
