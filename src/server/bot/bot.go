@@ -7,20 +7,20 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// Bot - Initiated session
-var Bot *discordgo.Session
+// Session - Initiated session
+var Session *discordgo.Session
 
 // InitBot - Starts the bot routine
 func InitBot() {
-	Bot, err := discordgo.New("Bot" + helper.Conf.Token)
+	Session, err := discordgo.New("Bot" + helper.Conf.Token)
 
 	if err != nil {
 		log.Panic("Unable to initiate bot session")
 	}
 
-	Bot.AddHandler(messageCreate)
+	Session.AddHandler(messageCreate)
 
-	err = Bot.Open()
+	err = Session.Open()
 
 	if err != nil {
 		log.Panic("Unable to open bot connection")
@@ -30,5 +30,10 @@ func InitBot() {
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+
+	// Prevent loops
+	if m.Author.ID == s.State.User.ID {
+		return
+	}
 
 }

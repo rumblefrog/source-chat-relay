@@ -24,7 +24,7 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
-	bot.Bot.Close()
+	bot.Session.Close()
 
 	// Socket closing
 }
