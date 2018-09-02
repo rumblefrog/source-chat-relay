@@ -10,6 +10,16 @@
 
 #pragma newdecls required
 
+enum FrameType
+{
+	START, // 1
+	OPCODE, // 1
+	USERID, // 8
+	PAYLOAD, // 256
+	CLOSE, // 1
+	FRAMECOUNT,
+}
+
 char sHostname[64];
 char sHost[64] = "127.0.0.1";
 char sToken[128];
@@ -135,6 +145,20 @@ bool IsListening(int channel)
 			return true;
 			
 	return false;
+}
+
+void PreProcessFrame()
+{
+	// START - 1 byte
+	// OPCODE - 1 byte
+	// USERID - 8 bytes
+	// PAYLOAD - 256 - bytes
+	// TERMINATE - 1 byte
+}
+
+void PackFrame(int iFrame, const char payload)
+{
+
 }
 
 stock bool Client_IsValid(int iClient, bool bAlive = false)
