@@ -10,20 +10,20 @@
 
 #pragma newdecls required
 
-enum FrameType
-{
-	OPCODE = 1,
-	PAYLOADLEN,
-	TERMINATE,
-	FRAMECOUNT
-}
-
 enum PayloadType
 {
-	Ping,
+	Ping = 1,
 	Message,
 	Terminate,
 	PayloadCount
+}
+
+enum RelayFrame
+{
+	PayloadType:OPCODE,
+	PAYLOADLEN,
+	TERMINATE,
+	FRAMECOUNT
 }
 
 char sHostname[64];
@@ -151,6 +151,8 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 		
 	if (!SocketIsConnected(hSocket))
 		return;
+		
+	ProcessFrame(Message, "Test");
 }
 
 bool IsListening(int channel)
@@ -162,9 +164,9 @@ bool IsListening(int channel)
 	return false;
 }
 
-void ProcessFrame(PayloadType payloadT, const char payload)
+void ProcessFrame(PayloadType payloadT, const char[] payload)
 {
-	int vFrame[FRAMECOUNT];
+	int vFrame[RelayFrame];
 
 	vFrame[OPCODE] = payloadT;
 
@@ -172,10 +174,10 @@ void ProcessFrame(PayloadType payloadT, const char payload)
 
 	vFrame[TERMINATE] = 1;
 
-	PackFrame(vFrame, payload)
+	PackFrame(vFrame, payload);
 }
 
-bool PackFrame(int vFrame, const char payload)
+bool PackFrame(int vFrame[RelayFrame], const char[] payload)
 {
 	// OPCODE - 1 byte
 	// PAYLOADLEN - 3 bytes
@@ -184,7 +186,7 @@ bool PackFrame(int vFrame, const char payload)
 
 	int iLen = vFrame[PAYLOADLEN] + 6;
 
-	char sFrame[] = new char[iLen];
+	char[] sFrame = new char[iLen];
 
 	switch (vFrame[OPCODE])
 	{
@@ -198,14 +200,14 @@ bool PackFrame(int vFrame, const char payload)
 		}
 		default:
 		{
-			LogError('Invalid OPCODE %d', vFrame[OPCODE]);
+			LogError("Invalid OPCODE %d", vFrame[OPCODE]);
 			return false;
 		}
 	}
 
 	if (vFrame[PAYLOADLEN] > 999)
 	{
-		LogError('Payload length exceeds 3 bytes');
+		LogError("Payload length exceeds 3 bytes");
 		return false;
 	}
 
