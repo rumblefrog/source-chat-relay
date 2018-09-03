@@ -5,6 +5,8 @@
 #define PLUGIN_AUTHOR "Fishy"
 #define PLUGIN_VERSION "0.0.1"
 
+#define MAX_PAYLOAD_LEN 999
+
 #include <sourcemod>
 #include <socket>
 
@@ -12,10 +14,9 @@
 
 enum PayloadType
 {
-	Ping = 1,
+	Ping,
 	Message,
-	Terminate,
-	PayloadCount
+	Terminate
 }
 
 enum RelayFrame
@@ -205,7 +206,7 @@ bool PackFrame(int vFrame[RelayFrame], const char[] payload)
 		}
 	}
 
-	if (vFrame[PAYLOADLEN] > 999)
+	if (vFrame[PAYLOADLEN] > MAX_PAYLOAD_LEN)
 	{
 		LogError("Payload length exceeds 3 bytes");
 		return false;
