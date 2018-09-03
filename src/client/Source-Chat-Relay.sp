@@ -12,12 +12,18 @@
 
 enum FrameType
 {
-	START, // 1
-	OPCODE, // 1
-	USERID, // 8
-	PAYLOAD, // 256
-	CLOSE, // 1
-	FRAMECOUNT,
+	OPCODE = 1,
+	PAYLOADLEN,
+	TERMINATE,
+	FRAMECOUNT
+}
+
+enum PayloadType
+{
+	Ping,
+	Message,
+	Terminate,
+	PayloadCount
 }
 
 char sHostname[64];
@@ -138,6 +144,15 @@ public int OnSocketReceive(Handle socket, const char[] receiveData, int dataSize
 	
 }
 
+public void OnClientSayCommand_Post(int client, const char[] command, const char[] sArgs)
+{
+	if (!Client_IsValid(client))
+		return;
+		
+	if (!SocketIsConnected(hSocket))
+		return;
+}
+
 bool IsListening(int channel)
 {
 	for (int i = 0; i < iTotalBindings; i++)
@@ -147,18 +162,64 @@ bool IsListening(int channel)
 	return false;
 }
 
-void PreProcessFrame()
+void ProcessFrame(PayloadType payloadT, const char payload)
 {
-	// START - 1 byte
-	// OPCODE - 1 byte
-	// USERID - 8 bytes
-	// PAYLOAD - 256 - bytes
-	// TERMINATE - 1 byte
+	int vFrame[FRAMECOUNT];
+
+	vFrame[OPCODE] = payloadT;
+
+	vFrame[PAYLOADLEN] = strlen(payload);
+
+	vFrame[TERMINATE] = 1;
+
+	PackFrame(vFrame, payload)
 }
 
-void PackFrame(int iFrame, const char payload)
+bool PackFrame(int vFrame, const char payload)
 {
+	// OPCODE - 1 byte
+	// PAYLOADLEN - 3 bytes
+	// PAYLOAD <- INJECTED <- X bytes
+	// TERMINATE - 2 bytes
 
+	int iLen = vFrame[PAYLOADLEN] + 6;
+
+	char sFrame[] = new char[iLen];
+
+	switch (vFrame[OPCODE])
+	{
+		case Ping:
+		{
+			sFrame[0] = 1;
+		}
+		case Message:
+		{
+			sFrame[0] = 2;
+		}
+		default:
+		{
+			LogError('Invalid OPCODE %d', vFrame[OPCODE]);
+			return false;
+		}
+	}
+
+	if (vFrame[PAYLOADLEN] > 999)
+	{
+		LogError('Payload length exceeds 3 bytes');
+		return false;
+	}
+
+	char sLen[3];
+
+	IntToString(vFrame[PAYLOADLEN], sLen, 3);
+
+	strcopy(sFrame[5], 3, sLen);
+
+	strcopy(sFrame[8], iLen - 5, payload);
+
+	Format(sFrame[iLen - 2], 2, "\0");
+
+	return true;
 }
 
 stock bool Client_IsValid(int iClient, bool bAlive = false)
