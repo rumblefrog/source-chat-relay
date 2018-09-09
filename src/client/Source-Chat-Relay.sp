@@ -5,26 +5,14 @@
 #define PLUGIN_AUTHOR "Fishy"
 #define PLUGIN_VERSION "0.0.1"
 
-#define MAX_PAYLOAD_LEN 999
-
 #include <sourcemod>
 #include <socket>
 
 #pragma newdecls required
 
-enum PayloadType
-{
-	Ping,
-	Message,
-	Terminate
-}
-
-enum RelayFrame
-{
-	PayloadType:OPCODE,
-	PAYLOADLEN,
-	TERMINATE,
-	FRAMECOUNT
+enum RelayFrame {
+	Ping = 2,
+	Message = 6
 }
 
 char sHostname[64];
@@ -98,8 +86,8 @@ public void OnConfigsExecuted()
 	for (int i = 0; i < iTotalBindings; i++)
 		iBindings[i] = StringToInt(pBindings[i]);
 	
-	if (!SocketIsConnected(hSocket))
-		ConnectRelay();
+	// if (!SocketIsConnected(hSocket))
+	// 	ConnectRelay();
 }
 
 void ConnectRelay()
@@ -150,10 +138,10 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 	if (!Client_IsValid(client))
 		return;
 		
-	if (!SocketIsConnected(hSocket))
-		return;
+	// if (!SocketIsConnected(hSocket))
+	// 	return;
 		
-	ProcessFrame(Message, "Test");
+	PackMessage(client, sArgs);
 }
 
 bool IsListening(int channel)
@@ -165,64 +153,102 @@ bool IsListening(int channel)
 	return false;
 }
 
-void ProcessFrame(PayloadType payloadT, const char[] payload)
+void PackMessage(int client, const char[] message)
 {
-	int vFrame[RelayFrame];
+	// 15
+	// 64
+	// 32
+	// remaining
+	
+	const int HeaderLen = 111;
+	
+	int iMessageLen = strlen(message);
+	
+	char[] sFrame = new char[HeaderLen + iMessageLen];
+	
+	PackServerIP(sFrame[0], 15);
 
-	vFrame[OPCODE] = payloadT;
-
-	vFrame[PAYLOADLEN] = strlen(payload);
-
-	vFrame[TERMINATE] = 1;
-
-	PackFrame(vFrame, payload);
+	strcopy(sFrame[15], 64, sHostname);
+	
+	char sName[32];
+	
+	GetClientName(client, sName, sizeof sName);
+	
+	strcopy(sFrame[79], 32, sName);
+	
+	strcopy(sFrame[HeaderLen], iMessageLen, message);
+	
+	PackFrame(Message, sFrame);
 }
 
-bool PackFrame(int vFrame[RelayFrame], const char[] payload)
+void PackFrame(RelayFrame opcode, const char[] payload)
 {
-	// OPCODE - 1 byte
-	// PAYLOADLEN - 3 bytes
-	// PAYLOAD <- INJECTED <- X bytes
-	// TERMINATE - 2 bytes
-
-	int iLen = vFrame[PAYLOADLEN] + 6;
-
+	int iPayloadLen = strlen(payload);
+	int iLen = iPayloadLen + view_as<int>(opcode);
+	
 	char[] sFrame = new char[iLen];
-
-	switch (vFrame[OPCODE])
+	
+	switch (opcode)
 	{
 		case Ping:
 		{
-			sFrame[0] = 1;
+			sFrame[0] = '0';
 		}
 		case Message:
 		{
-			sFrame[0] = 2;
-		}
-		default:
-		{
-			LogError("Invalid OPCODE %d", vFrame[OPCODE]);
-			return false;
+			sFrame[0] = '1';
+			
+			if (!PackLength(iPayloadLen, sFrame[1], 4))
+				return;
 		}
 	}
+	
+	sFrame[iLen - 1] = '\0';
+	
+	SendFrame(sFrame);
+	
+	#if defined DEBUG
+	#endif
+}
 
-	if (vFrame[PAYLOADLEN] > MAX_PAYLOAD_LEN)
+bool PackLength(int len, char[] buffer, int buffersize)
+{
+	if (len > 9999)
 	{
-		LogError("Payload length exceeds 3 bytes");
+		LogError("Payload length exceeds maximum length");
 		return false;
 	}
-
-	char sLen[3];
-
-	IntToString(vFrame[PAYLOADLEN], sLen, 3);
-
-	strcopy(sFrame[5], 3, sLen);
-
-	strcopy(sFrame[8], iLen - 5, payload);
-
-	Format(sFrame[iLen - 2], 2, "\0");
-
+	
+	char sLen[4];
+	
+	IntToString(len, sLen, sizeof sLen);		
+	
+	int iPadLen = 4 - strlen(sLen);
+	
+	for (int i = 0; i < iPadLen; i++)
+		Format(buffer, buffersize, "%s%s", buffer, "0");
+	
+	Format(buffer, buffersize, "%s%s", buffer, sLen);
+	
 	return true;
+}
+
+void SendFrame(const char[] frame)
+{
+	PrintToChatAll(frame);
+}
+
+stock char PackServerIP(char[] IP, int size)
+{
+	int pieces[4];
+	int longip = GetConVarInt(FindConVar("hostip"));
+	
+	pieces[0] = (longip >> 24) & 0x000000FF;
+	pieces[1] = (longip >> 16) & 0x000000FF;
+	pieces[2] = (longip >> 8) & 0x000000FF;
+	pieces[3] = longip & 0x000000FF;
+	
+	Format(IP, size, "%d.%d.%d.%d", pieces[0], pieces[1], pieces[2], pieces[3]);
 }
 
 stock bool Client_IsValid(int iClient, bool bAlive = false)
