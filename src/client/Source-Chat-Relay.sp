@@ -155,24 +155,17 @@ bool IsListening(int channel)
 
 void PackMessage(int client, const char[] message)
 {
-	// 15
 	// 64
 	// 32
 	// remaining
 	
-	const int HeaderLen = 112;
+	const int HeaderLen = 97;
 	
 	int iMessageLen = strlen(message);
 	
 	int iFrameLen = HeaderLen + iMessageLen;
 	
 	char[] sFrame = new char[iFrameLen];
-	
-	char sIP[15];
-	
-	PackServerIP(sIP, sizeof sIP);
-	
-	Format(sFrame, iFrameLen, "%s%-15s", sFrame, sIP);
 	
 	Format(sFrame, iFrameLen, "%s%-64s", sFrame, sHostname);
 	
@@ -230,39 +223,18 @@ void SendFrame(const char[] frame)
 	ParseMessageFrame(frame);
 }
 
-void PackServerIP(char[] IP, int size)
-{
-	int pieces[4];
-	int longip = GetConVarInt(FindConVar("hostip"));
-	
-	pieces[0] = (longip >> 24) & 0x000000FF;
-	pieces[1] = (longip >> 16) & 0x000000FF;
-	pieces[2] = (longip >> 8) & 0x000000FF;
-	pieces[3] = longip & 0x000000FF;
-	
-	Format(IP, size, "%d.%d.%d.%d", pieces[0], pieces[1], pieces[2], pieces[3]);
-}
-
 void ParseMessageFrame(const char[] frame)
 {
 	if (frame[0] != '1')
 		return;
 	
-	char ip[15], hostname[64], name[32], len[4];
+	char hostname[64], name[32], len[4];
 	
 	Format(len, sizeof len, "%c%c%c%c", frame[1], frame[2], frame[3], frame[4]);
 	
 	int iLen = strlen(frame);
 	
 	int iOffset = 5;
-	
-	for (int i = 0; i < 15; i++)
-	{
-		Format(ip, sizeof ip, "%s%c", ip, frame[iOffset]);
-		iOffset++;
-	}
-	
-	CleanBuffer(ip, sizeof ip);
 	
 	for (int i = 0; i < 64; i++)
 	{
@@ -291,8 +263,6 @@ void ParseMessageFrame(const char[] frame)
 	}
 	
 	PrintToConsoleAll("===== PARSING =====");
-	
-	PrintToConsoleAll("ip: %s", ip);
 	
 	PrintToConsoleAll("hostname: %s", hostname);
 	
