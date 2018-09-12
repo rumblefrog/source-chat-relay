@@ -153,16 +153,6 @@ bool IsListening(int channel)
 	return false;
 }
 
-void PackBuffer(char[] buffer, int bufferlen, int fieldlen, const char[] content)
-{	
-	int iPadLen = fieldlen - strlen(content);
-	
-	Format(buffer, bufferlen, "%s%s", buffer, content);
-	
-	for (int i = 0; i < iPadLen; i++)
-		Format(buffer, bufferlen, "%s ", buffer);
-}
-
 void PackMessage(int client, const char[] message)
 {
 	// 15
@@ -182,17 +172,17 @@ void PackMessage(int client, const char[] message)
 	
 	PackServerIP(sIP, sizeof sIP);
 	
-	PackBuffer(sFrame, iFrameLen, 15, sIP);
-
-	PackBuffer(sFrame, iFrameLen, 64, sHostname);
+	Format(sFrame, iFrameLen, "%s%-15s", sFrame, sIP);
+	
+	Format(sFrame, iFrameLen, "%s%-64s", sFrame, sHostname);
 	
 	char sName[32];
 	
 	GetClientName(client, sName, sizeof sName);
 	
-	PackBuffer(sFrame, iFrameLen, 32, sName);
+	Format(sFrame, iFrameLen, "%s%-32s", sFrame, sName);
 	
-	PackBuffer(sFrame, iFrameLen, iMessageLen, message);
+	Format(sFrame, iFrameLen, "%s%s", sFrame, message);
 	
 	PackFrame(Message, sFrame);
 }
@@ -214,8 +204,13 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 		{
 			sFrame[0] = '1';
 			
-			if (!PackLength(iPayloadLen, sFrame, iLen))
+			if (iPayloadLen > 9999)
+			{
+				LogError("Payload length exceeds maximum length");
 				return;
+			}
+				
+			Format(sFrame, iLen, "%s%04d", sFrame, iPayloadLen);
 				
 			Format(sFrame, iLen, "%s%s", sFrame, payload);
 		}
@@ -225,28 +220,6 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 	
 	#if defined DEBUG
 	#endif
-}
-
-bool PackLength(int len, char[] buffer, int buffersize)
-{
-	if (len > 9999)
-	{
-		LogError("Payload length exceeds maximum length");
-		return false;
-	}
-	
-	char sLen[4];
-	
-	IntToString(len, sLen, sizeof sLen);
-	
-	int iPadLen = 4 - strlen(sLen);
-	
-	for (int i = 0; i < iPadLen; i++)
-		Format(buffer, buffersize, "%s%s", buffer, "0");
-	
-	Format(buffer, buffersize, "%s%s", buffer, sLen);
-	
-	return true;
 }
 
 void SendFrame(const char[] frame)
@@ -265,7 +238,7 @@ void PackServerIP(char[] IP, int size)
 	pieces[0] = (longip >> 24) & 0x000000FF;
 	pieces[1] = (longip >> 16) & 0x000000FF;
 	pieces[2] = (longip >> 8) & 0x000000FF;
-	pieces[3] = longip & 0x000000FF
+	pieces[3] = longip & 0x000000FF;
 	
 	Format(IP, size, "%d.%d.%d.%d", pieces[0], pieces[1], pieces[2], pieces[3]);
 }
