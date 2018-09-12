@@ -10,6 +10,8 @@
 
 #pragma newdecls required
 
+#define HEADER_LEN 97
+
 enum RelayFrame {
 	Ping = 2,
 	Message = 6
@@ -159,11 +161,9 @@ void PackMessage(int client, const char[] message)
 	// 32
 	// remaining
 	
-	const int HeaderLen = 97;
-	
 	int iMessageLen = strlen(message);
 	
-	int iFrameLen = HeaderLen + iMessageLen;
+	int iFrameLen = HEADER_LEN + iMessageLen;
 	
 	char[] sFrame = new char[iFrameLen];
 	
