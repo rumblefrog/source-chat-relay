@@ -157,15 +157,12 @@ void PackBuffer(char[] buffer, int bufferlen, int fieldlen, const char[] content
 {	
 	int iPadLen = fieldlen - strlen(content);
 	
-	// strcopy(buffer, bufferlen, content);
-	
 	Format(buffer, bufferlen, "%s%s", buffer, content);
 	
 	for (int i = 0; i < iPadLen; i++)
 		Format(buffer, bufferlen, "%s ", buffer);
 }
 
-// sm plugins reload Source-Chat-Relay
 void PackMessage(int client, const char[] message)
 {
 	// 15
@@ -335,7 +332,6 @@ void ParseMessageFrame(const char[] frame)
 	PrintToConsoleAll("===================");
 }
 
-// sm plugins reload Source-Chat-Relay
 void CleanBuffer(char[] buffer, int bufferlen)
 {
 	int iLen = strlen(buffer);
