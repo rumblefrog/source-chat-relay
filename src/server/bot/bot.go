@@ -7,10 +7,8 @@ import (
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
 )
 
-// Session - Initiated session
 var Session *discordgo.Session
 
-// InitBot - Starts the bot routine
 func InitBot() {
 	Session, err := discordgo.New("Bot" + helper.Conf.Token)
 
