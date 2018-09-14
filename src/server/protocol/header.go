@@ -24,3 +24,11 @@ func ParseLength(b []byte) uint16 {
 
 	return uint16(r)
 }
+
+func (h *Header) GetOPCode() OPCODE {
+	return h.OPCode
+}
+
+func (h *Header) GetLength() uint16 {
+	return h.Length
+}
