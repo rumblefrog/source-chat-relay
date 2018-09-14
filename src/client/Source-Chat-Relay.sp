@@ -20,22 +20,12 @@ enum RelayFrame {
 
 char sHostname[64];
 char sHost[64] = "127.0.0.1";
-char sToken[128];
 
 // Randomly selected port
 int iPort = 57452;
-int iChannel = 1;
-int iBindings[128];
-int iTotalBindings;
-
-char sBindings[64];
-char pBindings[128][16];
 
 ConVar cHost;
 ConVar cPort;
-ConVar cToken;
-ConVar cChannel;
-ConVar cBindings;
 
 Handle hSocket;
 
@@ -56,12 +46,6 @@ public void OnPluginStart()
 
 	cPort = CreateConVar("scr_port", "57452", "Relay Server Port", FCVAR_PROTECTED);
 
-	cToken = CreateConVar("scr_token", "", "Relay Server Token", FCVAR_PROTECTED);
-
-	cChannel = CreateConVar("scr_channel", "1", "Channel to send messages on", FCVAR_NONE);
-
-	cBindings = CreateConVar("scr_bindings", "", "Channel(s) to listen for messages on; delimited by comma", FCVAR_NONE);
-
 	AutoExecConfig(true, "Source-Server-Relay");
 
 	hSocket = SocketCreate(SOCKET_TCP, OnSocketError);
@@ -77,17 +61,6 @@ public void OnConfigsExecuted()
 	cHost.GetString(sHost, sizeof sHost);
 	
 	iPort = cPort.IntValue;
-	
-	cToken.GetString(sToken, sizeof sToken);
-	
-	iChannel = cChannel.IntValue;
-	
-	cBindings.GetString(sBindings, sizeof sBindings);
-
-	iTotalBindings = ExplodeString(sBindings, ",", pBindings, sizeof pBindings, sizeof pBindings[]);
-
-	for (int i = 0; i < iTotalBindings; i++)
-		iBindings[i] = StringToInt(pBindings[i]);
 	
 	// if (!SocketIsConnected(hSocket))
 	// 	ConnectRelay();
@@ -145,15 +118,6 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 	// 	return;
 		
 	PackMessage(client, sArgs);
-}
-
-bool IsListening(int channel)
-{
-	for (int i = 0; i < iTotalBindings; i++)
-		if (iBindings[i] == channel)
-			return true;
-			
-	return false;
 }
 
 void PackMessage(int client, const char[] message)
