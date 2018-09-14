@@ -14,7 +14,7 @@
 
 enum RelayFrame {
 	Ping = 2,
-	Message = 6
+	Message = 6,
 	Unknown = 0
 }
 
