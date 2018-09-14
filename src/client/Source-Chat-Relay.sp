@@ -15,6 +15,7 @@
 enum RelayFrame {
 	Ping = 2,
 	Message = 6
+	Unknown = 0
 }
 
 char sHostname[64];

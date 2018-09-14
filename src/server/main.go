@@ -6,7 +6,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/rumblefrog/source-chat-relay/src/server/bot"
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
 	"github.com/rumblefrog/source-chat-relay/src/server/socket"
 )
@@ -16,7 +15,7 @@ func main() {
 
 	socket.InitSocket()
 
-	bot.InitBot()
+	// bot.InitBot()
 
 	log.Println("Server is now running. Press CTRL-C to exit.")
 
@@ -24,7 +23,9 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
-	bot.Session.Close()
+	log.Println("Received exit signal. Terminating.")
 
-	// Socket closing
+	// bot.Session.Close()
+
+	socket.NetListener.Close()
 }

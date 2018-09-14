@@ -1,4 +1,4 @@
-package net
+package protocol
 
 type Message struct {
 	Hostname   string

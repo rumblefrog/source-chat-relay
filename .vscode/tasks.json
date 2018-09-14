@@ -7,10 +7,7 @@
             "label": "Build Client",
             "type": "shell",
             "command": "D:/MegaSync/Projects/Sourcemod/scripting/spcomp.exe src/client/Source-Chat-Relay.sp -o src/client/Source-Chat-Relay.smx",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "problemMatcher": []
         },
         {
