@@ -10,7 +10,7 @@
 
 #pragma newdecls required
 
-#define HEADER_LEN 97
+#define HEADER_LEN 161
 
 enum RelayFrame {
 	Ping = 2,
@@ -157,8 +157,9 @@ bool IsListening(int channel)
 
 void PackMessage(int client, const char[] message)
 {
-	// 64
-	// 32
+	// 64 - Hostname
+	// 64 - ClientID (Snowflake / SteamID64)
+	// 32 - ClientName
 	// remaining
 	
 	int iMessageLen = strlen(message);
@@ -167,11 +168,15 @@ void PackMessage(int client, const char[] message)
 	
 	char[] sFrame = new char[iFrameLen];
 	
+	char sName[32], sID64[64];
+	
 	Format(sFrame, iFrameLen, "%s%-64s", sFrame, sHostname);
 	
-	char sName[32];
+	GetClientAuthId(client, AuthId_SteamID64, sID64, sizeof sID64);
 	
 	GetClientName(client, sName, sizeof sName);
+	
+	Format(sFrame, iFrameLen, "%s%-64s", sFrame, sID64);
 	
 	Format(sFrame, iFrameLen, "%s%-32s", sFrame, sName);
 	
@@ -192,6 +197,7 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 		case Ping:
 		{
 			sFrame[0] = '0';
+			sFrame[1] = '0';
 		}
 		case Message:
 		{
@@ -228,7 +234,7 @@ void ParseMessageFrame(const char[] frame)
 	if (frame[0] != '1')
 		return;
 	
-	char hostname[64], name[32], len[4];
+	char hostname[64], name[32], id64[32], len[4];
 	
 	Format(len, sizeof len, "%c%c%c%c", frame[1], frame[2], frame[3], frame[4]);
 	
@@ -243,6 +249,14 @@ void ParseMessageFrame(const char[] frame)
 	}
 	
 	CleanBuffer(hostname, sizeof hostname);
+	
+	for (int i = 0; i < 64; i++)
+	{
+		Format(id64, sizeof id64, "%s%c", id64, frame[iOffset]);
+		iOffset++;
+	}
+	
+	CleanBuffer(id64, sizeof id64);
 	
 	for (int i = 0; i < 32; i++)
 	{
@@ -265,6 +279,8 @@ void ParseMessageFrame(const char[] frame)
 	PrintToConsoleAll("===== PARSING =====");
 	
 	PrintToConsoleAll("hostname: %s", hostname);
+	
+	PrintToConsoleAll("id64: %s", id64);
 	
 	PrintToConsoleAll("name: %s", name);
 	
