@@ -1,7 +1,6 @@
 package protocol
 
 import (
-	"log"
 	"strings"
 )
 
@@ -20,43 +19,37 @@ type Message struct {
 }
 
 func ParseMessage(b []byte, h *Header) *Message {
-	var (
-		hostname   string
-		clientid   string
-		clientname string
-		content    string
-		offset     = 5
-	)
+	offset := 5
+
+	Message := &Message{}
+
+	Message.Header = h
 
 	for i := 0; i < HostnameLen; i++ {
-		hostname += string(b[offset])
+		Message.Hostname += string(b[offset])
 		offset++
 	}
 
-	log.Println(string(hostname))
-
 	for i := 0; i < ClientIDLen; i++ {
-		clientid += string(b[offset])
+		Message.ClientID += string(b[offset])
 		offset++
 	}
 
 	for i := 0; i < ClientNameLen; i++ {
-		clientname += string(b[offset])
+		Message.ClientName += string(b[offset])
 		offset++
 	}
 
 	for i := 0; i < h.GetPayloadLength()-offset; i++ {
-		content += string(b[offset])
+		Message.Content += string(b[offset])
 		offset++
 	}
 
-	return &Message{
-		Header:     h,
-		Hostname:   strings.TrimSpace(hostname),
-		ClientID:   strings.TrimSpace(clientid),
-		ClientName: strings.TrimSpace(clientname),
-		Content:    string(content),
-	}
+	strings.TrimSpace(Message.Hostname)
+	strings.TrimSpace(Message.ClientID)
+	strings.TrimSpace(Message.ClientName)
+
+	return Message
 }
 
 func (m *Message) GetHostname() string {
