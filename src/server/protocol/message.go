@@ -1,5 +1,10 @@
 package protocol
 
+import (
+	"log"
+	"strings"
+)
+
 const (
 	HostnameLen   = 64
 	ClientIDLen   = 64
@@ -7,38 +12,50 @@ const (
 )
 
 type Message struct {
+	Header     *Header
 	Hostname   string
 	ClientID   string
 	ClientName string
+	Content    string
 }
 
-func ParseMessage(b []byte) *Message {
+func ParseMessage(b []byte, h *Header) *Message {
 	var (
-		hostname   = make([]byte, HostnameLen)
-		clientid   = make([]byte, ClientIDLen)
-		clientname = make([]byte, ClientNameLen)
-		offset     = 0
+		hostname   string
+		clientid   string
+		clientname string
+		content    string
+		offset     = 5
 	)
 
 	for i := 0; i < HostnameLen; i++ {
-		hostname = append(hostname, b[offset])
+		hostname += string(b[offset])
 		offset++
 	}
 
+	log.Println(string(hostname))
+
 	for i := 0; i < ClientIDLen; i++ {
-		clientid = append(clientid, b[offset])
+		clientid += string(b[offset])
 		offset++
 	}
 
 	for i := 0; i < ClientNameLen; i++ {
-		clientname = append(clientname, b[offset])
+		clientname += string(b[offset])
+		offset++
+	}
+
+	for i := 0; i < h.GetPayloadLength()-offset; i++ {
+		content += string(b[offset])
 		offset++
 	}
 
 	return &Message{
-		Hostname:   string(hostname),
-		ClientID:   string(clientid),
-		ClientName: string(clientname),
+		Header:     h,
+		Hostname:   strings.TrimSpace(hostname),
+		ClientID:   strings.TrimSpace(clientid),
+		ClientName: strings.TrimSpace(clientname),
+		Content:    string(content),
 	}
 }
 
@@ -52,4 +69,8 @@ func (m *Message) GetClientID() string {
 
 func (m *Message) GetClientName() string {
 	return m.ClientName
+}
+
+func (m *Message) GetContent() string {
+	return m.Content
 }

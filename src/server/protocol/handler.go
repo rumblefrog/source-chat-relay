@@ -17,6 +17,31 @@ func HandlePacket(conn net.Conn) {
 
 	Header := NewHeader(buffer)
 
-	log.Println("DataLen", reqLen)
-	log.Println("Data", Header)
+	Header.RequestLength = reqLen
+
+	switch Header.GetOPCode() {
+	case MessageFrame:
+		{
+			go HandleMessage(buffer, Header)
+		}
+	case PingFrame:
+		{
+			go HandlePing(Header)
+		}
+	}
+}
+
+func HandleMessage(b []byte, h *Header) {
+	Message := ParseMessage(b, h)
+
+	log.Println(Message.GetClientName())
+
+	// log.Printf("Hostname: %s \n", Message.Hostname)
+	// log.Printf("ID: %s \n", Message.ClientID)
+	// log.Printf("Name: %s \n", Message.ClientName)
+	// log.Printf("Content: %s", Message.Content)
+}
+
+func HandlePing(h *Header) {
+
 }

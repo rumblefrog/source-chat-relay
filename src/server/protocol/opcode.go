@@ -3,9 +3,9 @@ package protocol
 type OPCODE int
 
 const (
-	MessageFrame OPCODE = iota
-	PingFrame    OPCODE = iota
-	UnknownFrame OPCODE = iota
+	PingFrame    OPCODE = 2
+	MessageFrame OPCODE = 6
+	UnknownFrame OPCODE = 0
 )
 
 func GetOPCode(b byte) OPCODE {

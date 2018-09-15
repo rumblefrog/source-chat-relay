@@ -13,13 +13,14 @@
 #define HEADER_LEN 161
 
 enum RelayFrame {
-	Ping = 2,
-	Message = 6,
+	Ping = 1,
+	Message = 5,
 	Unknown = 0
 }
 
 char sHostname[64];
-char sHost[64] = "127.0.0.1";
+//TODO: Change to 127.1
+char sHost[64] = "192.168.86.106";
 
 // Randomly selected port
 int iPort = 57452;
@@ -42,7 +43,8 @@ public void OnPluginStart()
 {
 	CreateConVar("sm_scr_version", PLUGIN_VERSION, "Source Chat Relay Version", FCVAR_REPLICATED | FCVAR_SPONLY | FCVAR_DONTRECORD | FCVAR_NOTIFY);
 
-	cHost = CreateConVar("scr_host", "127.0.0.1", "Relay Server Host", FCVAR_PROTECTED);
+	//TODO: Change to 127.1
+	cHost = CreateConVar("scr_host", "192.168.86.106", "Relay Server Host", FCVAR_PROTECTED);
 
 	cPort = CreateConVar("scr_port", "57452", "Relay Server Port", FCVAR_PROTECTED);
 
@@ -52,6 +54,7 @@ public void OnPluginStart()
 
 	SocketSetOption(hSocket, SocketReuseAddr, 1);
 	SocketSetOption(hSocket, SocketKeepAlive, 1);
+	SocketSetOption(hSocket, DebugMode, 1);
 }
 
 public void OnConfigsExecuted()
@@ -62,8 +65,8 @@ public void OnConfigsExecuted()
 	
 	iPort = cPort.IntValue;
 	
-	// if (!SocketIsConnected(hSocket))
-	// 	ConnectRelay();
+	if (!SocketIsConnected(hSocket))
+		ConnectRelay();
 }
 
 void ConnectRelay()
@@ -81,7 +84,9 @@ public Action Timer_Reconnect(Handle timer)
 
 void StartReconnectTimer()
 {
-	SocketDisconnect(hSocket);
+	if (SocketIsConnected(hSocket))
+		SocketDisconnect(hSocket);
+		
 	CreateTimer(10.0, Timer_Reconnect);
 }
 
@@ -114,8 +119,8 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 	if (!Client_IsValid(client))
 		return;
 		
-	// if (!SocketIsConnected(hSocket))
-	// 	return;
+	if (!SocketIsConnected(hSocket))
+		return;
 		
 	PackMessage(client, sArgs);
 }
@@ -162,7 +167,6 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 		case Ping:
 		{
 			sFrame[0] = '0';
-			sFrame[1] = '0';
 		}
 		case Message:
 		{
@@ -188,6 +192,8 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 
 void SendFrame(const char[] frame)
 {
+	SocketSend(hSocket, frame);
+	
 	PrintToConsoleAll(frame);
 	
 	// Testing if message can be de-constructed successfully
@@ -262,7 +268,7 @@ void CleanBuffer(char[] buffer, int bufferlen)
 
 	int iOffset = iLen;
 	
-	for (int i = iLen; i > 0; i--)
+	for (int i = iLen - 1; i > 0; i--)
 	{
 		if (buffer[i] != ' ')
 		{
