@@ -3,8 +3,8 @@ package protocol
 type OPCODE int
 
 const (
-	PingFrame    OPCODE = 2
-	MessageFrame OPCODE = 6
+	PingFrame    OPCODE = 1
+	MessageFrame OPCODE = 5
 	UnknownFrame OPCODE = 0
 )
 
