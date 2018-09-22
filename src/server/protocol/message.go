@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -50,6 +51,18 @@ func ParseMessage(b []byte, h *Header) *Message {
 	strings.TrimSpace(Message.ClientName)
 
 	return Message
+}
+
+func (m *Message) ToString() (buffer string) {
+	buffer += fmt.Sprintf("%s%-64s", buffer, m.Hostname)
+
+	buffer += fmt.Sprintf("%s%-64s", buffer, m.ClientID)
+
+	buffer += fmt.Sprintf("%s%-32s", buffer, m.ClientName)
+
+	buffer += fmt.Sprintf("%s%s", buffer, m.Content)
+
+	return
 }
 
 func (m *Message) GetHostname() string {
