@@ -205,7 +205,7 @@ void ParseMessageFrame(const char[] frame)
 	if (frame[0] != '1')
 		return;
 	
-	char hostname[65], id64[65], name[33], len[5];
+	char hostname[64], id64[64], name[32], len[5];
 	
 	Format(len, sizeof len, "%c%c%c%c", frame[1], frame[2], frame[3], frame[4]);
 	

@@ -17,7 +17,6 @@ type Message struct {
 	ClientID   string
 	ClientName string
 	Content    string
-	Channels   []int
 }
 
 func ParseMessage(b []byte, h *Header) *Message {

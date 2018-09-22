@@ -16,9 +16,10 @@ type ClientManager struct {
 }
 
 type Client struct {
-	Socket   net.Conn
-	Data     chan []byte
-	Channels []int
+	Socket          net.Conn
+	Data            chan []byte
+	SendChannels    []int
+	ReceiveChannels []int
 }
 
 func (manager *ClientManager) Start() {
@@ -88,8 +89,8 @@ func (manager *ClientManager) Send(client *Client) {
 	}
 }
 
-func (client *Client) HasChannel(channels []int) bool {
-	for c := range client.Channels {
+func (client *Client) CanReceive(channels []int) bool {
+	for c := range client.ReceiveChannels {
 		for c1 := range channels {
 			if c == c1 {
 				return true
