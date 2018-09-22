@@ -6,9 +6,26 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type Config struct {
+type GeneralConfig struct {
+	Port int `toml:"Port"`
+}
+
+type BotConfig struct {
 	Token string `toml:"Token"`
-	Port  int    `toml:"Port"`
+}
+
+type DatabaseConfig struct {
+	Host     string `toml:"Host"`
+	Username string `toml:"Username"`
+	Password string `toml:"Password"`
+	Database string `toml:"Database"`
+	Port     int    `toml:"Port"`
+}
+
+type Config struct {
+	General  GeneralConfig
+	Bot      BotConfig
+	Database DatabaseConfig
 }
 
 var Conf Config

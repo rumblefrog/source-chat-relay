@@ -10,7 +10,7 @@ import (
 var Session *discordgo.Session
 
 func InitBot() {
-	Session, err := discordgo.New("Bot" + helper.Conf.Token)
+	Session, err := discordgo.New("Bot" + helper.Conf.Bot.Token)
 
 	if err != nil {
 		log.Panic("Unable to initiate bot session")

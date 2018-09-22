@@ -14,7 +14,7 @@ var NetListener net.Listener
 func InitSocket() {
 	var err error
 
-	NetListener, err = net.Listen("tcp", fmt.Sprintf(":%d", helper.Conf.Port))
+	NetListener, err = net.Listen("tcp", fmt.Sprintf(":%d", helper.Conf.General.Port))
 
 	if err != nil {
 		log.Panic("Unable to start socket server", err)
@@ -32,6 +32,8 @@ func AcceptConnections() {
 			log.Println("Unable to accept connection", err)
 			return
 		}
+
+		// TODO:? Keep a record of Channel keyed map[string]slice of all channels & clients
 
 		go protocol.HandlePacket(conn)
 	}
