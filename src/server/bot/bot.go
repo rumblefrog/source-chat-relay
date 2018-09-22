@@ -45,5 +45,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// Create fake Client for Message
+
 	// Send to router directly aftering constructing struct
 }
