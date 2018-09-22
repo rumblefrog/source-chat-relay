@@ -31,4 +31,6 @@ func main() {
 	// bot.Session.Close()
 
 	socket.NetListener.Close()
+
+	storage.DBConnection.Close()
 }
