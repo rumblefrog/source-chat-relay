@@ -8,10 +8,13 @@ import (
 
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
 	"github.com/rumblefrog/source-chat-relay/src/server/socket"
+	"github.com/rumblefrog/source-chat-relay/src/server/storage"
 )
 
 func main() {
 	helper.LoadConfig()
+
+	storage.InitDB()
 
 	socket.InitSocket()
 
