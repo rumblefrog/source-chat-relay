@@ -6,14 +6,15 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/rumblefrog/source-chat-relay/src/server/database"
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
-	"github.com/rumblefrog/source-chat-relay/src/server/storage"
+	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
 )
 
 func main() {
 	helper.LoadConfig()
 
-	storage.InitDB()
+	database.InitDB()
 
 	protocol.InitSocket()
 
@@ -27,9 +28,9 @@ func main() {
 
 	log.Println("Received exit signal. Terminating.")
 
-	// bot.Session.Close()
+	// bot.RelayBot.Close()
 
 	protocol.NetListener.Close()
 
-	storage.DBConnection.Close()
+	database.DBConnection.Close()
 }

@@ -5,23 +5,34 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
+	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
 )
 
-var Session *discordgo.Session
+type DiscordBot struct {
+	Session *discordgo.Session
+	Data    chan *protocol.Message
+}
+
+var RelayBot *DiscordBot
 
 func InitBot() {
-	Session, err := discordgo.New("Bot" + helper.Conf.Bot.Token)
+	session, err := discordgo.New("Bot" + helper.Conf.Bot.Token)
 
 	if err != nil {
 		log.Panic("Unable to initiate bot session")
 	}
 
-	Session.AddHandler(messageCreate)
+	session.AddHandler(messageCreate)
 
-	err = Session.Open()
+	err = session.Open()
 
 	if err != nil {
 		log.Panic("Unable to open bot connection")
+	}
+
+	RelayBot = &DiscordBot{
+		Session: session,
+		Data:    make(chan *protocol.Message),
 	}
 
 	log.Println("Bot is now running")
@@ -34,4 +45,5 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// Send to router directly aftering constructing struct
 }

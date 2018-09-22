@@ -8,7 +8,10 @@ import (
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
 )
 
-var NetListener net.Listener
+var (
+	NetListener net.Listener
+	NetManager  *ClientManager
+)
 
 func InitSocket() {
 	var err error
@@ -24,7 +27,7 @@ func InitSocket() {
 }
 
 func AcceptConnections() {
-	manager := ClientManager{
+	NetManager := &ClientManager{
 		Clients:    make(map[*Client]bool),
 		Broadcast:  make(chan []byte),
 		Router:     make(chan *Message),
@@ -32,7 +35,7 @@ func AcceptConnections() {
 		Unregister: make(chan *Client),
 	}
 
-	go manager.Start()
+	go NetManager.Start()
 
 	for {
 		conn, err := NetListener.Accept()
@@ -51,10 +54,10 @@ func AcceptConnections() {
 
 		// TODO: Look up in data for the server's channels
 
-		manager.Register <- client
+		NetManager.Register <- client
 
-		go manager.Receive(client)
+		go NetManager.Receive(client)
 
-		go manager.Send(client)
+		go NetManager.Send(client)
 	}
 }
