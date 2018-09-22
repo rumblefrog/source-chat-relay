@@ -1,4 +1,4 @@
-package socket
+package protocol
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"net"
 
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
-	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
 )
 
 var NetListener net.Listener
@@ -28,7 +27,7 @@ func AcceptConnections() {
 	manager := ClientManager{
 		Clients:    make(map[*Client]bool),
 		Broadcast:  make(chan []byte),
-		Router:     make(chan []protocol.Message),
+		Router:     make(chan *Message),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 	}
@@ -57,7 +56,5 @@ func AcceptConnections() {
 		go manager.Receive(client)
 
 		go manager.Send(client)
-
-		go protocol.HandlePacket(conn)
 	}
 }

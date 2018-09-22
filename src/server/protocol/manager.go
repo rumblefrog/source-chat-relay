@@ -1,16 +1,14 @@
-package socket
+package protocol
 
 import (
 	"fmt"
 	"net"
-
-	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
 )
 
 type ClientManager struct {
 	Clients    map[*Client]bool
 	Broadcast  chan []byte
-	Router     chan []protocol.Message
+	Router     chan *Message
 	Register   chan *Client
 	Unregister chan *Client
 }
@@ -41,7 +39,12 @@ func (manager *ClientManager) Start() {
 					delete(manager.Clients, connection)
 				}
 			}
-			// case message := <-manager.Router:
+		case message := <-manager.Router:
+			for connection := range manager.Clients {
+				if connection.CanReceive(message.Header.Sender.SendChannels) {
+					connection.Data <- []byte(message.ToString())
+				}
+			}
 		}
 	}
 }
@@ -58,18 +61,20 @@ func (manager *ClientManager) Receive(client *Client) {
 		if length > 0 {
 			fmt.Println("RECEIVED: " + string(message))
 
-			Header := protocol.NewHeader(message)
+			Header := NewHeader(message)
+
+			Header.Sender = client
 
 			Header.RequestLength = length
 
 			switch Header.GetOPCode() {
-			case protocol.MessageFrame:
+			case MessageFrame:
 				{
-					go protocol.HandleMessage(message, Header)
+					go HandleMessage(message, Header)
 				}
-			case protocol.PingFrame:
+			case PingFrame:
 				{
-					go protocol.HandlePing(Header)
+					go HandlePing(Header)
 				}
 			}
 		}

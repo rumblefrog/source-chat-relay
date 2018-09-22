@@ -6,6 +6,7 @@ import (
 )
 
 type Header struct {
+	Sender        *Client
 	OPCode        OPCODE
 	RequestLength int
 	PayloadLength int

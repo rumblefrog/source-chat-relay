@@ -7,7 +7,6 @@ import (
 	"syscall"
 
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
-	"github.com/rumblefrog/source-chat-relay/src/server/socket"
 	"github.com/rumblefrog/source-chat-relay/src/server/storage"
 )
 
@@ -16,7 +15,7 @@ func main() {
 
 	storage.InitDB()
 
-	socket.InitSocket()
+	protocol.InitSocket()
 
 	// bot.InitBot()
 
@@ -30,7 +29,7 @@ func main() {
 
 	// bot.Session.Close()
 
-	socket.NetListener.Close()
+	protocol.NetListener.Close()
 
 	storage.DBConnection.Close()
 }
