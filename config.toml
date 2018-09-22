@@ -1,12 +1,12 @@
-[[General]]
+[General]
 Port = 57452 # Port to start the socket server on
 
-[[Bot]]
+[Bot]
 Token = "BotToken" # The Bot's Token
 
-[[Database]]
+[Database]
 Host = "127.0.0.1" # MySQL Database Host
-Username = "fishy" # MySQL Database Username
-Password = "fish!" # MySQL User Password
+Username = "root" # MySQL Database Username
+Password = "" # MySQL User Password
 Database = "relay" # MySQL Database To Use
-Port = "3306" # MySQL Server Port
+Port = 3306 # MySQL Server Port

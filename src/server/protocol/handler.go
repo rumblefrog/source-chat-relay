@@ -36,6 +36,8 @@ func HandleMessage(b []byte, h *Header) {
 
 	log.Println(Message.GetClientName())
 
+	//TODO: Obtain channels & store in msg struct
+
 	// log.Printf("Hostname: %s \n", Message.Hostname)
 	// log.Printf("ID: %s \n", Message.ClientID)
 	// log.Printf("Name: %s \n", Message.ClientName)

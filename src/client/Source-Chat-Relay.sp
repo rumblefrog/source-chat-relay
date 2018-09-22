@@ -158,7 +158,7 @@ void PackMessage(int client, const char[] message)
 void PackFrame(RelayFrame opcode, const char[] payload)
 {
 	int iPayloadLen = strlen(payload);
-	int iLen = iPayloadLen + view_as<int>(opcode);
+	int iLen = iPayloadLen + view_as<int>(opcode) + 1;
 	
 	char[] sFrame = new char[iLen];
 	
@@ -205,7 +205,7 @@ void ParseMessageFrame(const char[] frame)
 	if (frame[0] != '1')
 		return;
 	
-	char hostname[64], id64[64], name[32], len[4];
+	char hostname[65], id64[65], name[33], len[5];
 	
 	Format(len, sizeof len, "%c%c%c%c", frame[1], frame[2], frame[3], frame[4]);
 	
@@ -249,6 +249,8 @@ void ParseMessageFrame(const char[] frame)
 	
 	PrintToConsoleAll("===== PARSING =====");
 	
+	PrintToConsoleAll("Len: %s", len);
+	
 	PrintToConsoleAll("hostname: %s", hostname);
 	
 	PrintToConsoleAll("id64: %s", id64);
@@ -268,7 +270,7 @@ void CleanBuffer(char[] buffer, int bufferlen)
 
 	int iOffset = iLen;
 	
-	for (int i = iLen - 1; i > 0; i--)
+	for (int i = iLen; i > 0; i--)
 	{
 		if (buffer[i] != ' ')
 		{

@@ -25,6 +25,16 @@ func InitSocket() {
 }
 
 func AcceptConnections() {
+	manager := ClientManager{
+		Clients:    make(map[*Client]bool),
+		Broadcast:  make(chan []byte),
+		Router:     make(chan []protocol.Message),
+		Register:   make(chan *Client),
+		Unregister: make(chan *Client),
+	}
+
+	go manager.Start()
+
 	for {
 		conn, err := NetListener.Accept()
 
@@ -33,7 +43,20 @@ func AcceptConnections() {
 			return
 		}
 
-		// TODO:? Keep a record of Channel keyed map[string]slice of all channels & clients
+		log.Println(fmt.Sprintf("%s connected", conn.RemoteAddr()))
+
+		client := &Client{
+			Socket: conn,
+			Data:   make(chan []byte),
+		}
+
+		// TODO: Look up in data for the server's channels
+
+		manager.Register <- client
+
+		go manager.Receive(client)
+
+		go manager.Send(client)
 
 		go protocol.HandlePacket(conn)
 	}
