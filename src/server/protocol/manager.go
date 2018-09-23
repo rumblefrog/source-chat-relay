@@ -63,20 +63,20 @@ func (manager *ClientManager) RegisterClient(client *Client) {
 
 	data := database.RelayEntities{}
 
-	err = querystmt.QueryRow(client.Socket.RemoteAddr()).Scan(&data)
+	err = querystmt.QueryRow(client.Socket.RemoteAddr().String()).Scan(&data)
 
 	if err == sql.ErrNoRows {
 		insertstmt, err := database.DBConnection.Prepare("INSERT INTO `relay_entities` (`source`) VALUES (?)")
 
 		if err != nil {
-			log.Panic("Failed to prepare create client statement")
+			log.Panic("Failed to prepare create client statement", err)
 			return
 		}
 
-		_, err = insertstmt.Exec()
+		_, err = insertstmt.Exec(client.Socket.RemoteAddr().String())
 
 		if err != nil {
-			log.Panic("Failed to create client in database")
+			log.Panic("Failed to create client in database", err)
 			return
 		}
 
@@ -84,7 +84,7 @@ func (manager *ClientManager) RegisterClient(client *Client) {
 
 		return
 	} else if err != nil {
-		log.Panic("Failed to query to register client")
+		log.Panic("Failed to query to register client", err)
 		return
 	}
 
@@ -97,7 +97,7 @@ func (manager *ClientManager) RegisterClient(client *Client) {
 
 func (manager *ClientManager) Receive(client *Client) {
 	for {
-		message := make([]byte, 2048)
+		message := make([]byte, 4096)
 		length, err := client.Socket.Read(message)
 		if err != nil {
 			manager.Unregister <- client

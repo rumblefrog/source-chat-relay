@@ -20,6 +20,8 @@ func InitDB() {
 
 	c.Passwd = helper.Conf.Database.Password
 
+	c.DBName = helper.Conf.Database.Database
+
 	c.Collation = "utf8mb4_general_ci"
 
 	c.ParseTime = true

@@ -20,7 +20,7 @@ type Message struct {
 }
 
 func ParseMessage(b []byte, h *Header) *Message {
-	offset := 5
+	offset := 2
 
 	Message := &Message{}
 
@@ -41,7 +41,7 @@ func ParseMessage(b []byte, h *Header) *Message {
 		offset++
 	}
 
-	for i := 0; i < h.GetPayloadLength()-offset; i++ {
+	for i := 0; i < h.GetRequestLength()-offset; i++ {
 		Message.Content += string(b[offset])
 		offset++
 	}

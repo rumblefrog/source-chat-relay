@@ -3,9 +3,11 @@ package protocol
 type OPCODE int
 
 const (
-	PingFrame    OPCODE = 1
-	MessageFrame OPCODE = 5
-	UnknownFrame OPCODE = 0
+	PingFrame              OPCODE = iota // 0
+	AuthenticateFrame      OPCODE = iota // 1
+	AuthenticateReplyFrame OPCODE = iota // 2
+	MessageFrame           OPCODE = iota // 3
+	UnknownFrame           OPCODE = iota
 )
 
 func GetOPCode(b byte) OPCODE {
@@ -15,6 +17,14 @@ func GetOPCode(b byte) OPCODE {
 			return PingFrame
 		}
 	case '1':
+		{
+			return AuthenticateFrame
+		}
+	case '2':
+		{
+			return AuthenticateReplyFrame
+		}
+	case '3':
 		{
 			return MessageFrame
 		}

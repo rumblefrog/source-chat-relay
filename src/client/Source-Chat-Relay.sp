@@ -13,9 +13,12 @@
 #define HEADER_LEN 161
 
 enum RelayFrame {
-	Ping = 1,
-	Message = 5,
-	Unknown = 0
+	Ping,
+	Authenticate,
+	AuthenticateReplyFrame,
+	Message,
+	FrameCount,
+	Unknown
 }
 
 char sHostname[64];
@@ -158,7 +161,7 @@ void PackMessage(int client, const char[] message)
 void PackFrame(RelayFrame opcode, const char[] payload)
 {
 	int iPayloadLen = strlen(payload);
-	int iLen = iPayloadLen + view_as<int>(opcode) + 1;
+	int iLen = iPayloadLen + 2;
 	
 	char[] sFrame = new char[iLen];
 	
@@ -168,17 +171,13 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 		{
 			sFrame[0] = '0';
 		}
-		case Message:
+		case Authenticate:
 		{
 			sFrame[0] = '1';
-			
-			if (iPayloadLen > 9999)
-			{
-				LogError("Payload length exceeds maximum length");
-				return;
-			}
-				
-			Format(sFrame, iLen, "%s%04d", sFrame, iPayloadLen);
+		}
+		case Message:
+		{
+			sFrame[0] = '4';
 				
 			Format(sFrame, iLen, "%s%s", sFrame, payload);
 		}
@@ -205,13 +204,11 @@ void ParseMessageFrame(const char[] frame)
 	if (frame[0] != '1')
 		return;
 	
-	char hostname[64], id64[64], name[32], len[5];
-	
-	Format(len, sizeof len, "%c%c%c%c", frame[1], frame[2], frame[3], frame[4]);
+	char hostname[64], id64[64], name[32];
 	
 	int iLen = strlen(frame);
 	
-	int iOffset = 5;
+	int iOffset = 2;
 	
 	for (int i = 0; i < 64; i++)
 	{
@@ -248,8 +245,6 @@ void ParseMessageFrame(const char[] frame)
 	}
 	
 	PrintToConsoleAll("===== PARSING =====");
-	
-	PrintToConsoleAll("Len: %s", len);
 	
 	PrintToConsoleAll("hostname: %s", hostname);
 	
