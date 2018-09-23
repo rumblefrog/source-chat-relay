@@ -125,7 +125,13 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 	if (!SocketIsConnected(hSocket))
 		return;
 		
-	PackMessage(client, sArgs);
+	char buffer[256];
+	
+	Format(buffer, sizeof buffer, "%s", sArgs);
+	
+	EscapeBreak(buffer, sizeof buffer);
+		
+	PackMessage(client, buffer);
 }
 
 void PackMessage(int client, const char[] message)
@@ -161,7 +167,7 @@ void PackMessage(int client, const char[] message)
 void PackFrame(RelayFrame opcode, const char[] payload)
 {
 	int iPayloadLen = strlen(payload);
-	int iLen = iPayloadLen + 2;
+	int iLen = iPayloadLen + 4;
 	
 	char[] sFrame = new char[iLen];
 	
@@ -183,10 +189,9 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 		}
 	}
 	
-	SendFrame(sFrame);
+	Format(sFrame, iLen, "%s\n", sFrame);
 	
-	#if defined DEBUG
-	#endif
+	SendFrame(sFrame);
 }
 
 void SendFrame(const char[] frame)
@@ -282,6 +287,11 @@ void CleanBuffer(char[] buffer, int bufferlen)
 		Format(sBuffer, iEnd, "%s%c", sBuffer, buffer[i]);
 	
 	Format(buffer, bufferlen, "%s", sBuffer);
+}
+
+void EscapeBreak(char[] buffer, int buffersize)
+{
+	ReplaceString(buffer, buffersize, "\n", "\\n", false);
 }
 
 stock bool Client_IsValid(int iClient, bool bAlive = false)
