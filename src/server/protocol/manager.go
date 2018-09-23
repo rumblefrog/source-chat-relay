@@ -1,8 +1,12 @@
 package protocol
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"net"
+
+	"github.com/rumblefrog/source-chat-relay/src/server/database"
 )
 
 type ClientManager struct {
@@ -24,7 +28,7 @@ func (manager *ClientManager) Start() {
 	for {
 		select {
 		case connection := <-manager.Register:
-			manager.Clients[connection] = true
+			manager.RegisterClient(connection)
 		case connection := <-manager.Unregister:
 			if _, ok := manager.Clients[connection]; ok {
 				close(connection.Data)
@@ -49,6 +53,48 @@ func (manager *ClientManager) Start() {
 	}
 }
 
+func (manager *ClientManager) RegisterClient(client *Client) {
+	querystmt, err := database.DBConnection.Prepare("SELECT * FROM `relay_entities` WHERE `source` = ? AND `type` = 0")
+
+	if err != nil {
+		log.Panic("Failed to prepare query to register client")
+		return
+	}
+
+	data := database.RelayEntities{}
+
+	err = querystmt.QueryRow(client.Socket.RemoteAddr()).Scan(&data)
+
+	if err == sql.ErrNoRows {
+		insertstmt, err := database.DBConnection.Prepare("INSERT INTO `relay_entities` (`source`) VALUES (?)")
+
+		if err != nil {
+			log.Panic("Failed to prepare create client statement")
+			return
+		}
+
+		_, err = insertstmt.Exec()
+
+		if err != nil {
+			log.Panic("Failed to create client in database")
+			return
+		}
+
+		manager.Clients[client] = true
+
+		return
+	} else if err != nil {
+		log.Panic("Failed to query to register client")
+		return
+	}
+
+	client.ReceiveChannels = database.ParseChannels(data.ReceiveChannels)
+
+	client.SendChannels = database.ParseChannels(data.SendChannels)
+
+	manager.Clients[client] = true
+}
+
 func (manager *ClientManager) Receive(client *Client) {
 	for {
 		message := make([]byte, 2048)
@@ -59,6 +105,7 @@ func (manager *ClientManager) Receive(client *Client) {
 			break
 		}
 		if length > 0 {
+			// TODO: Remove
 			fmt.Println("RECEIVED: " + string(message))
 
 			Header := NewHeader(message)

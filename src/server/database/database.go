@@ -22,6 +22,8 @@ func InitDB() {
 
 	c.Collation = "utf8mb4_general_ci"
 
+	c.ParseTime = true
+
 	var err error
 
 	DBConnection, err = sql.Open("mysql", c.FormatDSN())
@@ -29,4 +31,6 @@ func InitDB() {
 	if err != nil {
 		log.Panic("Unable to connect to database")
 	}
+
+	CreateTables(DBConnection)
 }
