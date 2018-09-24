@@ -26,25 +26,19 @@ func ParseMessage(b []byte, h *Header) *Message {
 
 	Message.Header = h
 
-	for i := 0; i < HostnameLen; i++ {
-		Message.Hostname += string(b[offset])
-		offset++
-	}
+	Message.Hostname = string(b[offset : offset+HostnameLen])
 
-	for i := 0; i < ClientIDLen; i++ {
-		Message.ClientID += string(b[offset])
-		offset++
-	}
+	offset += HostnameLen
 
-	for i := 0; i < ClientNameLen; i++ {
-		Message.ClientName += string(b[offset])
-		offset++
-	}
+	Message.ClientID = string(b[offset : offset+ClientIDLen])
 
-	for i := 0; i < h.GetRequestLength()-offset; i++ {
-		Message.Content += string(b[offset])
-		offset++
-	}
+	offset += ClientIDLen
+
+	Message.ClientName = string(b[offset : offset+ClientNameLen])
+
+	offset += ClientNameLen
+
+	Message.Content = string(b[offset:])
 
 	strings.TrimSpace(Message.Hostname)
 	strings.TrimSpace(Message.ClientID)
