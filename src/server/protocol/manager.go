@@ -20,6 +20,7 @@ type ClientManager struct {
 type Client struct {
 	Socket          net.Conn
 	Data            chan []byte
+	Token           string
 	SendChannels    []int
 	ReceiveChannels []int
 }
@@ -28,7 +29,7 @@ func (manager *ClientManager) Start() {
 	for {
 		select {
 		case connection := <-manager.Register:
-			manager.RegisterClient(connection)
+			manager.Clients[connection] = true
 		case connection := <-manager.Unregister:
 			if _, ok := manager.Clients[connection]; ok {
 				close(connection.Data)
@@ -46,14 +47,19 @@ func (manager *ClientManager) Start() {
 		case message := <-manager.Router:
 			for connection := range manager.Clients {
 				if connection.CanReceive(message.Header.Sender.SendChannels) {
-					connection.Data <- []byte(message.ToString())
+					select {
+					case connection.Data <- []byte(message.ToString()):
+					default:
+						close(connection.Data)
+						delete(manager.Clients, connection)
+					}
 				}
 			}
 		}
 	}
 }
 
-func (manager *ClientManager) RegisterClient(client *Client) {
+func (manager *ClientManager) RegisterClient(client *Client, token []byte) {
 	querystmt, err := database.DBConnection.Prepare("SELECT * FROM `relay_entities` WHERE `source` = ? AND `type` = 0")
 
 	if err != nil {
@@ -63,7 +69,7 @@ func (manager *ClientManager) RegisterClient(client *Client) {
 
 	data := database.RelayEntities{}
 
-	err = querystmt.QueryRow(client.Socket.RemoteAddr().String()).Scan(&data)
+	err = querystmt.QueryRow(string(token)).Scan(&data)
 
 	if err == sql.ErrNoRows {
 		insertstmt, err := database.DBConnection.Prepare("INSERT INTO `relay_entities` (`source`) VALUES (?)")
@@ -73,7 +79,7 @@ func (manager *ClientManager) RegisterClient(client *Client) {
 			return
 		}
 
-		_, err = insertstmt.Exec(client.Socket.RemoteAddr().String())
+		_, err = insertstmt.Exec(string(token))
 
 		if err != nil {
 			log.Panic("Failed to create client in database", err)
@@ -115,13 +121,13 @@ func (manager *ClientManager) Receive(client *Client) {
 			Header.RequestLength = length
 
 			switch Header.GetOPCode() {
+			case AuthenticateFrame:
+				{
+					go manager.RegisterClient(client, message[1:])
+				}
 			case MessageFrame:
 				{
-					go HandleMessage(message, Header)
-				}
-			case PingFrame:
-				{
-					go HandlePing(Header)
+					go manager.HandleMessage(message, Header)
 				}
 			}
 		}

@@ -13,7 +13,7 @@ var (
 	NetManager  *ClientManager
 )
 
-func InitSocket() {
+func init() {
 	var err error
 
 	NetListener, err = net.Listen("tcp", fmt.Sprintf(":%d", helper.Conf.General.Port))

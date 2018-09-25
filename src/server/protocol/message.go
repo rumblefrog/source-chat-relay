@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -17,6 +18,19 @@ type Message struct {
 	ClientID   string
 	ClientName string
 	Content    string
+}
+
+func (m *ClientManager) HandleMessage(b []byte, h *Header) {
+	Message := ParseMessage(b, h)
+
+	log.Println(Message.GetClientName())
+
+	// TODO: Send to router & bot chan
+
+	// log.Printf("Hostname: %s \n", Message.Hostname)
+	// log.Printf("ID: %s \n", Message.ClientID)
+	// log.Printf("Name: %s \n", Message.ClientName)
+	// log.Printf("Content: %s", Message.Content)
 }
 
 func ParseMessage(b []byte, h *Header) *Message {

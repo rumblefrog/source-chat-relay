@@ -11,7 +11,7 @@ import (
 
 var DBConnection *sql.DB
 
-func InitDB() {
+func init() {
 	c := mysql.NewConfig()
 
 	c.Addr = fmt.Sprintf("%s:%d", helper.Conf.Database.Host, helper.Conf.Database.Port)

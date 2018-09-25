@@ -30,10 +30,8 @@ type Config struct {
 
 var Conf Config
 
-func LoadConfig() *Config {
+func init() {
 	if _, err := toml.DecodeFile("config.toml", &Conf); err != nil {
 		log.Panic(err)
 	}
-
-	return &Conf
 }

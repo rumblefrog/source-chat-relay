@@ -15,6 +15,7 @@ type DiscordBot struct {
 
 var RelayBot *DiscordBot
 
+// TODO: rename to init
 func InitBot() {
 	session, err := discordgo.New("Bot" + helper.Conf.Bot.Token)
 

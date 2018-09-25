@@ -3,27 +3,16 @@ package protocol
 type OPCODE int
 
 const (
-	PingFrame         OPCODE = iota // 0
-	AuthenticateFrame OPCODE = iota // 1
-	MessageFrame      OPCODE = iota // 2
-	UnknownFrame      OPCODE = iota
+	PingFrame OPCODE = iota // 0
+	AuthenticateFrame
+	MessageFrame
+	UnknownFrame
 )
 
 func GetOPCode(b byte) OPCODE {
-	switch b {
-	case '0':
-		{
-			return PingFrame
-		}
-	case '1':
-		{
-			return AuthenticateFrame
-		}
-	case '2':
-		{
-			return MessageFrame
-		}
+	if OPCODE(b) >= UnknownFrame {
+		return UnknownFrame
 	}
 
-	return UnknownFrame
+	return OPCODE(b)
 }
