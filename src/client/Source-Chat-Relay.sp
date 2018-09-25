@@ -15,15 +15,14 @@
 enum RelayFrame {
 	Ping,
 	Authenticate,
-	AuthenticateReplyFrame,
 	Message,
-	FrameCount,
 	Unknown
 }
 
 char sHostname[64];
 //TODO: Change to 127.1
 char sHost[64] = "192.168.86.106";
+char sToken[64];
 
 // Randomly selected port
 int iPort = 57452;
@@ -70,6 +69,31 @@ public void OnConfigsExecuted()
 	
 	if (!SocketIsConnected(hSocket))
 		ConnectRelay();
+		
+	char sPath[PLATFORM_MAX_PATH];
+	
+	BuildPath(Path_SM, sPath, sizeof sPath, "data/scr.data");
+	
+	if (FileExists(sPath, false))
+	{
+		File tFile = OpenFile(sPath, "r", false);
+		
+		tFile.ReadString(sToken, sizeof sToken, -1);
+		
+		delete tFile;
+		
+		return;
+	}
+	
+	File tFile = OpenFile(sPath, "w", false);
+	
+	char sBuffer[64];
+	
+	GenerateRandomChars(sBuffer, sizeof sBuffer, 32);
+	
+	tFile.WriteString(sBuffer, true);
+	
+	delete tFile;
 }
 
 void ConnectRelay()
@@ -114,7 +138,12 @@ public int OnSocketConnected(Handle socket, any arg)
 
 public int OnSocketReceive(Handle socket, const char[] receiveData, int dataSize, any arg)
 {
+	char sPackets[8][1024];
 	
+	int pCount = ExplodeString(receiveData, "\\n", sPackets, sizeof sPackets, sizeof sPackets[]);
+	
+	for (int i = 0; i < pCount; i++)
+		ParseMessageFrame(sPackets[i]);
 }
 
 public void OnClientSayCommand_Post(int client, const char[] command, const char[] sArgs)
@@ -180,10 +209,12 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 		case Authenticate:
 		{
 			sFrame[0] = '1';
+			
+			Format(sFrame, iLen, "%s%s", sFrame, sToken);
 		}
 		case Message:
 		{
-			sFrame[0] = '4';
+			sFrame[0] = '2';
 				
 			Format(sFrame, iLen, "%s%s", sFrame, payload);
 		}
@@ -201,7 +232,8 @@ void SendFrame(const char[] frame)
 	PrintToConsoleAll(frame);
 	
 	// Testing if message can be de-constructed successfully
-	ParseMessageFrame(frame);
+	if (frame[0] == '1')
+		ParseMessageFrame(frame);
 }
 
 void ParseMessageFrame(const char[] frame)
@@ -291,7 +323,15 @@ void CleanBuffer(char[] buffer, int bufferlen)
 
 void EscapeBreak(char[] buffer, int buffersize)
 {
-	ReplaceString(buffer, buffersize, "\n", "\\n", false);
+	ReplaceString(buffer, buffersize, "\n", "", false);
+}
+
+stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
+{
+	char charset[] = "adefghijstuv6789!@#$%^klmwxyz01bc2345nopqr&*+-_=";
+	
+	for (int i = 0; i < len; i++)
+		Format(buffer, buffersize, "%s%c", buffer, charset[GetRandomInt(0, sizeof charset)]);
 }
 
 stock bool Client_IsValid(int iClient, bool bAlive = false)
