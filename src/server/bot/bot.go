@@ -9,8 +9,15 @@ import (
 )
 
 type DiscordBot struct {
-	Session *discordgo.Session
-	Data    chan *protocol.Message
+	Session       *discordgo.Session
+	Data          chan *protocol.Message
+	RelayChannels *[]RelayChannel
+}
+
+type RelayChannel struct {
+	Channel         *discordgo.Channel
+	ReceiveChannels []int
+	SendChannels    []int
 }
 
 var RelayBot *DiscordBot

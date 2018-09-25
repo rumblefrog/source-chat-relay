@@ -75,20 +75,9 @@ func (manager *ClientManager) RegisterClient(client *Client, token []byte) {
 	err = querystmt.QueryRow(string(token)).Scan(&receiveChannels, &sendChannels)
 
 	if err == sql.ErrNoRows {
-		insertstmt, err := database.DBConnection.Prepare("INSERT INTO `relay_entities` (`id`) VALUES (?)")
-
-		if err != nil {
-			log.Panic("Failed to prepare create client statement", err)
-			return
-		}
-
-		_, err = insertstmt.Exec(string(token))
-
-		if err != nil {
+		if _, err := database.DBConnection.Exec("INSERT INTO `relay_entities` (`id`) VALUES (?)", string(token)); err != nil {
 			log.Panic("Failed to create client in database", err)
-			return
 		}
-
 		return
 	} else if err != nil {
 		log.Panic("Failed to query to register client", err)
