@@ -66,9 +66,6 @@ public void OnConfigsExecuted()
 	cHost.GetString(sHost, sizeof sHost);
 	
 	iPort = cPort.IntValue;
-	
-	if (!SocketIsConnected(hSocket))
-		ConnectRelay();
 		
 	char sPath[PLATFORM_MAX_PATH];
 	
@@ -81,23 +78,23 @@ public void OnConfigsExecuted()
 		tFile.ReadString(sToken, sizeof sToken, -1);
 		
 		delete tFile;
-		
-		return;
+	} else
+	{
+		File tFile = OpenFile(sPath, "w", false);
+	
+		GenerateRandomChars(sToken, sizeof sToken, 32);
+	
+		tFile.WriteString(sToken, true);
+	
+		delete tFile;
 	}
-	
-	File tFile = OpenFile(sPath, "w", false);
-	
-	char sBuffer[64];
-	
-	GenerateRandomChars(sBuffer, sizeof sBuffer, 32);
-	
-	tFile.WriteString(sBuffer, true);
-	
-	delete tFile;
+
+	if (!SocketIsConnected(hSocket))
+		ConnectRelay();
 }
 
 void ConnectRelay()
-{
+{	
 	if (!SocketIsConnected(hSocket))
 		SocketConnect(hSocket, OnSocketConnected, OnSocketReceive, OnSocketDisconnected, sHost, iPort);
 	else
@@ -133,17 +130,21 @@ public int OnSocketError(Handle socket, int errorType, int errorNum, any ary)
 
 public int OnSocketConnected(Handle socket, any arg)
 {
+	PackFrame(Authenticate, sToken);
+	
 	PrintToServer("Successfully Connected");
 }
 
 public int OnSocketReceive(Handle socket, const char[] receiveData, int dataSize, any arg)
 {
-	char sPackets[8][1024];
+	// char sPackets[8][1024];
 	
-	int pCount = ExplodeString(receiveData, "\\n", sPackets, sizeof sPackets, sizeof sPackets[]);
+	// int pCount = ExplodeString(receiveData, "\\n", sPackets, sizeof sPackets, sizeof sPackets[]);
 	
-	for (int i = 0; i < pCount; i++)
-		ParseMessageFrame(sPackets[i]);
+	// for (int i = 0; i < pCount; i++)
+	// 	 ParseMessageFrame(sPackets[i]);
+	
+	ParseMessageFrame(receiveData);
 }
 
 public void OnClientSayCommand_Post(int client, const char[] command, const char[] sArgs)
@@ -154,13 +155,13 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 	if (!SocketIsConnected(hSocket))
 		return;
 		
-	char buffer[256];
+	// char buffer[256];
 	
-	Format(buffer, sizeof buffer, "%s", sArgs);
+	// Format(buffer, sizeof buffer, "%s", sArgs);
 	
-	EscapeBreak(buffer, sizeof buffer);
+	// EscapeBreak(buffer, sizeof buffer);
 		
-	PackMessage(client, buffer);
+	PackMessage(client, sArgs);
 }
 
 void PackMessage(int client, const char[] message)
@@ -210,7 +211,7 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 		{
 			sFrame[0] = '1';
 			
-			Format(sFrame, iLen, "%s%s", sFrame, sToken);
+			Format(sFrame, iLen, "%s%s", sFrame, payload);
 		}
 		case Message:
 		{
@@ -220,7 +221,9 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 		}
 	}
 	
-	Format(sFrame, iLen, "%s\n", sFrame);
+	// Format(sFrame, iLen, "%s\n", sFrame);
+	
+	PrintToServer(sFrame);
 	
 	SendFrame(sFrame);
 }
@@ -232,7 +235,7 @@ void SendFrame(const char[] frame)
 	PrintToConsoleAll(frame);
 	
 	// Testing if message can be de-constructed successfully
-	if (frame[0] == '1')
+	if (frame[0] == '2')
 		ParseMessageFrame(frame);
 }
 
@@ -321,7 +324,7 @@ void CleanBuffer(char[] buffer, int bufferlen)
 	Format(buffer, bufferlen, "%s", sBuffer);
 }
 
-void EscapeBreak(char[] buffer, int buffersize)
+stock void EscapeBreak(char[] buffer, int buffersize)
 {
 	ReplaceString(buffer, buffersize, "\n", "", false);
 }

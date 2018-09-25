@@ -10,9 +10,14 @@ const (
 )
 
 func GetOPCode(b byte) OPCODE {
-	if OPCODE(b) >= UnknownFrame {
-		return UnknownFrame
+	switch b {
+	case '0':
+		return PingFrame
+	case '1':
+		return AuthenticateFrame
+	case '2':
+		return MessageFrame
 	}
 
-	return OPCODE(b)
+	return UnknownFrame
 }

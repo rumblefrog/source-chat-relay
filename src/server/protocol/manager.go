@@ -60,19 +60,22 @@ func (manager *ClientManager) Start() {
 }
 
 func (manager *ClientManager) RegisterClient(client *Client, token []byte) {
-	querystmt, err := database.DBConnection.Prepare("SELECT * FROM `relay_entities` WHERE `source` = ? AND `type` = 0")
+	querystmt, err := database.DBConnection.Prepare("SELECT `receive_channels`, `send_channels` FROM `relay_entities` WHERE `id` = ? AND `type` = 0")
 
 	if err != nil {
 		log.Panic("Failed to prepare query to register client")
 		return
 	}
 
-	data := database.RelayEntities{}
+	var (
+		receiveChannels string
+		sendChannels    string
+	)
 
-	err = querystmt.QueryRow(string(token)).Scan(&data)
+	err = querystmt.QueryRow(string(token)).Scan(&receiveChannels, &sendChannels)
 
 	if err == sql.ErrNoRows {
-		insertstmt, err := database.DBConnection.Prepare("INSERT INTO `relay_entities` (`source`) VALUES (?)")
+		insertstmt, err := database.DBConnection.Prepare("INSERT INTO `relay_entities` (`id`) VALUES (?)")
 
 		if err != nil {
 			log.Panic("Failed to prepare create client statement", err)
@@ -86,24 +89,24 @@ func (manager *ClientManager) RegisterClient(client *Client, token []byte) {
 			return
 		}
 
-		manager.Clients[client] = true
-
 		return
 	} else if err != nil {
 		log.Panic("Failed to query to register client", err)
 		return
 	}
 
-	client.ReceiveChannels = database.ParseChannels(data.ReceiveChannels)
+	client.Token = string(token)
 
-	client.SendChannels = database.ParseChannels(data.SendChannels)
+	client.ReceiveChannels = database.ParseChannels(receiveChannels)
 
-	manager.Clients[client] = true
+	client.SendChannels = database.ParseChannels(sendChannels)
+
+	log.Println(client.ReceiveChannels)
 }
 
 func (manager *ClientManager) Receive(client *Client) {
 	for {
-		message := make([]byte, 4096)
+		message := make([]byte, 2048)
 		length, err := client.Socket.Read(message)
 		if err != nil {
 			manager.Unregister <- client
@@ -111,6 +114,8 @@ func (manager *ClientManager) Receive(client *Client) {
 			break
 		}
 		if length > 0 {
+			message = message[:length]
+
 			// TODO: Remove
 			fmt.Println("RECEIVED: " + string(message))
 
