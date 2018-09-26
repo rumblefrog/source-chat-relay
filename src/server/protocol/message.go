@@ -2,8 +2,10 @@ package protocol
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
+	"strconv"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -23,7 +25,7 @@ type Message struct {
 func (m *ClientManager) HandleMessage(b []byte, h *Header) {
 	Message := ParseMessage(b, h)
 
-	log.Println(Message.GetClientName())
+	log.Println(Message.ClientName)
 
 	// TODO: Send to router & bot chan
 
@@ -73,18 +75,14 @@ func (m *Message) ToString() (buffer string) {
 	return
 }
 
-func (m *Message) GetHostname() string {
-	return m.Hostname
+func (m *Message) GetClientURL() string {
+	return fmt.Sprintf("https://steamcommunity.com/profiles/%s", m.ClientID)
 }
 
-func (m *Message) GetClientID() string {
-	return m.ClientID
-}
+func (m *Message) GetClientColor() int {
+	c := []byte(m.ClientID)
 
-func (m *Message) GetClientName() string {
-	return m.ClientName
-}
+	i, _ := strconv.ParseInt(string(c[len(c)-6:]), 16, 64)
 
-func (m *Message) GetContent() string {
-	return m.Content
+	return int(i)
 }

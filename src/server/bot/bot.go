@@ -15,7 +15,7 @@ type DiscordBot struct {
 }
 
 type RelayChannel struct {
-	Channel         *discordgo.Channel
+	ChannelID       string
 	ReceiveChannels []int
 	SendChannels    []int
 }

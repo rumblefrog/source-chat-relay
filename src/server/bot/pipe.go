@@ -1,12 +1,23 @@
 package bot
 
+import (
+	"github.com/bwmarrin/discordgo"
+)
+
 func (b *DiscordBot) Listen() {
 	for {
 		select {
 		case message := <-b.Data:
+			embed := &discordgo.MessageEmbed{
+				URL:         message.GetClientURL(),
+				Title:       message.ClientName,
+				Color:       message.GetClientColor(),
+				Description: message.Content,
+			}
+
 			for _, c := range b.RelayChannels {
 				if c.CanReceive(message.Header.Sender.SendChannels) {
-					// Yes
+					b.Session.ChannelMessageSendEmbed(c.ChannelID, embed)
 				}
 			}
 		}
