@@ -17,7 +17,7 @@ func (b *DiscordBot) Listen() {
 			}
 
 			for _, c := range b.RelayChannels {
-				if c.CanReceive(message.Header.Sender.SendChannels) {
+				if c.CanReceive(message.GetSendChannels()) {
 					b.Session.ChannelMessageSendEmbed(c.ChannelID, embed)
 				}
 			}

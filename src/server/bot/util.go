@@ -30,3 +30,13 @@ func GuildMemberPermissions(member *discordgo.Member, guild *discordgo.Guild) (a
 
 	return
 }
+
+func (b *DiscordBot) GetRelayChannel(channelID string) *RelayChannel {
+	for _, c := range b.RelayChannels {
+		if c.ChannelID == channelID {
+			return c
+		}
+	}
+
+	return nil
+}

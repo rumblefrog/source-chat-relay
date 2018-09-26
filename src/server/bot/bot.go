@@ -7,6 +7,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
+	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
 )
 
 type DiscordBot struct {
@@ -43,9 +44,22 @@ func init() {
 		err := router.FindAndExecute(session, "r/", session.State.User.ID, m.Message)
 
 		if err == dgrouter.ErrCouldNotFindRoute {
-			// Create fake Client for Message
 
-			// Send to router directly aftering constructing struct
+			relayChannel := RelayBot.GetRelayChannel(m.ChannelID)
+
+			if relayChannel == nil {
+				return
+			}
+
+			message := &protocol.Message{
+				Overwrite: &protocol.OverwriteData{
+					SendChannels: relayChannel.SendChannels,
+				},
+				ClientName: m.Author.Username,
+				ClientID:   m.Author.ID,
+			}
+
+			protocol.NetManager.Router <- message
 		}
 	})
 }

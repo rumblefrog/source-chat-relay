@@ -48,6 +48,8 @@ func ParseMessage(b []byte, h *Header) *Message {
 
 	Message.Header = h
 
+	Message.Overwrite = nil
+
 	Message.Hostname = string(b[offset : offset+HostnameLen])
 
 	offset += HostnameLen
