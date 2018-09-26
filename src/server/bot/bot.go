@@ -22,28 +22,34 @@ type RelayChannel struct {
 
 var RelayBot *DiscordBot
 
-// TODO: rename to init
-func InitBot() {
-	session, err := discordgo.New("Bot" + helper.Conf.Bot.Token)
+func init() {
+	session, err := discordgo.New("Bot " + helper.Conf.Bot.Token)
 
 	if err != nil {
 		log.Fatal("Unable to initiate bot session")
 	}
 
+	session.AddHandler(ready)
 	session.AddHandler(messageCreate)
 
 	err = session.Open()
 
 	if err != nil {
-		log.Fatal("Unable to open bot connection")
+		log.Fatal("Unable to open bot connection", err)
 	}
+}
 
+func ready(s *discordgo.Session, event *discordgo.Ready) {
 	RelayBot = &DiscordBot{
-		Session: session,
+		Session: s,
 		Data:    make(chan *protocol.Message),
 	}
 
-	log.Info("Bot is now running")
+	log.WithFields(log.Fields{
+		"Username":    event.User.Username,
+		"Session ID":  event.SessionID,
+		"Guild Count": len(event.Guilds),
+	}).Info("Bot is now running")
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {

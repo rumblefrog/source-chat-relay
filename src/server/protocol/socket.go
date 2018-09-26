@@ -42,11 +42,11 @@ func AcceptConnections() {
 		conn, err := NetListener.Accept()
 
 		if err != nil {
-			log.Warn("Unable to accept connection", err)
+			log.Warn("Unable to accept connection ", err)
 			return
 		}
 
-		log.Info(fmt.Sprintf("%s connected", conn.RemoteAddr()))
+		log.WithField("address", conn.RemoteAddr()).Info("A client connected")
 
 		client := &Client{
 			Socket: conn,
