@@ -2,12 +2,13 @@ package bot
 
 import (
 	"github.com/bwmarrin/discordgo"
+	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
 )
 
 func (b *DiscordBot) Listen() {
 	for {
 		select {
-		case message := <-b.Data:
+		case message := <-protocol.NetManager.Bot:
 			embed := &discordgo.MessageEmbed{
 				URL:         message.GetClientURL(),
 				Title:       message.ClientName,

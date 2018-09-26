@@ -2,7 +2,7 @@
 Port = 57452 # Port to start the socket server on
 
 [Bot]
-Token = "NDQ0OTE2OTQ0NjAxMzUwMTQ0.Do2LLQ.re463avIQ37dthA5xPQYdKshBI0" # The Bot's Token
+Token = "NDQ0OTE2OTQ0NjAxMzUwMTQ0.Do2LLQ.re463avIQ37dthA5xPQYdKshBI0" # The Bot's Token TODO: Reset on publish
 
 [Database]
 Host = "127.0.0.1" # MySQL Database Host

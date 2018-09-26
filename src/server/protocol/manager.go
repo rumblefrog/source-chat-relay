@@ -13,6 +13,7 @@ import (
 type ClientManager struct {
 	Clients    map[*Client]bool
 	Broadcast  chan []byte
+	Bot        chan *Message
 	Router     chan *Message
 	Register   chan *Client
 	Unregister chan *Client
@@ -47,12 +48,10 @@ func (manager *ClientManager) Start() {
 			}
 		case message := <-manager.Router:
 			for connection := range manager.Clients {
-				if connection.CanReceive(message.Header.Sender.SendChannels) {
-					select {
-					case connection.Data <- []byte(message.ToString()):
-					default:
-						close(connection.Data)
-						delete(manager.Clients, connection)
+				if connection.CanReceive(message.GetSendChannels()) {
+					connection.Data <- []byte(message.ToString())
+					if message.Overwrite == nil {
+						manager.Bot <- message
 					}
 				}
 			}

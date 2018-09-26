@@ -1,16 +1,16 @@
 package bot
 
 import (
+	"github.com/Necroforger/dgrouter"
+	"github.com/Necroforger/dgrouter/exrouter"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
-	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
 )
 
 type DiscordBot struct {
 	Session       *discordgo.Session
-	Data          chan *protocol.Message
 	RelayChannels []*RelayChannel
 }
 
@@ -30,19 +30,29 @@ func init() {
 	}
 
 	session.AddHandler(ready)
-	session.AddHandler(messageCreate)
 
 	err = session.Open()
 
 	if err != nil {
 		log.Fatal("Unable to open bot connection", err)
 	}
+
+	router := exrouter.New()
+
+	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
+		err := router.FindAndExecute(session, "r/", session.State.User.ID, m.Message)
+
+		if err == dgrouter.ErrCouldNotFindRoute {
+			// Create fake Client for Message
+
+			// Send to router directly aftering constructing struct
+		}
+	})
 }
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
 	RelayBot = &DiscordBot{
 		Session: s,
-		Data:    make(chan *protocol.Message),
 	}
 
 	log.WithFields(log.Fields{
@@ -50,16 +60,4 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 		"Session ID":  event.SessionID,
 		"Guild Count": len(event.Guilds),
 	}).Info("Bot is now running")
-}
-
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-
-	// Prevent loops
-	if m.Author.ID == s.State.User.ID {
-		return
-	}
-
-	// Create fake Client for Message
-
-	// Send to router directly aftering constructing struct
 }

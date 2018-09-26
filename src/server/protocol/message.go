@@ -16,10 +16,16 @@ const (
 
 type Message struct {
 	Header     *Header
+	Overwrite  *OverwriteData
 	Hostname   string
 	ClientID   string
 	ClientName string
 	Content    string
+}
+
+type OverwriteData struct {
+	ReceiveChannels []int
+	SendChannels    []int
 }
 
 func (m *ClientManager) HandleMessage(b []byte, h *Header) {
@@ -73,6 +79,22 @@ func (m *Message) ToString() (buffer string) {
 	buffer += fmt.Sprintf("%s%s", buffer, m.Content)
 
 	return
+}
+
+func (m *Message) GetSendChannels() []int {
+	if m.Overwrite != nil {
+		return m.Overwrite.SendChannels
+	}
+
+	return m.Header.Sender.SendChannels
+}
+
+func (m *Message) GetReceiveChannels() []int {
+	if m.Overwrite != nil {
+		return m.Overwrite.ReceiveChannels
+	}
+
+	return m.Header.Sender.ReceiveChannels
 }
 
 func (m *Message) GetClientURL() string {
