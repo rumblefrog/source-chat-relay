@@ -3,8 +3,9 @@ package protocol
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/rumblefrog/source-chat-relay/src/server/database"
 )
@@ -63,7 +64,7 @@ func (manager *ClientManager) RegisterClient(client *Client, token []byte) {
 	querystmt, err := database.DBConnection.Prepare("SELECT `receive_channels`, `send_channels` FROM `relay_entities` WHERE `id` = ? AND `type` = 0")
 
 	if err != nil {
-		log.Panic("Failed to prepare query to register client")
+		log.Fatal("Failed to prepare query to register client")
 		return
 	}
 
@@ -76,11 +77,11 @@ func (manager *ClientManager) RegisterClient(client *Client, token []byte) {
 
 	if err == sql.ErrNoRows {
 		if _, err := database.DBConnection.Exec("INSERT INTO `relay_entities` (`id`) VALUES (?)", string(token)); err != nil {
-			log.Panic("Failed to create client in database", err)
+			log.Fatal("Failed to create client in database", err)
 		}
 		return
 	} else if err != nil {
-		log.Panic("Failed to query to register client", err)
+		log.Fatal("Failed to query to register client", err)
 		return
 	}
 

@@ -2,8 +2,9 @@ package protocol
 
 import (
 	"fmt"
-	"log"
 	"net"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
 )
@@ -19,7 +20,7 @@ func init() {
 	NetListener, err = net.Listen("tcp", fmt.Sprintf(":%d", helper.Conf.General.Port))
 
 	if err != nil {
-		log.Panic("Unable to start socket server", err)
+		log.Fatal("Unable to start socket server", err)
 		return
 	}
 
@@ -41,11 +42,11 @@ func AcceptConnections() {
 		conn, err := NetListener.Accept()
 
 		if err != nil {
-			log.Println("Unable to accept connection", err)
+			log.Warn("Unable to accept connection", err)
 			return
 		}
 
-		log.Println(fmt.Sprintf("%s connected", conn.RemoteAddr()))
+		log.Info(fmt.Sprintf("%s connected", conn.RemoteAddr()))
 
 		client := &Client{
 			Socket: conn,

@@ -3,7 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
@@ -31,7 +32,7 @@ func init() {
 	DBConnection, err = sql.Open("mysql", c.FormatDSN())
 
 	if err != nil {
-		log.Panic("Unable to connect to database")
+		log.Fatal("Unable to connect to database")
 	}
 
 	CreateTables(DBConnection)

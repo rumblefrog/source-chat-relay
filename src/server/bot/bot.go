@@ -1,7 +1,7 @@
 package bot
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
@@ -11,7 +11,7 @@ import (
 type DiscordBot struct {
 	Session       *discordgo.Session
 	Data          chan *protocol.Message
-	RelayChannels *[]RelayChannel
+	RelayChannels []*RelayChannel
 }
 
 type RelayChannel struct {
@@ -27,7 +27,7 @@ func InitBot() {
 	session, err := discordgo.New("Bot" + helper.Conf.Bot.Token)
 
 	if err != nil {
-		log.Panic("Unable to initiate bot session")
+		log.Fatal("Unable to initiate bot session")
 	}
 
 	session.AddHandler(messageCreate)
@@ -35,7 +35,7 @@ func InitBot() {
 	err = session.Open()
 
 	if err != nil {
-		log.Panic("Unable to open bot connection")
+		log.Fatal("Unable to open bot connection")
 	}
 
 	RelayBot = &DiscordBot{
@@ -43,7 +43,7 @@ func InitBot() {
 		Data:    make(chan *protocol.Message),
 	}
 
-	log.Println("Bot is now running")
+	log.Info("Bot is now running")
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
