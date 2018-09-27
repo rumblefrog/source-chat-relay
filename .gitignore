@@ -14,3 +14,6 @@
 # SourceMod Plugin Bin
 
 *.smx
+
+# Go DEP
+vendor/*

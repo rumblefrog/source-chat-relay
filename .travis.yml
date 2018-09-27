@@ -25,7 +25,6 @@ install:
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 before_script:
-    - dep ensure
     - chmod +x addons/sourcemod/scripting/spcomp
 
 script:
