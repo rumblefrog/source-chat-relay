@@ -24,7 +24,7 @@ install:
     - cp src/client/include/socket.inc addons/sourcemod/scripting/include
 
 before_script:
-    - go get -t ./src/server
+    - go get -td ./src/server/...
     - chmod +x addons/sourcemod/scripting/spcomp
 
 script:
