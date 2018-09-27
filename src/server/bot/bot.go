@@ -55,6 +55,7 @@ func init() {
 				Overwrite: &protocol.OverwriteData{
 					SendChannels: relayChannel.SendChannels,
 				},
+				Hostname:   "Discord",
 				ClientName: m.Author.Username,
 				ClientID:   m.Author.ID,
 			}
@@ -62,13 +63,15 @@ func init() {
 			protocol.NetManager.Router <- message
 		}
 	})
+
+	RelayBot = &DiscordBot{
+		Session: session,
+	}
+
+	router.On("setchannel", SetChannel)
 }
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
-	RelayBot = &DiscordBot{
-		Session: s,
-	}
-
 	log.WithFields(log.Fields{
 		"Username":    event.User.Username,
 		"Session ID":  event.SessionID,

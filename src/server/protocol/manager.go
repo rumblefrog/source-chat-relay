@@ -2,7 +2,6 @@ package protocol
 
 import (
 	"database/sql"
-	"fmt"
 	"net"
 
 	log "github.com/sirupsen/logrus"
@@ -55,6 +54,11 @@ func (manager *ClientManager) Start() {
 					}
 				}
 			}
+			log.WithFields(log.Fields{
+				"Hostname":    message.Hostname,
+				"Client Name": message.ClientName,
+				"Client ID":   message.ClientID,
+			}).Debug()
 		}
 	}
 }
@@ -89,8 +93,6 @@ func (manager *ClientManager) RegisterClient(client *Client, token []byte) {
 	client.ReceiveChannels = database.ParseChannels(receiveChannels)
 
 	client.SendChannels = database.ParseChannels(sendChannels)
-
-	log.Println(client.ReceiveChannels)
 }
 
 func (manager *ClientManager) Receive(client *Client) {
@@ -106,7 +108,7 @@ func (manager *ClientManager) Receive(client *Client) {
 			message = message[:length]
 
 			// TODO: Remove
-			fmt.Println("RECEIVED: " + string(message))
+			log.WithField("Message", string(message)).Debug("Received Message")
 
 			Header := NewHeader(message)
 

@@ -42,7 +42,7 @@ func (m *ClientManager) HandleMessage(b []byte, h *Header) {
 }
 
 func ParseMessage(b []byte, h *Header) *Message {
-	offset := 2
+	offset := 1
 
 	Message := &Message{}
 

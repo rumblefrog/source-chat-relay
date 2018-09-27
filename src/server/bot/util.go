@@ -1,6 +1,12 @@
 package bot
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"regexp"
+
+	"github.com/bwmarrin/discordgo"
+)
+
+var ChannelRegex = regexp.MustCompile("^(?:<#)?([0-9]+)>?$")
 
 func GuildMemberPermissions(member *discordgo.Member, guild *discordgo.Guild) (apermissions int) {
 	if member.User.ID == guild.OwnerID {
@@ -39,4 +45,12 @@ func (b *DiscordBot) GetRelayChannel(channelID string) *RelayChannel {
 	}
 
 	return nil
+}
+
+func ParseChannel(arg string) (string, bool) {
+	if ChannelRegex.Match([]byte(arg)) {
+		return ChannelRegex.FindAllStringSubmatch(arg, -1)[0][1], true
+	}
+
+	return "", false
 }

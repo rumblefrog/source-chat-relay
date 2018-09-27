@@ -12,6 +12,10 @@ import (
 	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
 )
 
+func init() {
+	log.SetLevel(log.DebugLevel)
+}
+
 func main() {
 	log.Println("Server is now running. Press CTRL-C to exit.")
 
