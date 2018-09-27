@@ -16,7 +16,7 @@ addons:
       - lib32stdc++6
 
 install:
-    - SMLATEST=`curl "https://www.sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux"`
+    - SMLATEST=`curl -s "https://www.sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux"`
     - SMPACKAGE="https://www.sourcemod.net/smdrop/$SMVERSION/$SMLATEST"
     - wget $SMPACKAGE
     - tar -xzf $(basename "$SMPACKAGE")
@@ -24,7 +24,7 @@ install:
     - cp src/client/include/socket.inc addons/sourcemod/scripting/include
 
 before_script:
-    - go get -t -d ./src/server/...
+    - go get -t ./src/server/...
     - chmod +x addons/sourcemod/scripting/spcomp
 
 script:
