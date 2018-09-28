@@ -52,11 +52,6 @@ func (manager *ClientManager) Start() {
 					}
 				}
 			}
-			log.WithFields(log.Fields{
-				"Hostname":    message.Hostname,
-				"Client Name": message.ClientName,
-				"Client ID":   message.ClientID,
-			}).Debug()
 		}
 	}
 }
