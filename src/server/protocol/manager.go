@@ -66,7 +66,8 @@ func (manager *ClientManager) RegisterClient(client *Client, token []byte) {
 
 	if err == sql.ErrNoRows {
 		entity = &database.Entity{
-			ID: string(token),
+			ID:   string(token),
+			Type: database.Server,
 		}
 
 		if _, err = entity.CreateEntity(); err != nil {
