@@ -13,17 +13,19 @@ import (
 )
 
 func init() {
+	// TODO: Configurable level
+
 	log.SetLevel(log.DebugLevel)
 }
 
 func main() {
-	log.Println("Server is now running. Press CTRL-C to exit.")
+	log.Info("Server is now running. Press CTRL-C to exit.")
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
-	log.Println("Received exit signal. Terminating.")
+	log.Info("Received exit signal. Terminating.")
 
 	bot.RelayBot.Session.Close()
 

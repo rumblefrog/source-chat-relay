@@ -31,14 +31,14 @@ type OverwriteData struct {
 func (m *ClientManager) HandleMessage(b []byte, h *Header) {
 	Message := ParseMessage(b, h)
 
-	log.Println(Message.ClientName)
+	log.WithFields(log.Fields{
+		"Hostname":    Message.Hostname,
+		"Client ID":   Message.ClientID,
+		"Client Name": Message.ClientName,
+		"Content":     Message.Content,
+	}).Debug()
 
-	// TODO: Send to router & bot chan
-
-	// log.Printf("Hostname: %s \n", Message.Hostname)
-	// log.Printf("ID: %s \n", Message.ClientID)
-	// log.Printf("Name: %s \n", Message.ClientName)
-	// log.Printf("Content: %s", Message.Content)
+	NetManager.Router <- Message
 }
 
 func ParseMessage(b []byte, h *Header) *Message {

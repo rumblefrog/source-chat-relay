@@ -93,8 +93,7 @@ func (manager *ClientManager) Receive(client *Client) {
 		if length > 0 {
 			message = message[:length]
 
-			// TODO: Remove
-			log.WithField("Message", string(message)).Debug("Received Message")
+			log.WithField("message", string(message)).Debug("Received Message")
 
 			Header := NewHeader(message)
 
