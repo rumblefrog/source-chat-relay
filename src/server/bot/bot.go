@@ -86,6 +86,8 @@ func init() {
 }
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
+	go RelayBot.Listen()
+
 	log.WithFields(log.Fields{
 		"Username":    event.User.Username,
 		"Session ID":  event.SessionID,
