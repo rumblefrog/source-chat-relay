@@ -12,6 +12,7 @@ type EntityType int
 const (
 	Server EntityType = iota
 	Channel
+	All
 )
 
 type Entity struct {
@@ -23,11 +24,7 @@ type Entity struct {
 }
 
 func FetchEntity(id string) (*Entity, error) {
-	stmt, err := DBConnection.Prepare("SELECT * FROM `relay_entities` WHERE `id` = ?")
-
-	if err != nil {
-		return nil, err
-	}
+	row := DBConnection.QueryRow("SELECT * FROM `relay_entities` WHERE `id` = ?", id)
 
 	var (
 		entity          = &Entity{}
@@ -35,7 +32,7 @@ func FetchEntity(id string) (*Entity, error) {
 		sendChannels    string
 	)
 
-	err = stmt.QueryRow(id).Scan(
+	err := row.Scan(
 		&entity.ID,
 		&entity.Type,
 		&receiveChannels,
@@ -52,6 +49,46 @@ func FetchEntity(id string) (*Entity, error) {
 	entity.SendChannels = ParseChannels(sendChannels)
 
 	return entity, nil
+}
+
+func FetchEntities(eType EntityType) ([]*Entity, error) {
+	rows, err := DBConnection.Query("SELECT * FROM `relay_entities` WHERE `type` = ?", eType.Polarize())
+
+	if err != nil {
+		return nil, err
+	}
+
+	var entities []*Entity
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			entity          = &Entity{}
+			receiveChannels string
+			sendChannels    string
+		)
+
+		rows.Scan(
+			&entity.ID,
+			&entity.Type,
+			&receiveChannels,
+			&sendChannels,
+			&entity.CreatedAt,
+		)
+
+		entity.ReceiveChannels = ParseChannels(receiveChannels)
+
+		entity.SendChannels = ParseChannels(sendChannels)
+
+		entities = append(entities, entity)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return entities, nil
 }
 
 func (entity *Entity) UpdateChannels() (sql.Result, error) {
@@ -91,4 +128,15 @@ func EncodeChannels(channels []int) string {
 	}
 
 	return strings.Join(s, ",")
+}
+
+func (eType EntityType) Polarize() EntityType {
+	switch eType {
+	case Server:
+		return Channel
+	case Channel:
+		return Server
+	default:
+		return All
+	}
 }
