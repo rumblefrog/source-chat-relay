@@ -61,7 +61,7 @@ func (manager *ClientManager) Start() {
 	}
 }
 
-func (manager *ClientManager) RegisterClient(client *Client, token []byte) {
+func (client *Client) Register(token []byte) {
 	entity, err := database.FetchEntity(string(token))
 
 	if err == sql.ErrNoRows {
@@ -104,7 +104,7 @@ func (manager *ClientManager) Receive(client *Client) {
 			switch Header.GetOPCode() {
 			case AuthenticateFrame:
 				{
-					go manager.RegisterClient(client, message[1:])
+					go client.Register(message[1:])
 				}
 			case MessageFrame:
 				{
