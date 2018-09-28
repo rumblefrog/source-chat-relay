@@ -24,18 +24,19 @@ func init() {
 		return
 	}
 
-	go AcceptConnections()
-}
-
-func AcceptConnections() {
-	NetManager := &ClientManager{
+	NetManager = &ClientManager{
 		Clients:    make(map[*Client]bool),
 		Broadcast:  make(chan []byte),
+		Bot:        make(chan *Message),
 		Router:     make(chan *Message),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 	}
 
+	go AcceptConnections()
+}
+
+func AcceptConnections() {
 	go NetManager.Start()
 
 	for {

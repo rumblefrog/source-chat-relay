@@ -130,6 +130,16 @@ func EncodeChannels(channels []int) string {
 	return strings.Join(s, ",")
 }
 
+func EncodeChannelsSep(channels []int, sep string) string {
+	var s []string
+
+	for c := range channels {
+		s = append(s, strconv.Itoa(c))
+	}
+
+	return strings.Join(s, sep)
+}
+
 func (eType EntityType) Polarize() EntityType {
 	switch eType {
 	case Server:
@@ -138,5 +148,16 @@ func (eType EntityType) Polarize() EntityType {
 		return Server
 	default:
 		return All
+	}
+}
+
+func (eType EntityType) String() string {
+	switch eType {
+	case Server:
+		return "Server"
+	case Channel:
+		return "Channel"
+	default:
+		return "Unknown"
 	}
 }

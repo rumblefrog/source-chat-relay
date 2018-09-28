@@ -3,6 +3,8 @@ package bot
 import (
 	"regexp"
 
+	"github.com/rumblefrog/source-chat-relay/src/server/database"
+
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/bwmarrin/discordgo"
 )
@@ -70,4 +72,33 @@ func ParseChannel(arg string) (string, bool) {
 	}
 
 	return "", false
+}
+
+func DisplayEntity(ctx *exrouter.Context, entity *database.Entity, title string) {
+	ctx.Ses.ChannelMessageSendEmbed(ctx.Msg.ChannelID, &discordgo.MessageEmbed{
+		Title: title,
+		Color: 14795100,
+		Fields: []*discordgo.MessageEmbedField{
+			&discordgo.MessageEmbedField{
+				Name:  "Entity",
+				Value: entity.ID,
+			},
+			&discordgo.MessageEmbedField{
+				Name:  "Entity Type",
+				Value: entity.Type.String(),
+			},
+			&discordgo.MessageEmbedField{
+				Name:  "Receive Channels",
+				Value: database.EncodeChannelsSep(entity.ReceiveChannels, ", "),
+			},
+			&discordgo.MessageEmbedField{
+				Name:  "Send Channels",
+				Value: database.EncodeChannelsSep(entity.SendChannels, ", "),
+			},
+			&discordgo.MessageEmbedField{
+				Name:  "Created At",
+				Value: entity.CreatedAt.String(),
+			},
+		},
+	})
 }

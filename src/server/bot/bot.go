@@ -73,7 +73,7 @@ func init() {
 
 		r.Use(Auth)
 
-		r.On("setchannel", SetChannel).Desc("Set the relay channel of this ID/TextChannel").Alias("sc")
+		r.On("channel", ChannelCommand).Desc("Get/Set the relay channel of this ID/TextChannel").Alias("c")
 	})
 
 	router.Group(func(r *exrouter.Route) {
@@ -90,7 +90,6 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 
 	log.WithFields(log.Fields{
 		"Username":    event.User.Username,
-		"Session ID":  event.SessionID,
 		"Guild Count": len(event.Guilds),
 	}).Info("Bot is now running")
 }
