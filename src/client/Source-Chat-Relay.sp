@@ -331,7 +331,7 @@ stock void EscapeBreak(char[] buffer, int buffersize)
 
 stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
 {
-	char charset[] = "adefghijstuv6789!@#$%^klmwxyz01bc2345nopqr&*+-_=";
+	char charset[] = "adefghijstuv6789!@#$%^klmwxyz01bc2345nopqr&+=";
 	
 	for (int i = 0; i < len; i++)
 		Format(buffer, buffersize, "%s%c", buffer, charset[GetRandomInt(0, sizeof charset)]);
