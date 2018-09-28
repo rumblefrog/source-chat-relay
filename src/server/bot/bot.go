@@ -68,7 +68,21 @@ func init() {
 		Session: session,
 	}
 
-	router.On("setchannel", SetChannel)
+	router.Group(func(r *exrouter.Route) {
+		r.Cat("configuration")
+
+		r.Use(Auth)
+
+		r.On("setchannel", SetChannel).Desc("Set the relay channel of this ID/TextChannel").Alias("sc")
+	})
+
+	router.Group(func(r *exrouter.Route) {
+		r.Cat("other")
+
+		r.On("ping", func(ctx *exrouter.Context) {
+			ctx.Reply("pong")
+		}).Desc("Responds with pong").Cat("other")
+	})
 }
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
