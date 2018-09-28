@@ -32,7 +32,7 @@ func init() {
 	DBConnection, err = sql.Open("mysql", c.FormatDSN())
 
 	if err != nil {
-		log.Fatal("Unable to connect to database")
+		log.WithField("error", err).Fatal("Unable to connect to database")
 	}
 
 	CreateTables(DBConnection)

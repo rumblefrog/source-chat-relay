@@ -32,6 +32,6 @@ var Conf Config
 
 func init() {
 	if _, err := toml.DecodeFile("config.toml", &Conf); err != nil {
-		log.Fatal(err)
+		log.WithField("error", err).Fatal("Unable to parse config")
 	}
 }

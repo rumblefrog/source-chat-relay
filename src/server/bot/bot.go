@@ -27,7 +27,7 @@ func init() {
 	session, err := discordgo.New("Bot " + helper.Conf.Bot.Token)
 
 	if err != nil {
-		log.Fatal("Unable to initiate bot session")
+		log.WithField("error", err).Fatal("Unable to initiate bot session")
 	}
 
 	session.AddHandler(ready)
@@ -35,7 +35,7 @@ func init() {
 	err = session.Open()
 
 	if err != nil {
-		log.Fatal("Unable to open bot connection", err)
+		log.WithField("error", err).Fatal("Unable to open bot session")
 	}
 
 	router := exrouter.New()

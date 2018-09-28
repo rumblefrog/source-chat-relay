@@ -20,7 +20,7 @@ func init() {
 	NetListener, err = net.Listen("tcp", fmt.Sprintf(":%d", helper.Conf.General.Port))
 
 	if err != nil {
-		log.Fatal("Unable to start socket server", err)
+		log.WithField("error", err).Fatal("Unable to start socket server")
 		return
 	}
 
@@ -42,7 +42,7 @@ func AcceptConnections() {
 		conn, err := NetListener.Accept()
 
 		if err != nil {
-			log.Warn("Unable to accept connection ", err)
+			log.WithField("error", err).Warn("Unable to accept connection")
 			return
 		}
 
@@ -52,8 +52,6 @@ func AcceptConnections() {
 			Socket: conn,
 			Data:   make(chan []byte),
 		}
-
-		// TODO: Look up in data for the server's channels
 
 		NetManager.Register <- client
 
