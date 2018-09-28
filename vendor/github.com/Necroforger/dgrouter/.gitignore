@@ -1,5 +1,0 @@
-*.test
-*.exe
-debug
-*.db
-*.db.lock

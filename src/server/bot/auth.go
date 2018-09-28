@@ -3,20 +3,22 @@ package bot
 import (
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/bwmarrin/discordgo"
+	log "github.com/sirupsen/logrus"
 )
 
 func Auth(fn exrouter.HandlerFunc) exrouter.HandlerFunc {
 	return func(ctx *exrouter.Context) {
-		member, err := ctx.Member(ctx.Msg.GuildID, ctx.Msg.Author.ID)
+		guild, err := GetMessageGuild(ctx, ctx.Msg)
+
+		if err != nil {
+			log.WithField("error", err).Warn()
+			ctx.Reply("Could not fetch guild: ", err)
+		}
+
+		member, err := ctx.Member(guild.ID, ctx.Msg.Author.ID)
 
 		if err != nil {
 			ctx.Reply("Could not fetch member: ", err)
-		}
-
-		guild, err := ctx.Guild(ctx.Msg.GuildID)
-
-		if err != nil {
-			ctx.Reply("Could not fetch guild: ", err)
 		}
 
 		if GuildMemberPermissions(member, guild)&discordgo.PermissionManageServer != 0 {
