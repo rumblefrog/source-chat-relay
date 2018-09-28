@@ -88,7 +88,7 @@ func (m *Message) GetSendChannels() []int {
 		return m.Overwrite.SendChannels
 	}
 
-	return m.Header.Sender.SendChannels
+	return m.Header.Sender.Entity.SendChannels
 }
 
 func (m *Message) GetReceiveChannels() []int {
@@ -96,7 +96,7 @@ func (m *Message) GetReceiveChannels() []int {
 		return m.Overwrite.ReceiveChannels
 	}
 
-	return m.Header.Sender.ReceiveChannels
+	return m.Header.Sender.Entity.ReceiveChannels
 }
 
 func (m *Message) GetClientURL() string {

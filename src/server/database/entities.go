@@ -62,6 +62,16 @@ func (entity *Entity) UpdateChannels() (sql.Result, error) {
 	)
 }
 
+func (entity *Entity) CreateEntity() (sql.Result, error) {
+	return DBConnection.Exec(
+		"INSERT INTO `relay_entities` (`id`, `type`, `receive_channels`, `send_channels`) VALUES (?, ?, ?, ?)",
+		entity.ID,
+		entity.Type,
+		EncodeChannels(entity.ReceiveChannels),
+		EncodeChannels(entity.SendChannels),
+	)
+}
+
 func ParseChannels(s string) (c []int) {
 	ss := strings.Split(s, ",")
 

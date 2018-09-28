@@ -19,11 +19,9 @@ type ClientManager struct {
 }
 
 type Client struct {
-	Socket          net.Conn
-	Data            chan []byte
-	Token           string
-	SendChannels    []int
-	ReceiveChannels []int
+	Socket net.Conn
+	Data   chan []byte
+	Entity *database.Entity
 }
 
 func (manager *ClientManager) Start() {
@@ -64,35 +62,22 @@ func (manager *ClientManager) Start() {
 }
 
 func (manager *ClientManager) RegisterClient(client *Client, token []byte) {
-	querystmt, err := database.DBConnection.Prepare("SELECT `receive_channels`, `send_channels` FROM `relay_entities` WHERE `id` = ? AND `type` = 0")
-
-	if err != nil {
-		log.Fatal("Failed to prepare query to register client")
-		return
-	}
-
-	var (
-		receiveChannels string
-		sendChannels    string
-	)
-
-	err = querystmt.QueryRow(string(token)).Scan(&receiveChannels, &sendChannels)
+	entity, err := database.FetchEntity(string(token))
 
 	if err == sql.ErrNoRows {
-		if _, err := database.DBConnection.Exec("INSERT INTO `relay_entities` (`id`) VALUES (?)", string(token)); err != nil {
-			log.Fatal("Failed to create client in database", err)
+		entity = &database.Entity{
+			ID: string(token),
 		}
-		return
+
+		if _, err = entity.CreateEntity(); err != nil {
+			log.WithField("error", err).Warn("Failed to create entity in database")
+			return
+		}
 	} else if err != nil {
-		log.Fatal("Failed to query to register client", err)
-		return
+		log.WithField("error", err).Warn("Failed to fetch entity from database")
 	}
 
-	client.Token = string(token)
-
-	client.ReceiveChannels = database.ParseChannels(receiveChannels)
-
-	client.SendChannels = database.ParseChannels(sendChannels)
+	client.Entity = entity
 }
 
 func (manager *ClientManager) Receive(client *Client) {
@@ -144,7 +129,7 @@ func (manager *ClientManager) Send(client *Client) {
 }
 
 func (client *Client) CanReceive(channels []int) bool {
-	for c := range client.ReceiveChannels {
+	for c := range client.Entity.ReceiveChannels {
 		for c1 := range channels {
 			if c == c1 {
 				return true
