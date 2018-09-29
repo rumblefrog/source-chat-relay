@@ -57,10 +57,10 @@ func GetMessageGuild(c *exrouter.Context, m *discordgo.Message) (*discordgo.Guil
 	return guild, nil
 }
 
-func (b *DiscordBot) GetRelayChannel(channelID string) *RelayChannel {
-	for _, c := range b.RelayChannels {
-		if c.ChannelID == channelID {
-			return c
+func (b *DiscordBot) GetEntityOfChannel(channelID string) *database.Entity {
+	for _, e := range b.Cache {
+		if e.ID == channelID {
+			return e
 		}
 	}
 

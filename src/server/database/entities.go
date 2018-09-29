@@ -110,6 +110,18 @@ func (entity *Entity) CreateEntity() (sql.Result, error) {
 	)
 }
 
+func (entity *Entity) CanReceive(channels []int) bool {
+	for _, c := range entity.ReceiveChannels {
+		for _, c1 := range channels {
+			if c == c1 {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func ParseChannels(s string) (c []int) {
 	ss := strings.Split(strings.Replace(s, " ", "", -1), ",")
 

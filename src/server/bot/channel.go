@@ -51,16 +51,14 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 				ID:              id,
 				Type:            cType,
 				ReceiveChannels: database.ParseChannels(channel),
-				SendChannels:    []int{},
 				CreatedAt:       time.Now(),
 			}
 		} else if cmdType == Send {
 			entity = &database.Entity{
-				ID:              id,
-				Type:            cType,
-				ReceiveChannels: []int{},
-				SendChannels:    database.ParseChannels(channel),
-				CreatedAt:       time.Now(),
+				ID:           id,
+				Type:         cType,
+				SendChannels: database.ParseChannels(channel),
+				CreatedAt:    time.Now(),
 			}
 		}
 

@@ -16,23 +16,11 @@ func (b *DiscordBot) Listen() {
 				Description: message.Content,
 			}
 
-			for _, c := range b.RelayChannels {
-				if c.CanReceive(message.GetSendChannels()) {
-					b.Session.ChannelMessageSendEmbed(c.ChannelID, embed)
+			for _, e := range b.Cache {
+				if e.CanReceive(message.GetSendChannels()) {
+					b.Session.ChannelMessageSendEmbed(e.ID, embed)
 				}
 			}
 		}
 	}
-}
-
-func (channel *RelayChannel) CanReceive(channels []int) bool {
-	for c := range channel.ReceiveChannels {
-		for c1 := range channels {
-			if c == c1 {
-				return true
-			}
-		}
-	}
-
-	return false
 }

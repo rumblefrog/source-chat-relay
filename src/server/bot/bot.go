@@ -6,19 +6,15 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/rumblefrog/source-chat-relay/src/server/database"
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
 	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
 )
 
 type DiscordBot struct {
-	Session       *discordgo.Session
-	RelayChannels []*RelayChannel
-}
-
-type RelayChannel struct {
-	ChannelID       string
-	ReceiveChannels []int
-	SendChannels    []int
+	Session         *discordgo.Session
+	Cache           []*database.Entity
+	CacheController chan *database.Entity
 }
 
 var RelayBot *DiscordBot
@@ -45,7 +41,7 @@ func init() {
 
 		if err == dgrouter.ErrCouldNotFindRoute {
 
-			relayChannel := RelayBot.GetRelayChannel(m.ChannelID)
+			relayChannel := RelayBot.GetEntityOfChannel(m.ChannelID)
 
 			if relayChannel == nil {
 				return
@@ -65,7 +61,8 @@ func init() {
 	})
 
 	RelayBot = &DiscordBot{
-		Session: session,
+		Session:         session,
+		CacheController: make(chan *database.Entity),
 	}
 
 	router.Group(func(r *exrouter.Route) {
@@ -88,7 +85,10 @@ func init() {
 }
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
+	go RelayBot.StartCache()
 	go RelayBot.Listen()
+
+	RelayBot.SyncCache()
 
 	log.WithFields(log.Fields{
 		"Username":    event.User.Username,
