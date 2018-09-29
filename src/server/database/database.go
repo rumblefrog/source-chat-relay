@@ -42,4 +42,6 @@ func init() {
 	}
 
 	Cache.DownloadCache()
+
+	go Cache.StartCache()
 }

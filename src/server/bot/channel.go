@@ -40,11 +40,6 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		id = pid
 	}
 
-	log.WithFields(log.Fields{
-		"ID":      id,
-		"Channel": channel,
-	}).Debug()
-
 	entity, err := database.FetchEntity(id)
 
 	if err == sql.ErrNoRows && channel != "" {
