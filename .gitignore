@@ -25,8 +25,3 @@ vendor/*
 # Config
 
 *.toml
-
-# Out
-
-out/*
-!out/.gitkeep
