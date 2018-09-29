@@ -21,6 +21,7 @@ install:
     - wget $SMPACKAGE
     - tar -xzf $(basename "$SMPACKAGE")
     - cp src/client/Source-Chat-Relay.sp addons/sourcemod/scripting/
+    - cp src/client/include/morecolors.inc addons/sourcemod/scripting/include
     - cp src/client/include/socket.inc addons/sourcemod/scripting/include
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
