@@ -2,6 +2,7 @@ package bot
 
 import (
 	"regexp"
+	"time"
 
 	"github.com/rumblefrog/source-chat-relay/src/server/database"
 
@@ -89,15 +90,15 @@ func DisplayEntity(ctx *exrouter.Context, entity *database.Entity, title string)
 			},
 			&discordgo.MessageEmbedField{
 				Name:  "Receive Channels",
-				Value: database.EncodeChannelsSep(entity.ReceiveChannels, ", "),
+				Value: database.ChannelString(entity.ReceiveChannels),
 			},
 			&discordgo.MessageEmbedField{
 				Name:  "Send Channels",
-				Value: database.EncodeChannelsSep(entity.SendChannels, ", "),
+				Value: database.ChannelString(entity.SendChannels),
 			},
 			&discordgo.MessageEmbedField{
 				Name:  "Created At",
-				Value: entity.CreatedAt.String(),
+				Value: entity.CreatedAt.Format(time.RFC1123),
 			},
 		},
 	})

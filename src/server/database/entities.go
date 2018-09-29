@@ -93,9 +93,10 @@ func FetchEntities(eType EntityType) ([]*Entity, error) {
 
 func (entity *Entity) UpdateChannels() (sql.Result, error) {
 	return DBConnection.Exec(
-		"UPDATE `relay_entities` SET `receive_channels` = ?, `send_channels` = ?",
+		"UPDATE `relay_entities` SET `receive_channels` = ?, `send_channels` = ? WHERE `id` = ?",
 		EncodeChannels(entity.ReceiveChannels),
 		EncodeChannels(entity.SendChannels),
+		entity.ID,
 	)
 }
 
@@ -110,7 +111,7 @@ func (entity *Entity) CreateEntity() (sql.Result, error) {
 }
 
 func ParseChannels(s string) (c []int) {
-	ss := strings.Split(s, ",")
+	ss := strings.Split(strings.Replace(s, " ", "", -1), ",")
 
 	for _, channel := range ss {
 		tc, _ := strconv.Atoi(channel)
@@ -123,21 +124,27 @@ func ParseChannels(s string) (c []int) {
 func EncodeChannels(channels []int) string {
 	var s []string
 
-	for c := range channels {
+	for _, c := range channels {
 		s = append(s, strconv.Itoa(c))
 	}
 
 	return strings.Join(s, ",")
 }
 
-func EncodeChannelsSep(channels []int, sep string) string {
+func ChannelString(channels []int) string {
 	var s []string
 
-	for c := range channels {
+	for _, c := range channels {
 		s = append(s, strconv.Itoa(c))
 	}
 
-	return strings.Join(s, sep)
+	j := strings.Join(s, ", ")
+
+	if j == "" {
+		return "None"
+	}
+
+	return j
 }
 
 func (eType EntityType) Polarize() EntityType {
