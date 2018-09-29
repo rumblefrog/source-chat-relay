@@ -31,6 +31,10 @@ type OverwriteData struct {
 func (m *ClientManager) HandleMessage(b []byte, h *Header) {
 	Message := ParseMessage(b, h)
 
+	if Message.Header.Sender.Entity == nil {
+		return
+	}
+
 	log.WithFields(log.Fields{
 		"Hostname":      Message.Hostname,
 		"Client ID":     Message.ClientID,

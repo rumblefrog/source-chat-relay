@@ -211,7 +211,9 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 		}
 	}
 	
-	PrintToServer(sFrame);
+	#if defined DEBUG
+		PrintToServer("%s", sFrame);
+	#endif
 	
 	SendFrame(sFrame);
 }
@@ -220,7 +222,9 @@ void SendFrame(const char[] frame)
 {
 	SocketSend(hSocket, frame);
 	
-	PrintToConsoleAll(frame);
+	#if defined DEBUG
+		PrintToConsoleAll(frame);
+	#endif
 }
 
 void ParseMessageFrame(const char[] frame)
