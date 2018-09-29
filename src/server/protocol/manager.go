@@ -49,9 +49,9 @@ func (manager *ClientManager) Start() {
 				if connection.CanReceive(message.GetSendChannels()) {
 					connection.Data <- []byte(message.ToString())
 				}
-				if message.Overwrite == nil {
-					manager.Bot <- message
-				}
+			}
+			if message.Overwrite == nil {
+				manager.Bot <- message
 			}
 		case entity := <-manager.CacheController:
 			for connection := range manager.Clients {
