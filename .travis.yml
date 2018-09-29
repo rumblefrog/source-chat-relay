@@ -31,3 +31,13 @@ before_script:
 script:
     - go build ./src/server
     - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/src/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/Source-Chat-Relay.smx
+
+deploy:
+    provider: releases
+    api_key: "$githubkey"
+    files:
+        - $TRAVIS_BUILD_DIR/server
+        - $TRAVIS_BUILD_DIR/Source-Chat-Relay.smx
+    skip_cleanup: true
+    on:
+        tags: true

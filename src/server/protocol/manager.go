@@ -47,7 +47,12 @@ func (manager *ClientManager) Start() {
 		case message := <-manager.Router:
 			for connection := range manager.Clients {
 				if connection.CanReceive(message.GetSendChannels()) {
-					connection.Data <- []byte(message.ToString())
+					select {
+					case connection.Data <- []byte(message.ToString()):
+					default:
+						close(connection.Data)
+						delete(manager.Clients, connection)
+					}
 				}
 			}
 			if message.Overwrite == nil {

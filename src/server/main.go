@@ -13,9 +13,7 @@ import (
 )
 
 func init() {
-	// TODO: Configurable level
-
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.InfoLevel)
 }
 
 func main() {
