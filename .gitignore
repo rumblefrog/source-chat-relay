@@ -18,6 +18,10 @@
 # Go DEP
 vendor/*
 
+# VSCODE
+
+.vscode/*
+
 # Config
 
 *.toml
