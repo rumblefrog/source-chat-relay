@@ -10,12 +10,13 @@ import (
 )
 
 type ClientManager struct {
-	Clients    map[*Client]bool
-	Broadcast  chan []byte
-	Bot        chan *Message
-	Router     chan *Message
-	Register   chan *Client
-	Unregister chan *Client
+	Clients         map[*Client]bool
+	Broadcast       chan []byte
+	Bot             chan *Message
+	Router          chan *Message
+	Register        chan *Client
+	Unregister      chan *Client
+	CacheController chan *database.Entity
 }
 
 type Client struct {
@@ -50,6 +51,13 @@ func (manager *ClientManager) Start() {
 					if message.Overwrite == nil {
 						manager.Bot <- message
 					}
+				}
+			}
+		case entity := <-manager.CacheController:
+			for connection := range manager.Clients {
+				if connection.Entity.ID == entity.ID {
+					connection.Entity.ReceiveChannels = entity.ReceiveChannels
+					connection.Entity.SendChannels = entity.SendChannels
 				}
 			}
 		}

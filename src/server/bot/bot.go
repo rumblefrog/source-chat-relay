@@ -42,11 +42,15 @@ func init() {
 	router := exrouter.New()
 
 	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
+		if m.Author.Bot {
+			return
+		}
+
 		err := router.FindAndExecute(session, "r/", session.State.User.ID, m.Message)
 
 		if err == dgrouter.ErrCouldNotFindRoute {
 
-			relayChannel := RelayBot.GetEntityOfChannel(m.ChannelID)
+			relayChannel := database.Cache.GetEntity(m.ChannelID)
 
 			if relayChannel == nil {
 				return
@@ -59,6 +63,7 @@ func init() {
 				Hostname:   "Discord",
 				ClientName: m.Author.Username,
 				ClientID:   m.Author.ID,
+				Content:    m.Content,
 			}
 
 			protocol.NetManager.Router <- message
@@ -85,10 +90,7 @@ func init() {
 }
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
-	go RelayBot.StartCache()
 	go RelayBot.Listen()
-
-	RelayBot.SyncCache()
 
 	log.WithFields(log.Fields{
 		"Username":    event.User.Username,

@@ -57,16 +57,6 @@ func GetMessageGuild(c *exrouter.Context, m *discordgo.Message) (*discordgo.Guil
 	return guild, nil
 }
 
-func (b *DiscordBot) GetEntityOfChannel(channelID string) *database.Entity {
-	for _, e := range b.Cache {
-		if e.ID == channelID {
-			return e
-		}
-	}
-
-	return nil
-}
-
 func ParseChannel(arg string) (string, bool) {
 	if ChannelRegex.Match([]byte(arg)) {
 		return ChannelRegex.FindAllStringSubmatch(arg, -1)[0][1], true

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/rumblefrog/source-chat-relay/src/server/database"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/rumblefrog/source-chat-relay/src/server/helper"
@@ -25,12 +27,13 @@ func init() {
 	}
 
 	NetManager = &ClientManager{
-		Clients:    make(map[*Client]bool),
-		Broadcast:  make(chan []byte),
-		Bot:        make(chan *Message),
-		Router:     make(chan *Message),
-		Register:   make(chan *Client),
-		Unregister: make(chan *Client),
+		Clients:         make(map[*Client]bool),
+		Broadcast:       make(chan []byte),
+		Bot:             make(chan *Message),
+		Router:          make(chan *Message),
+		Register:        make(chan *Client),
+		Unregister:      make(chan *Client),
+		CacheController: make(chan *database.Entity),
 	}
 
 	go AcceptConnections()

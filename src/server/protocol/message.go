@@ -32,10 +32,11 @@ func (m *ClientManager) HandleMessage(b []byte, h *Header) {
 	Message := ParseMessage(b, h)
 
 	log.WithFields(log.Fields{
-		"Hostname":    Message.Hostname,
-		"Client ID":   Message.ClientID,
-		"Client Name": Message.ClientName,
-		"Content":     Message.Content,
+		"Hostname":      Message.Hostname,
+		"Client ID":     Message.ClientID,
+		"Client Name":   Message.ClientName,
+		"Content":       Message.Content,
+		"Send Channels": Message.Header.Sender.Entity.SendChannels,
 	}).Debug()
 
 	NetManager.Router <- Message
@@ -64,21 +65,23 @@ func ParseMessage(b []byte, h *Header) *Message {
 
 	Message.Content = string(b[offset:])
 
-	strings.TrimSpace(Message.Hostname)
-	strings.TrimSpace(Message.ClientID)
-	strings.TrimSpace(Message.ClientName)
+	Message.Hostname = strings.TrimSpace(Message.Hostname)
+	Message.ClientID = strings.TrimSpace(Message.ClientID)
+	Message.ClientName = strings.TrimSpace(Message.ClientName)
 
 	return Message
 }
 
 func (m *Message) ToString() (buffer string) {
-	buffer += fmt.Sprintf("%s%-64s", buffer, m.Hostname)
+	buffer += "1"
 
-	buffer += fmt.Sprintf("%s%-64s", buffer, m.ClientID)
+	buffer += fmt.Sprintf("%-64s", m.Hostname)
 
-	buffer += fmt.Sprintf("%s%-32s", buffer, m.ClientName)
+	buffer += fmt.Sprintf("%-64s", m.ClientID)
 
-	buffer += fmt.Sprintf("%s%s", buffer, m.Content)
+	buffer += fmt.Sprintf("%-32s", m.ClientName)
+
+	buffer += fmt.Sprintf("%s", m.Content)
 
 	return
 }

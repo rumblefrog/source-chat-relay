@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
+
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/rumblefrog/source-chat-relay/src/server/database"
 	log "github.com/sirupsen/logrus"
@@ -91,6 +93,9 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 			return
 		}
 	}
+
+	database.Cache.Controller <- entity
+	protocol.NetManager.CacheController <- entity
 
 	DisplayEntity(ctx, entity, "Entity Descriptor")
 }

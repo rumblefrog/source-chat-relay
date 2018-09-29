@@ -36,4 +36,10 @@ func init() {
 	}
 
 	CreateTables(DBConnection)
+
+	Cache = &EntityCache{
+		Controller: make(chan *Entity),
+	}
+
+	Cache.DownloadCache()
 }

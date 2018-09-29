@@ -144,6 +144,8 @@ public int OnSocketReceive(Handle socket, const char[] receiveData, int dataSize
 	// for (int i = 0; i < pCount; i++)
 	// 	 ParseMessageFrame(sPackets[i]);
 	
+	PrintToServer(receiveData);
+	
 	ParseMessageFrame(receiveData);
 }
 
@@ -248,7 +250,7 @@ void ParseMessageFrame(const char[] frame)
 	
 	int iLen = strlen(frame);
 	
-	int iOffset = 2;
+	int iOffset = 1;
 	
 	for (int i = 0; i < 64; i++)
 	{

@@ -2,6 +2,7 @@ package bot
 
 import (
 	"github.com/bwmarrin/discordgo"
+	"github.com/rumblefrog/source-chat-relay/src/server/database"
 	"github.com/rumblefrog/source-chat-relay/src/server/protocol"
 )
 
@@ -16,8 +17,8 @@ func (b *DiscordBot) Listen() {
 				Description: message.Content,
 			}
 
-			for _, e := range b.Cache {
-				if e.CanReceive(message.GetSendChannels()) {
+			for _, e := range database.Cache.Entities {
+				if e.Type == database.Channel && e.CanReceive(message.GetSendChannels()) {
 					b.Session.ChannelMessageSendEmbed(e.ID, embed)
 				}
 			}
