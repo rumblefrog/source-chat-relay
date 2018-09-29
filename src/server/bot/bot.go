@@ -78,6 +78,8 @@ func init() {
 		r.On("receivechannel", ChannelCommandRoute).Desc("Get/Set the receive relay channel of this ID/TextChannel").Alias("rc")
 
 		r.On("sendchannel", ChannelCommandRoute).Desc("Get/Set the send relay channel of this ID/TextChannel").Alias("sc")
+
+		r.On("entities", EntitiesCMD).Desc("Fetch all entities (of certain type)").Alias("e")
 	})
 
 	router.Group(func(r *exrouter.Route) {

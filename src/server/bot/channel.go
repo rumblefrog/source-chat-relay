@@ -92,5 +92,5 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 	database.Cache.Controller <- entity
 	protocol.NetManager.CacheController <- entity
 
-	DisplayEntity(ctx, entity, "Entity Descriptor")
+	ctx.Ses.ChannelMessageSendEmbed(ctx.Msg.ChannelID, entity.Embed())
 }

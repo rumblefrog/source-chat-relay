@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 type EntityType int
@@ -122,6 +124,34 @@ func (entity *Entity) CanReceive(channels []int) bool {
 	return false
 }
 
+func (entity *Entity) Embed() *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 14795100,
+		Fields: []*discordgo.MessageEmbedField{
+			&discordgo.MessageEmbedField{
+				Name:  "Entity",
+				Value: entity.ID,
+			},
+			&discordgo.MessageEmbedField{
+				Name:  "Entity Type",
+				Value: entity.Type.String(),
+			},
+			&discordgo.MessageEmbedField{
+				Name:  "Receive Channels",
+				Value: ChannelString(entity.ReceiveChannels),
+			},
+			&discordgo.MessageEmbedField{
+				Name:  "Send Channels",
+				Value: ChannelString(entity.SendChannels),
+			},
+			&discordgo.MessageEmbedField{
+				Name:  "Created At",
+				Value: entity.CreatedAt.Format(time.RFC1123),
+			},
+		},
+	}
+}
+
 func ParseChannels(s string) (c []int) {
 	ss := strings.Split(strings.Replace(s, " ", "", -1), ",")
 
@@ -165,6 +195,17 @@ func (eType EntityType) Polarize() EntityType {
 		return Channel
 	case Channel:
 		return Server
+	default:
+		return All
+	}
+}
+
+func EntityTypeFromString(t string) EntityType {
+	switch strings.ToLower(t) {
+	case "server":
+		return Server
+	case "channel":
+		return Channel
 	default:
 		return All
 	}
