@@ -26,6 +26,11 @@ func init() {
 		log.WithField("error", err).Fatal("Unable to initiate bot session")
 	}
 
+	RelayBot = &DiscordBot{
+		Session:         session,
+		CacheController: make(chan *database.Entity),
+	}
+
 	session.AddHandler(ready)
 
 	err = session.Open()
@@ -59,11 +64,6 @@ func init() {
 			protocol.NetManager.Router <- message
 		}
 	})
-
-	RelayBot = &DiscordBot{
-		Session:         session,
-		CacheController: make(chan *database.Entity),
-	}
 
 	router.Group(func(r *exrouter.Route) {
 		r.Cat("configuration")

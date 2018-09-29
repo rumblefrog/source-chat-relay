@@ -52,7 +52,7 @@ func FetchEntity(id string) (*Entity, error) {
 }
 
 func FetchEntities(eType EntityType) ([]*Entity, error) {
-	rows, err := DBConnection.Query("SELECT * FROM `relay_entities` WHERE `type` = ?", eType.Polarize())
+	rows, err := DBConnection.Query("SELECT * FROM `relay_entities` WHERE `type` != ?", eType.Polarize())
 
 	if err != nil {
 		return nil, err

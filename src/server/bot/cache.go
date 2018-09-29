@@ -34,9 +34,11 @@ func (b *DiscordBot) SyncCache() {
 	entities, err := database.FetchEntities(database.Channel)
 
 	if err != nil {
-		log.WithField("error", err).Warn("Unable to sync channel cache")
+		log.WithField("error", err).Warn("Unable to sync relay channel cache")
 		return
 	}
 
 	b.Cache = entities
+
+	log.WithField("len", len(b.Cache)).Info("Bot relay channel cache synced")
 }
