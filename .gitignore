@@ -17,3 +17,7 @@
 
 # Go DEP
 vendor/*
+
+# Config
+
+*.toml
