@@ -21,8 +21,7 @@ enum RelayFrame {
 }
 
 char sHostname[64];
-//TODO: Change to 127.1
-char sHost[64] = "192.168.86.106";
+char sHost[64] = "127.0.0.1";
 char sToken[64];
 
 // Randomly selected port
@@ -46,8 +45,7 @@ public void OnPluginStart()
 {
 	CreateConVar("sm_scr_version", PLUGIN_VERSION, "Source Chat Relay Version", FCVAR_REPLICATED | FCVAR_SPONLY | FCVAR_DONTRECORD | FCVAR_NOTIFY);
 
-	//TODO: Change to 127.1
-	cHost = CreateConVar("scr_host", "192.168.86.106", "Relay Server Host", FCVAR_PROTECTED);
+	cHost = CreateConVar("scr_host", "127.0.0.1", "Relay Server Host", FCVAR_PROTECTED);
 
 	cPort = CreateConVar("scr_port", "57452", "Relay Server Port", FCVAR_PROTECTED);
 
@@ -57,7 +55,10 @@ public void OnPluginStart()
 
 	SocketSetOption(hSocket, SocketReuseAddr, 1);
 	SocketSetOption(hSocket, SocketKeepAlive, 1);
-	SocketSetOption(hSocket, DebugMode, 1);
+	
+	#if defined DEBUG
+		SocketSetOption(hSocket, DebugMode, 1);
+	#endif
 }
 
 public void OnConfigsExecuted()
