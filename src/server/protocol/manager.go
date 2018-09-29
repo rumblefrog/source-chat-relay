@@ -28,13 +28,16 @@ type Client struct {
 func (manager *ClientManager) Start() {
 	for {
 		select {
+
 		case connection := <-manager.Register:
 			manager.Clients[connection] = true
+
 		case connection := <-manager.Unregister:
 			if _, ok := manager.Clients[connection]; ok {
 				close(connection.Data)
 				delete(manager.Clients, connection)
 			}
+
 		case message := <-manager.Broadcast:
 			for connection := range manager.Clients {
 				select {
@@ -44,6 +47,7 @@ func (manager *ClientManager) Start() {
 					delete(manager.Clients, connection)
 				}
 			}
+
 		case message := <-manager.Router:
 			for connection := range manager.Clients {
 				if connection.CanReceive(message.GetSendChannels()) {
@@ -58,6 +62,7 @@ func (manager *ClientManager) Start() {
 			if message.Overwrite == nil {
 				manager.Bot <- message
 			}
+
 		case entity := <-manager.CacheController:
 			for connection := range manager.Clients {
 				if connection.Entity.ID == entity.ID {
@@ -65,6 +70,7 @@ func (manager *ClientManager) Start() {
 					connection.Entity.SendChannels = entity.SendChannels
 				}
 			}
+
 		}
 	}
 }

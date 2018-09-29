@@ -6,6 +6,7 @@
 #define PLUGIN_VERSION "0.0.1"
 
 #include <sourcemod>
+#include <morecolors>
 #include <socket>
 
 #pragma newdecls required
@@ -137,13 +138,6 @@ public int OnSocketConnected(Handle socket, any arg)
 
 public int OnSocketReceive(Handle socket, const char[] receiveData, int dataSize, any arg)
 {
-	// char sPackets[8][1024];
-	
-	// int pCount = ExplodeString(receiveData, "\\n", sPackets, sizeof sPackets, sizeof sPackets[]);
-	
-	// for (int i = 0; i < pCount; i++)
-	// 	 ParseMessageFrame(sPackets[i]);
-	
 	PrintToServer(receiveData);
 	
 	ParseMessageFrame(receiveData);
@@ -156,12 +150,6 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 		
 	if (!SocketIsConnected(hSocket))
 		return;
-		
-	// char buffer[256];
-	
-	// Format(buffer, sizeof buffer, "%s", sArgs);
-	
-	// EscapeBreak(buffer, sizeof buffer);
 		
 	PackMessage(client, sArgs);
 }
@@ -223,8 +211,6 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 		}
 	}
 	
-	// Format(sFrame, iLen, "%s\n", sFrame);
-	
 	PrintToServer(sFrame);
 	
 	SendFrame(sFrame);
@@ -235,10 +221,6 @@ void SendFrame(const char[] frame)
 	SocketSend(hSocket, frame);
 	
 	PrintToConsoleAll(frame);
-	
-	// Testing if message can be de-constructed successfully
-	if (frame[0] == '2')
-		ParseMessageFrame(frame);
 }
 
 void ParseMessageFrame(const char[] frame)
@@ -286,19 +268,23 @@ void ParseMessageFrame(const char[] frame)
 		iOffset++;
 	}
 	
-	PrintToConsoleAll("===== PARSING =====");
+	#if defined DEBUG
+		PrintToConsoleAll("===== PARSING =====");
 	
-	PrintToConsoleAll("hostname: %s", hostname);
+		PrintToConsoleAll("hostname: %s", hostname);
 	
-	PrintToConsoleAll("id64: %s", id64);
+		PrintToConsoleAll("id64: %s", id64);
 	
-	PrintToConsoleAll("name: %s", name);
+		PrintToConsoleAll("name: %s", name);
 	
-	PrintToConsoleAll("sContentLen: %d", iContentLen);
+		PrintToConsoleAll("sContentLen: %d", iContentLen);
 	
-	PrintToConsoleAll("sContent: %s", sContent);
+		PrintToConsoleAll("sContent: %s", sContent);
 	
-	PrintToConsoleAll("===================");
+		PrintToConsoleAll("===================");
+	#endif
+	
+	CPrintToChatAll("{lightseagreen}[{navy}%s{lightseagreen}] {peru}%s {white}: {orchid}", hostname, name, sContent);
 }
 
 void CleanBuffer(char[] buffer, int bufferlen)

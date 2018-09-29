@@ -56,11 +56,17 @@ func init() {
 				return
 			}
 
+			channel, err := session.Channel(m.ChannelID)
+
+			if err != nil {
+				return
+			}
+
 			message := &protocol.Message{
 				Overwrite: &protocol.OverwriteData{
 					SendChannels: relayChannel.SendChannels,
 				},
-				Hostname:   "Discord",
+				Hostname:   channel.Name,
 				ClientName: m.Author.Username,
 				ClientID:   m.Author.ID,
 				Content:    m.Content,
