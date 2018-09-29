@@ -66,7 +66,7 @@ func init() {
 				Overwrite: &protocol.OverwriteData{
 					SendChannels: relayChannel.SendChannels,
 				},
-				Hostname:   channel.Name,
+				Hostname:   CapitalChannelName(channel),
 				ClientName: m.Author.Username,
 				ClientID:   m.Author.ID,
 				Content:    m.Content,

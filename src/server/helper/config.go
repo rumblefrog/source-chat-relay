@@ -20,6 +20,7 @@ type DatabaseConfig struct {
 	Password string `toml:"Password"`
 	Database string `toml:"Database"`
 	Port     int    `toml:"Port"`
+	Socket   bool   `toml:"Socket"`
 }
 
 type Config struct {

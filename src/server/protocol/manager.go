@@ -50,7 +50,7 @@ func (manager *ClientManager) Start() {
 
 		case message := <-manager.Router:
 			for connection := range manager.Clients {
-				if connection.CanReceive(message.GetSendChannels()) {
+				if !connection.IsNotFromSelf(message) && connection.CanReceive(message.GetSendChannels()) {
 					select {
 					case connection.Data <- []byte(message.ToString()):
 					default:
@@ -76,7 +76,7 @@ func (manager *ClientManager) Start() {
 }
 
 func (client *Client) Register(token []byte) {
-	entity, err := database.FetchEntity(string(token))
+	entity, err := database.FetchEntity(string(token), database.Server)
 
 	if err == sql.ErrNoRows {
 		entity = &database.Entity{
@@ -142,10 +142,18 @@ func (manager *ClientManager) Send(client *Client) {
 	}
 }
 
+func (client *Client) IsNotFromSelf(message *Message) bool {
+	if message.Overwrite != nil {
+		return false
+	}
+
+	return client.Entity == message.Header.Sender.Entity
+}
+
 func (client *Client) CanReceive(channels []int) bool {
 	for _, c := range client.Entity.ReceiveChannels {
 		for _, c1 := range channels {
-			if c == c1 {
+			if c == c1 || c == -1 {
 				return true
 			}
 		}

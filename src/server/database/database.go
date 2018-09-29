@@ -15,7 +15,12 @@ var DBConnection *sql.DB
 func init() {
 	c := mysql.NewConfig()
 
-	c.Addr = fmt.Sprintf("%s:%d", helper.Conf.Database.Host, helper.Conf.Database.Port)
+	if helper.Conf.Database.Socket {
+		c.Addr = helper.Conf.Database.Host
+		c.Net = "unix"
+	} else {
+		c.Addr = fmt.Sprintf("%s:%d", helper.Conf.Database.Host, helper.Conf.Database.Port)
+	}
 
 	c.User = helper.Conf.Database.Username
 

@@ -25,8 +25,8 @@ type Entity struct {
 	CreatedAt       time.Time
 }
 
-func FetchEntity(id string) (*Entity, error) {
-	row := DBConnection.QueryRow("SELECT * FROM `relay_entities` WHERE `id` = ?", id)
+func FetchEntity(id string, eType EntityType) (*Entity, error) {
+	row := DBConnection.QueryRow("SELECT * FROM `relay_entities` WHERE `id` = ? AND `type` = ?", id, eType)
 
 	var (
 		entity          = &Entity{}
@@ -115,7 +115,7 @@ func (entity *Entity) CreateEntity() (sql.Result, error) {
 func (entity *Entity) CanReceive(channels []int) bool {
 	for _, c := range entity.ReceiveChannels {
 		for _, c1 := range channels {
-			if c == c1 {
+			if c == c1 || c == -1 {
 				return true
 			}
 		}
@@ -126,22 +126,22 @@ func (entity *Entity) CanReceive(channels []int) bool {
 
 func (entity *Entity) Embed() *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
-		Color: 14795100,
+		Color: 0xE1C15C,
 		Fields: []*discordgo.MessageEmbedField{
 			&discordgo.MessageEmbedField{
-				Name:  "Entity",
+				Name:  entity.DisplayName(),
 				Value: entity.ID,
 			},
 			&discordgo.MessageEmbedField{
-				Name:  "Entity Type",
+				Name:  "Entity Type :gear:",
 				Value: entity.Type.String(),
 			},
 			&discordgo.MessageEmbedField{
-				Name:  "Receive Channels",
+				Name:  "Receive Channels :inbox_tray:",
 				Value: ChannelString(entity.ReceiveChannels),
 			},
 			&discordgo.MessageEmbedField{
-				Name:  "Send Channels",
+				Name:  "Send Channels :outbox_tray:",
 				Value: ChannelString(entity.SendChannels),
 			},
 			&discordgo.MessageEmbedField{
@@ -150,6 +150,14 @@ func (entity *Entity) Embed() *discordgo.MessageEmbed {
 			},
 		},
 	}
+}
+
+func (entity *Entity) DisplayName() string {
+	if entity.Type == Server {
+		return "Entity ID (Keep Private) :key:"
+	}
+
+	return "Entity ID :key:"
 }
 
 func ParseChannels(s string) (c []int) {

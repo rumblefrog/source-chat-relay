@@ -228,7 +228,7 @@ void ParseMessageFrame(const char[] frame)
 	if (frame[0] != '1')
 		return;
 	
-	char hostname[64], id64[64], name[32];
+	char b1[64], b2[64], b3[32], hostname[64], id64[64], name[32];
 	
 	int iLen = strlen(frame);
 	
@@ -236,27 +236,28 @@ void ParseMessageFrame(const char[] frame)
 	
 	for (int i = 0; i < 64; i++)
 	{
-		Format(hostname, sizeof hostname, "%s%c", hostname, frame[iOffset]);
+		Format(b1, sizeof b1, "%s%c", b1, frame[iOffset]);
 		iOffset++;
 	}
 	
-	CleanBuffer(hostname, sizeof hostname);
+	String_Trim(b1, hostname, sizeof hostname);
 	
 	for (int i = 0; i < 64; i++)
 	{
-		Format(id64, sizeof id64, "%s%c", id64, frame[iOffset]);
+		Format(b2, sizeof b2, "%s%c", b2, frame[iOffset]);
 		iOffset++;
 	}
 	
-	CleanBuffer(id64, sizeof id64);
+	
+	String_Trim(b2, id64, sizeof id64);
 	
 	for (int i = 0; i < 32; i++)
 	{
-		Format(name, sizeof name, "%s%c", name, frame[iOffset]);
+		Format(b3, sizeof b3, "%s%c", b3, frame[iOffset]);
 		iOffset++;
 	}
 	
-	CleanBuffer(name, sizeof name);
+	String_Trim(b3, name, sizeof name);
 	
 	int iContentLen = iLen - iOffset;
 	
@@ -284,32 +285,25 @@ void ParseMessageFrame(const char[] frame)
 		PrintToConsoleAll("===================");
 	#endif
 	
-	CPrintToChatAll("{lightseagreen}[{navy}%s{lightseagreen}] {peru}%s {white}: {orchid}", hostname, name, sContent);
+	CPrintToChatAll("{lightseagreen}[%s] {chartreuse}%s{white}: {gray}%s", hostname, name, sContent);
 }
 
-void CleanBuffer(char[] buffer, int bufferlen)
+stock void String_Trim(const char[] str, char[] output, int size, const char[] chrs=" \t\r\n")
 {
-	int iLen = strlen(buffer);
-
-	int iOffset = iLen;
+	int x = 0;
 	
-	for (int i = iLen; i > 0; i--)
-	{
-		if (buffer[i] != ' ')
-		{
-			iOffset = i;
-			break;
-		}
+	while (str[x] != '\0' && FindCharInString(chrs, str[x]) != -1) {
+		x++;
 	}
-	
-	int iEnd = iOffset + 1;
-	
-	char[] sBuffer = new char[iEnd];
-	
-	for (int i = 0; i < iOffset; i++)
-		Format(sBuffer, iEnd, "%s%c", sBuffer, buffer[i]);
-	
-	Format(buffer, bufferlen, "%s", sBuffer);
+
+	x = strcopy(output, size, str[x]);
+	x--;
+
+	while (x >= 0 && FindCharInString(chrs, output[x]) != -1) {
+		x--;
+	}
+
+	output[++x] = '\0';
 }
 
 stock void EscapeBreak(char[] buffer, int buffersize)

@@ -40,7 +40,7 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		id = pid
 	}
 
-	entity, err := database.FetchEntity(id)
+	entity, err := database.FetchEntity(id, cType)
 
 	if err == sql.ErrNoRows && channel != "" {
 		if cmdType == Receive {
