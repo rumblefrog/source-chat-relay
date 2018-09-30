@@ -36,9 +36,10 @@ script:
 deploy:
     provider: releases
     api_key: "$githubkey"
-    files:
+    file:
         - $TRAVIS_BUILD_DIR/out/server
         - $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
+        - $TRAVIS_BUILD_DIR/config.toml.example
     skip_cleanup: true
     on:
         tags: true
