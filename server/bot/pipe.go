@@ -14,11 +14,16 @@ func (b *DiscordBot) Listen() {
 		select {
 		case message := <-protocol.NetManager.Bot:
 			embed := &discordgo.MessageEmbed{
-				URL:         message.GetClientURL(),
-				Title:       message.ClientName,
 				Color:       message.GetClientColor(),
 				Description: message.Content,
 				Timestamp:   time.Now().Format(time.RFC3339),
+				Author: &discordgo.MessageEmbedAuthor{
+					Name: message.ClientName,
+					URL:  message.GetClientURL(),
+				},
+				Footer: &discordgo.MessageEmbedFooter{
+					Text: message.Hostname,
+				},
 			}
 
 			for _, e := range repoEntity.GetEntities(repoEntity.All) {
