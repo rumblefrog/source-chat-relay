@@ -26,7 +26,6 @@ func init() {
 
 	NetManager = &ClientManager{
 		Clients:    make(map[*Client]bool),
-		Broadcast:  make(chan []byte),
 		Bot:        make(chan *Message),
 		Router:     make(chan *Message),
 		Register:   make(chan *Client),

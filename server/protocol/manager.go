@@ -11,7 +11,6 @@ import (
 
 type ClientManager struct {
 	Clients    map[*Client]bool
-	Broadcast  chan []byte
 	Bot        chan *Message
 	Router     chan *Message
 	Register   chan *Client
@@ -35,16 +34,6 @@ func (manager *ClientManager) Start() {
 			if _, ok := manager.Clients[connection]; ok {
 				close(connection.Data)
 				delete(manager.Clients, connection)
-			}
-
-		case message := <-manager.Broadcast:
-			for connection := range manager.Clients {
-				select {
-				case connection.Data <- message:
-				default:
-					close(connection.Data)
-					delete(manager.Clients, connection)
-				}
 			}
 
 		case message := <-manager.Router:
