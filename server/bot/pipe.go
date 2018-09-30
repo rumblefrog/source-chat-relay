@@ -1,6 +1,8 @@
 package bot
 
 import (
+	"time"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/rumblefrog/source-chat-relay/server/protocol"
 
@@ -16,6 +18,7 @@ func (b *DiscordBot) Listen() {
 				Title:       message.ClientName,
 				Color:       message.GetClientColor(),
 				Description: message.Content,
+				Timestamp:   time.Now().Format(time.RFC3339),
 			}
 
 			for _, e := range repoEntity.GetEntities(repoEntity.All) {
