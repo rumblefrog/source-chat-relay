@@ -14,7 +14,6 @@
 #define HEADER_LEN 161
 
 enum RelayFrame {
-	Ping,
 	Authenticate,
 	Message,
 	Unknown
@@ -194,10 +193,6 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 	
 	switch (opcode)
 	{
-		case Ping:
-		{
-			sFrame[0] = '0';
-		}
 		case Authenticate:
 		{
 			sFrame[0] = '1';
