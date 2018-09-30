@@ -195,13 +195,13 @@ void PackFrame(RelayFrame opcode, const char[] payload)
 	{
 		case Authenticate:
 		{
-			sFrame[0] = '1';
+			sFrame[0] = '0';
 			
 			Format(sFrame, iLen, "%s%s", sFrame, payload);
 		}
 		case Message:
 		{
-			sFrame[0] = '2';
+			sFrame[0] = '1';
 				
 			Format(sFrame, iLen, "%s%s", sFrame, payload);
 		}
