@@ -36,7 +36,7 @@ func Sync() {
 	}
 
 	for _, e := range entities {
-		Cache.Entities[e.ID] = e
+		Cache.Controller <- e
 	}
 
 	log.WithField("len", len(Cache.Entities)).Info("Relay channel cache synced")
