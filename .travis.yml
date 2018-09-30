@@ -20,18 +20,18 @@ install:
     - SMPACKAGE="https://www.sourcemod.net/smdrop/$SMVERSION/$SMLATEST"
     - wget $SMPACKAGE
     - tar -xzf $(basename "$SMPACKAGE")
-    - cp src/client/Source-Chat-Relay.sp addons/sourcemod/scripting/
-    - cp src/client/include/morecolors.inc addons/sourcemod/scripting/include
-    - cp src/client/include/socket.inc addons/sourcemod/scripting/include
+    - cp client/Source-Chat-Relay.sp addons/sourcemod/scripting/
+    - cp client/include/morecolors.inc addons/sourcemod/scripting/include
+    - cp client/include/socket.inc addons/sourcemod/scripting/include
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 before_script:
-    - go get -d ./src/server
+    - go get -d ./server
     - chmod +x addons/sourcemod/scripting/spcomp
 
 script:
-    - go build -o ./out/server ./src/server
-    - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/src/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
+    - go build -o ./out/server ./server
+    - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
 
 deploy:
     provider: releases
