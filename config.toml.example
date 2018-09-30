@@ -10,4 +10,4 @@ Username = "root" # MySQL Database Username
 Password = "" # MySQL User Password
 Database = "relay" # MySQL Database To Use
 Port = 3306 # MySQL Server Port
-Socket = false
+Protocol = "tcp" # The protocol to parse DSN as, most users can leave this at default

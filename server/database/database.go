@@ -15,12 +15,7 @@ var DBConnection *sql.DB
 func init() {
 	c := mysql.NewConfig()
 
-	if helper.Conf.Database.Socket {
-		c.Addr = helper.Conf.Database.Host
-		c.Net = "unix"
-	} else {
-		c.Addr = fmt.Sprintf("%s:%d", helper.Conf.Database.Host, helper.Conf.Database.Port)
-	}
+	c.Net = helper.Conf.Database.Protocol
 
 	c.User = helper.Conf.Database.Username
 
@@ -32,6 +27,12 @@ func init() {
 
 	c.ParseTime = true
 
+	if helper.Conf.Database.Protocol == "tcp" {
+		c.Addr = fmt.Sprintf("%s:%d", helper.Conf.Database.Host, helper.Conf.Database.Port)
+	} else {
+		c.Addr = helper.Conf.Database.Host
+	}
+
 	var err error
 
 	DBConnection, err = sql.Open("mysql", c.FormatDSN())
@@ -41,12 +42,4 @@ func init() {
 	}
 
 	CreateTables(DBConnection)
-
-	// Cache = &EntityCache{
-	// 	Controller: make(chan *Entity),
-	// }
-
-	// Cache.DownloadCache()
-
-	// go Cache.StartCache()
 }
