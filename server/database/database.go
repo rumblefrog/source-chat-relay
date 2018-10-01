@@ -25,6 +25,8 @@ func init() {
 
 	c.Collation = "utf8mb4_general_ci"
 
+	c.InterpolateParams = true
+
 	c.ParseTime = true
 
 	if helper.Conf.Database.Protocol == "tcp" {
