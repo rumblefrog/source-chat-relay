@@ -35,15 +35,15 @@ script:
     - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
 
 before_deploy:
-    - 7zr a linux-amd64.tar.gz out/server $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx $TRAVIS_BUILD_DIR/config.toml.example
-    - 7zr a windows-64.7z out/server.exe $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx $TRAVIS_BUILD_DIR/config.toml.example
+    - 7zr a linux-amd64.tar.gz $TRAVIS_BUILD_DIR/out/server $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx $TRAVIS_BUILD_DIR/config.toml.example
+    - 7zr a windows-amd64.7z $TRAVIS_BUILD_DIR/out/server.exe $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx $TRAVIS_BUILD_DIR/config.toml.example
 
 deploy:
     provider: releases
     api_key: "$githubkey"
     file:
         - $TRAVIS_BUILD_DIR/linux-amd64.tar.gz
-        - $TRAVIS_BUILD_DIR/windows-64.7z
+        - $TRAVIS_BUILD_DIR/windows-amd64.7z
     skip_cleanup: true
     on:
         tags: true
