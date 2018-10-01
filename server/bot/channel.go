@@ -73,8 +73,11 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 
 		return
 	} else {
-		err = entity.SetReceiveChannels(repoEntity.ParseChannels(channel))
-
+		if cmdType == Receive {
+			err = entity.SetReceiveChannels(repoEntity.ParseChannels(channel))
+		} else if cmdType == Send {
+			err = entity.SetSendChannels(repoEntity.ParseChannels(channel))
+		}
 		if err != nil {
 			log.WithField("error", err).Warn("Unable to update entity")
 
