@@ -8,7 +8,7 @@ import (
 )
 
 func FetchEntity(id string, eType EntityType) (*Entity, error) {
-	row := database.DBConnection.QueryRow("SELECT * FROM `relay_entities` WHERE `id` = ? AND `type` = ?", id, eType)
+	row := database.DBConnection.QueryRow("SELECT `id`, `type`, `receive_channels`, `send_channels`, `created_at` FROM `relay_entities` WHERE `id` = ? AND `type` = ?", id, eType)
 
 	var (
 		entity          = &Entity{}
@@ -55,8 +55,7 @@ func (entity *Entity) CreateEntity() (sql.Result, error) {
 }
 
 func FetchEntities(eType EntityType) ([]*Entity, error) {
-	rows, err := database.DBConnection.Query("SELECT * FROM `relay_entities` WHERE `type` != ?", eType.Polarize())
-
+	rows, err := database.DBConnection.Query("SELECT `id`, `type`, `receive_channels`, `send_channels`, `created_at` FROM `relay_entities` WHERE `type` != ?", eType.Polarize())
 	if err != nil {
 		return nil, err
 	}
