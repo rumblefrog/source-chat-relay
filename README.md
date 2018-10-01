@@ -10,7 +10,12 @@
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Getting started](#getting-started)
+  - [Relay Server](#relay-server)
+  - [Game server](#game-server)
 - [Bot Commands](#bot-commands)
+- [Troubleshooting](#troubleshooting)
+  - [Game server is not connecting to the relay server?](#game-server-is-not-connecting-to-the-relay-server)
+  - [I'm getting errno 3 from the plugin](#im-getting-errno-3-from-the-plugin)
 - [Credits](#credits)
 - [License](#license)
 
@@ -33,27 +38,28 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
 
 ## Prerequisites
  - Server to host the relay binary on (with MySQL if not external)
- - Source game server with the socket extension
- - A Discord bot token
+ - Source game server with the [socket](https://forums.alliedmods.net/showthread.php?t=67640) extension
+ - A Discord bot token (https://discordapp.com/developers/applications/)
 
 ## Getting started
- 1. Head over to [releases](https://github.com/rumblefrog/source-chat-relay/releases) and download the latest package for your operating system
- 2. Relay Server
+ 1. Download the latest release from [releases](https://github.com/rumblefrog/source-chat-relay/releases) for your operating system
+ 
+### Relay Server
 
-    1. Upload the binary to the server
-    2. Configure `config.toml.example` and rename it to `config.toml`
-    3. Start it by running `./server`
+1. Upload the binary (server[.exe]) to the server
+2. Configure `config.toml.example` and rename it to `config.toml`
+3. Start it by running `./server`
 
-3. Game server
+### Game server
 
-    1. Upload the plugin to `addons/sourcemod/plugins`
-    2. Load the plugin
-    3. Configure the config at `cfg/sourcemod/Source-Chat-Relay.cfg` with the host/port of the relay server
-    4. Reload the plugin
+1. Upload the plugin to `addons/sourcemod/plugins`
+2. Load the plugin via `sm plugins load Source-Chat-Relay`
+3. Configure the config at `cfg/sourcemod/Source-Chat-Relay.cfg`
+4. Reload the plugin via `sm plugins reload Source-Chat-Relay`
 
-4. If all goes properly, you may view the registered entities via `r/entities`
-5. Configure the receive/send channels via `r/receivechannels EntityID Channel (comma delimited)` and `r/sendchannels EntityID Channel (comma delimited)` respectively
-6. If all done correctly, you will be able to receive and send messages base on the channels you set it to
+If all goes correctly, a new entity will appear when you use `r/entities` command
+
+Following that, you may use `r/receivechannel` and `r/sendchannel` to set receive and send respectively
 
 ## Bot Commands
 
@@ -62,11 +68,25 @@ Before any clients can send messages, you must set the receive/send channels on 
  - r/receivechannel #TextChannel/EntityID Channel
     - #TextChannel/EntityID - Either a text channel mention via #channel-name or a game server entity ID obtainable via `r/entities`
     - Channel - List of channels to receive at. If more than one, you may use comma to separate them
+
  - r/sendchannel #TextChannel/EntityID Channel
     - #TextChannel/EntityID - Either a text channel mention via #channel-name or a game server entity ID obtainable via `r/entities`
     - Channel - List of channels to send to. If more than one, you may use comma to separate them
+
  - r/entities ?channel/server
     - ?channel/server - Optional argument, allows you filter the return results by either channel or server type
+
+## Troubleshooting
+
+Common problem & steps to troubleshoot
+
+### Game server is not connecting to the relay server?
+
+This can be numerous amount of things, check the game server log for errors emitted by the plugin
+
+### I'm getting errno 3 from the plugin
+
+Either the server is not started or your firewall is not configured to allow connections to it
 
 ## Credits
  - Ron for being a human linter
