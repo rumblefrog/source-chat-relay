@@ -27,12 +27,11 @@ install:
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 before_script:
-    - go get -d ./server
     - chmod +x addons/sourcemod/scripting/spcomp
 
 script:
-    - go build -o ./out/server ./server
-    - export GOOS=windows && go build -o ./out/server.exe ./server
+    - go get -d ./server && go build -o ./out/server ./server
+    - export GOOS=windows && go get -d ./server && go build -o ./out/server.exe ./server
     - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
 
 before_deploy:
