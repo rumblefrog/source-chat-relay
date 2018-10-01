@@ -54,13 +54,13 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
 ## Getting started
  1. Download the latest release from [releases](https://github.com/rumblefrog/source-chat-relay/releases) for your operating system
  
-### Relay Server
+#### Relay Server
 
 1. Upload the binary (server[.exe]) to the server
 2. Configure `config.toml.example` and rename it to `config.toml`
 3. Start it by running `./server`
 
-### Game server
+#### Game server
 
 1. Upload the plugin to `addons/sourcemod/plugins`
 2. Load the plugin via `sm plugins load Source-Chat-Relay`
@@ -90,11 +90,11 @@ Before any clients can send messages, you must set the receive/send channels on 
 
 Common problem & steps to troubleshoot
 
-### Game server is not connecting to the relay server?
+#### Game server is not connecting to the relay server?
 
 This can be numerous amount of things, check the game server log for errors emitted by the plugin
 
-### I'm getting errno 3 from the plugin
+#### I'm getting errno 3 from the plugin
 
 Either the server is not started or your firewall is not configured to allow connections to it
 
