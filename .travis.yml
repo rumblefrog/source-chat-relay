@@ -14,6 +14,7 @@ matrix:
 addons:
     apt_packages:
       - lib32stdc++6
+      - p7zip
 
 install:
     - SMLATEST=`curl -s "https://www.sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux"`
@@ -26,20 +27,23 @@ install:
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 before_script:
-    - go get -d ./server
     - chmod +x addons/sourcemod/scripting/spcomp
 
 script:
-    - go build -o ./out/server ./server
+    - go get -d ./server && go build -o ./out/server ./server
+    - export GOOS=windows && go get -d ./server && go build -o ./out/server.exe ./server
     - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
+
+before_deploy:
+    - 7z linux-amd64.tar.gz out/server $TRAVIS_BUILD_DIR/Source-Chat-Relay $TRAVIS_BUILD_DIR/config.toml.example
+    - 7z windows-64.7z out/server.exe $TRAVIS_BUILD_DIR/Source-Chat-Relay $TRAVIS_BUILD_DIR/config.toml.example
 
 deploy:
     provider: releases
     api_key: "$githubkey"
     file:
-        - $TRAVIS_BUILD_DIR/out/server
-        - $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
-        - $TRAVIS_BUILD_DIR/config.toml.example
+        - $TRAVIS_BUILD_DIR/linux-amd64.tar.gz
+        - $TRAVIS_BUILD_DIR/windows-64.7z
     skip_cleanup: true
     on:
         tags: true
