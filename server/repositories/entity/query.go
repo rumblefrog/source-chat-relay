@@ -63,8 +63,6 @@ func FetchEntities(eType EntityType) ([]*Entity, error) {
 
 	var entities []*Entity
 
-	defer rows.Close()
-
 	for rows.Next() {
 		var (
 			entity          = &Entity{}
@@ -72,23 +70,22 @@ func FetchEntities(eType EntityType) ([]*Entity, error) {
 			sendChannels    string
 		)
 
-		rows.Scan(
+		if err = rows.Scan(
 			&entity.ID,
 			&entity.Type,
 			&receiveChannels,
 			&sendChannels,
 			&entity.CreatedAt,
-		)
+		); err != nil {
+			rows.Close()
+			return nil, err
+		}
 
 		entity.ReceiveChannels = ParseChannels(receiveChannels)
 
 		entity.SendChannels = ParseChannels(sendChannels)
 
 		entities = append(entities, entity)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
 	}
 
 	return entities, nil
