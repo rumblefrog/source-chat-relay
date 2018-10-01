@@ -23,10 +23,20 @@
 
 ## Introduction
 
-![Travis (.com)](https://img.shields.io/travis/com/rumblefrog/source-chat-relay.svg?style=for-the-badge)
-![Discord](https://img.shields.io/discord/443915420324331521.svg?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/rumblefrog/source-chat-relay.svg?style=for-the-badge)
-![GitHub](https://img.shields.io/github/license/rumblefrog/source-chat-relay.svg?style=for-the-badge)
+<p>
+    <a href="https://travis-ci.com/rumblefrog/source-chat-relay">
+        <img src="https://img.shields.io/travis/com/rumblefrog/source-chat-relay.svg?style=for-the-badge">
+    </a>
+    <a href="https://discord.gg/TZ4BsrQ">
+        <img src="https://img.shields.io/discord/443915420324331521.svg?style=for-the-badge">
+    </a>
+    <a href="https://github.com/rumblefrog/source-chat-relay/issues">
+        <img src="https://img.shields.io/github/issues/rumblefrog/source-chat-relay.svg?style=for-the-badge">
+    </a>
+    <a href="https://github.com/rumblefrog/source-chat-relay/blob/master/LICENSE">
+        <img src="https://img.shields.io/github/license/rumblefrog/source-chat-relay.svg?style=for-the-badge">
+    </a>
+</p>
 
 Communicate between Discord & In-Game, monitor server without being in-game, control the flow of messages and user base engagement!
 
