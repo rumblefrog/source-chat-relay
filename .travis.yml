@@ -32,7 +32,7 @@ before_script:
 
 script:
     - go build -o ./out/server ./server
-    - EXPORT GOOS=windows && go build -o ./out/server.exe ./server
+    - export GOOS=windows && go build -o ./out/server.exe ./server
     - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
 
 before_deploy:
