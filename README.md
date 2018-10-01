@@ -33,7 +33,7 @@ A self-hosted Discord <=> Source game relay
 
 ## Bot Commands
 
-    Before any clients can send messages, you must set the receive/send channels on them
+Before any clients can send messages, you must set the receive/send channels on them
 
  - r/receivechannel #Channel/EntityID Channel
  - r/sendchannel #Channel/EntityID Channel
