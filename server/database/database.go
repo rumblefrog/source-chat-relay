@@ -40,6 +40,4 @@ func init() {
 	if err != nil {
 		log.WithField("error", err).Fatal("Unable to connect to database")
 	}
-
-	CreateTables(DBConnection)
 }

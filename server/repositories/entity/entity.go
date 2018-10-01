@@ -6,5 +6,7 @@ func init() {
 		Controller: make(chan *Entity),
 	}
 
+	CreateTable()
+
 	go Start()
 }
