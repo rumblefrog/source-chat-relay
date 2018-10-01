@@ -1,7 +1,7 @@
 <h1 align="center"> Source Chat Relay </h1> <br>
 
 <p align="center">
-    <img src="assets/cloud-computing.svg">
+    <img src="assets/logo/cloud-computing.svg">
 </p>
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
