@@ -1,7 +1,5 @@
-<h1 align="center"> Source Chat Relay </h1> <br>
-
 <p align="center">
-    <img src="assets/logo/cloud-computing.svg" width="450">
+    <img src="assets/logo/cloud-computing.svg" width="250">
 </p>
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -28,10 +26,10 @@
 Communicate between Discord & In-Game, monitor server without being in-game, control the flow of messages and user base engagement!
 
 ## Features
- - Bidirectional - You can receive/send on both Discord and game server side!
- - Channel - Get creative! With the ability to specify receive/send channels, you can even send messages to other game servers, not only to Discord!
- - Ease of use - Setup is incrediblily easy with Discord bot commands and simple config files
- - Reliable - Upon disconnect, game servers will attempt to reconnect at a fixed interval
+ - Receive and send messages bidrectionally
+ - Channel configuration for powerful setups
+ - Setup is incrediblily easy with Discord bot commands and simple config files
+ - Upon disconnect, game servers will attempt to reconnect at a fixed interval
 
 ## Prerequisites
  - Server to host the relay binary on (with MySQL if not external)
