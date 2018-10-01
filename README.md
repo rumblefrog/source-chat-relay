@@ -104,4 +104,5 @@ Either the server is not started or your firewall is not configured to allow con
 ## License
 
 This project is licensed under GPL 3.0
- 
+
+Icons made by <a href="https://www.flaticon.com/authors/itim2101" title="itim2101">itim2101</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
