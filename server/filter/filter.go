@@ -3,6 +3,7 @@ package filter
 import (
 	"bufio"
 	"os"
+	"regexp"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -19,7 +20,13 @@ func init() {
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
-		Filter = append(Filter, scanner.Text())
+		regex, err := regexp.Compile(scanner.Text())
+
+		if err != nil {
+			continue
+		}
+
+		Filter = append(Filter, regex)
 	}
 
 	if err := scanner.Err(); err != nil {

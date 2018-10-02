@@ -1,3 +1,5 @@
 package filter
 
-var Filter []string
+import "regexp"
+
+var Filter []*regexp.Regexp

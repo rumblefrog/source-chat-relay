@@ -1,8 +1,6 @@
 package filter
 
 import (
-	"strings"
-
 	"github.com/rumblefrog/source-chat-relay/server/helper"
 )
 
@@ -15,8 +13,8 @@ func IsInFilter(s string) bool {
 		return false
 	}
 
-	for _, i := range Filter {
-		if strings.Contains(s, i) {
+	for _, r := range Filter {
+		if r.MatchString(s) {
 			return true
 		}
 	}
