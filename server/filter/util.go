@@ -1,8 +1,16 @@
 package filter
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/rumblefrog/source-chat-relay/server/helper"
+)
 
 func IsInFilter(s string) bool {
+	if !helper.Conf.General.Filter {
+		return false
+	}
+
 	if len(Filter) <= 0 {
 		return false
 	}
