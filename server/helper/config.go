@@ -7,7 +7,8 @@ import (
 )
 
 type GeneralConfig struct {
-	Port int `toml:"Port"`
+	Port   int  `toml:"Port"`
+	Filter bool `toml:"Filter"`
 }
 
 type BotConfig struct {

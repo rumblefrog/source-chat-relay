@@ -1,5 +1,6 @@
 [General]
 Port = 57452 # Port to start the socket server on. Most users can leave this alone.
+Filter = false # Message content filter. If true, create a filter.txt within the same directory as the binary with each line being the word to filter out
 
 [Bot]
 Token = "Bot Token" # You may obtain this at https://discordapp.com/developers/applications/

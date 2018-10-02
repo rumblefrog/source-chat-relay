@@ -6,6 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/rumblefrog/source-chat-relay/server/filter"
 	repoEntity "github.com/rumblefrog/source-chat-relay/server/repositories/entity"
 )
 
@@ -37,8 +38,11 @@ func (manager *ClientManager) Start() {
 			}
 
 		case message := <-manager.Router:
-			for connection := range manager.Clients {
+			if filter.IsInFilter(message.Content) {
+				return
+			}
 
+			for connection := range manager.Clients {
 				entity, err := repoEntity.GetEntity(connection.ID, repoEntity.Server)
 
 				if err != nil {
@@ -54,6 +58,7 @@ func (manager *ClientManager) Start() {
 					}
 				}
 			}
+
 			if message.Overwrite == nil {
 				manager.Bot <- message
 			}
