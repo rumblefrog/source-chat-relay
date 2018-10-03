@@ -5,10 +5,15 @@ import (
 	"os"
 	"regexp"
 
+	"github.com/rumblefrog/source-chat-relay/server/helper"
 	log "github.com/sirupsen/logrus"
 )
 
 func init() {
+	if !helper.Conf.General.Filter {
+		return
+	}
+
 	file, err := os.Open("filter.txt")
 
 	if err != nil {

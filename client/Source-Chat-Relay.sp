@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "0.0.5"
+#define PLUGIN_VERSION "0.0.6"
 
 #include <sourcemod>
 #include <morecolors>
@@ -283,7 +283,7 @@ void ParseMessageFrame(const char[] frame)
 		PrintToConsoleAll("===================");
 	#endif
 	
-	CPrintToChatAll("{lightseagreen}[%s] {chartreuse}%s{white}: {gray}%s", hostname, name, sContent);
+	CPrintToChatAll("{purple}[%s] {lightgreen}%s{white}: {grey}%s", hostname, name, sContent);
 }
 
 stock void String_Trim(const char[] str, char[] output, int size, const char[] chrs=" \t\r\n")

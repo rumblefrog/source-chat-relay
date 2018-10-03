@@ -7,6 +7,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/rumblefrog/source-chat-relay/server/helper"
 	repoEntity "github.com/rumblefrog/source-chat-relay/server/repositories/entity"
 )
 
@@ -80,13 +81,13 @@ func ParseMessage(b []byte, h *Header) *Message {
 func (m *Message) ToString() (buffer string) {
 	buffer += "1"
 
-	buffer += fmt.Sprintf("%-64s", m.Hostname)
+	buffer += fmt.Sprintf("%-64s", helper.StripSymbol(m.Hostname))
 
-	buffer += fmt.Sprintf("%-64s", m.ClientID)
+	buffer += fmt.Sprintf("%-64s", helper.StripSymbol(m.ClientID))
 
-	buffer += fmt.Sprintf("%-32s", m.ClientName)
+	buffer += fmt.Sprintf("%-32s", helper.StripSymbol(m.ClientName))
 
-	buffer += fmt.Sprintf("%s", m.Content)
+	buffer += fmt.Sprintf("%s", helper.StripSymbol(m.Content))
 
 	return
 }
