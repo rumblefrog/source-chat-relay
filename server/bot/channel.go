@@ -69,7 +69,7 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		}
 
 		if eType == repoEntity.Channel && dChannel != nil {
-			entity.SetDisplayName(dChannel.Name)
+			entity.DisplayName = dChannel.Name
 		}
 
 		err = entity.Insert()
@@ -85,14 +85,14 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 
 		return
 	} else {
+		if entity.Type == repoEntity.Channel && dChannel != nil {
+			entity.DisplayName = dChannel.Name
+		}
+
 		if cmdType == Receive {
 			err = entity.SetReceiveChannels(repoEntity.ParseChannels(channel))
 		} else if cmdType == Send {
 			err = entity.SetSendChannels(repoEntity.ParseChannels(channel))
-		}
-
-		if entity.Type == repoEntity.Channel && dChannel != nil {
-			entity.SetDisplayName(dChannel.Name)
 		}
 
 		if err != nil {

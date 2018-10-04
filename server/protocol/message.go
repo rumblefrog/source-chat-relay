@@ -42,8 +42,6 @@ func (m *ClientManager) HandleMessage(b []byte, h *Header) {
 		sender, err := repoEntity.GetEntity(message.Header.Sender.ID, repoEntity.Server)
 
 		if err == nil && sender.DisplayName != message.Hostname {
-			sender.DisplayName = message.Hostname
-
 			go sender.SetDisplayName(message.Hostname)
 		}
 	}
