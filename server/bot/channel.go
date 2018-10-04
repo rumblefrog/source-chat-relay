@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/bwmarrin/discordgo"
+
 	"github.com/rumblefrog/source-chat-relay/server/repositories/entity"
 
 	"github.com/Necroforger/dgrouter/exrouter"
@@ -30,6 +32,11 @@ func ChannelCommandRoute(ctx *exrouter.Context) {
 }
 
 func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
+	var (
+		dChannel *discordgo.Channel
+		err      error
+	)
+
 	id := ctx.Args.Get(1)
 	channel := ctx.Args.After(2)
 	eType := repoEntity.Server
@@ -39,6 +46,11 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 	if ok {
 		eType = repoEntity.Channel
 		id = pid
+		dChannel, err = ctx.Ses.Channel(id)
+
+		if err != nil {
+			log.WithField("error", err).Warn("Unable to fetch channel for insertion")
+		}
 	}
 
 	entity, err := entity.GetEntity(id, eType)
@@ -56,14 +68,8 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 			entity.SendChannels = repoEntity.ParseChannels(channel)
 		}
 
-		if eType == repoEntity.Channel {
-			dChannel, err := ctx.Ses.Channel(id)
-
-			if err != nil {
-				log.WithField("error", err).Warn("Unable to fetch channel for insertion")
-			} else {
-				entity.DisplayName = dChannel.Name
-			}
+		if eType == repoEntity.Channel && dChannel != nil {
+			entity.SetDisplayName(dChannel.Name)
 		}
 
 		err = entity.Insert()
@@ -84,6 +90,11 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		} else if cmdType == Send {
 			err = entity.SetSendChannels(repoEntity.ParseChannels(channel))
 		}
+
+		if entity.Type == repoEntity.Channel && dChannel != nil {
+			entity.SetDisplayName(dChannel.Name)
+		}
+
 		if err != nil {
 			log.WithField("error", err).Warn("Unable to update entity")
 
