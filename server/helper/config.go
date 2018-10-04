@@ -12,7 +12,8 @@ type GeneralConfig struct {
 }
 
 type BotConfig struct {
-	Token string `toml:"Token"`
+	Token         string `toml:"Token"`
+	SimpleMessage bool   `toml:"SimpleMessage"`
 }
 
 type DatabaseConfig struct {

@@ -13,6 +13,11 @@ Filter = false
 # You may obtain this at https://discordapp.com/developers/applications/
 Token = "Bot Token"
 
+# Instead of an embed sent by the bot
+# You have the option to enable simple message, to display incoming messages as "Name: Message"
+# Takes up less room but with less detail
+SimpleMessage = false
+
 [Database]
 # MySQL Database host
 Host = "127.0.0.1"
