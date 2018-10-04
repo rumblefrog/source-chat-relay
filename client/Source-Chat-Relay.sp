@@ -20,12 +20,18 @@ enum RelayFrame {
 char sHostname[64];
 char sHost[64] = "127.0.0.1";
 char sToken[64];
+char sPrefix[8];
 
 // Randomly selected port
 int iPort = 57452;
+int iFlag;
+
+bool bFlag;
 
 ConVar cHost;
 ConVar cPort;
+ConVar cPrefix;
+ConVar cFlag;
 
 Handle hSocket;
 
@@ -45,6 +51,10 @@ public void OnPluginStart()
 	cHost = CreateConVar("rf_scr_host", "127.0.0.1", "Relay Server Host", FCVAR_PROTECTED);
 
 	cPort = CreateConVar("rf_scr_port", "57452", "Relay Server Port", FCVAR_PROTECTED);
+	
+	cPrefix = CreateConVar("rf_scr_prefix", "", "Prefix required to send message to Discord", FCVAR_NONE);
+	
+	cFlag = CreateConVar("rf_scr_flag", "", "If prefix is enabled, this admin flag is required to send message using the prefix", FCVAR_PROTECTED);
 
 	AutoExecConfig(true, "Source-Server-Relay");
 
@@ -64,7 +74,22 @@ public void OnConfigsExecuted()
 
 	cHost.GetString(sHost, sizeof sHost);
 	
+	cPrefix.GetString(sPrefix, sizeof sPrefix);
+	
 	iPort = cPort.IntValue;
+	
+	char sFlag[8];
+	
+	cFlag.GetString(sFlag, sizeof sFlag);
+	
+	if (!StrEqual(sFlag, ""))
+	{
+		AdminFlag aFlag;
+		
+		bFlag = FindFlagByChar(sFlag[0], aFlag);
+		
+		iFlag = FlagToBit(aFlag);
+	}
 		
 	char sPath[PLATFORM_MAX_PATH];
 	
@@ -149,7 +174,34 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 	if (!SocketIsConnected(hSocket))
 		return;
 		
-	PackMessage(client, sArgs);
+	if (StrEqual(sPrefix, ""))
+		PackMessage(client, sArgs);
+	else
+	{
+		if (bFlag && !CheckCommandAccess(client, "arandomcommandthatsnotregistered", iFlag, true))
+			return;
+		
+		int iLen = strlen(sPrefix);
+		
+		bool bMatch = true;
+		
+		for (int i = 0; i < iLen; i++)
+		{
+			if (sPrefix[i] != sArgs[i])
+			{
+				bMatch = false;
+				break;
+			}
+		}
+		
+		char sBuffer[MAX_MESSAGE_LENGTH];
+		
+		for (int i = iLen; i < strlen(sArgs); i++)
+			Format(sBuffer, sizeof sBuffer, "%s%c", sBuffer, sArgs[i]);
+		
+		if (bMatch)
+			PackMessage(client, sBuffer);
+	}
 }
 
 void PackMessage(int client, const char[] message)
