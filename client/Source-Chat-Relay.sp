@@ -6,6 +6,7 @@
 #include <sourcemod>
 #include <morecolors>
 #include <socket>
+#include <smlib>
 
 #pragma newdecls required
 
@@ -91,9 +92,11 @@ public void OnConfigsExecuted()
 		iFlag = FlagToBit(aFlag);
 	}
 		
-	char sPath[PLATFORM_MAX_PATH];
+	char sPath[PLATFORM_MAX_PATH], sIP[64];
 	
-	BuildPath(Path_SM, sPath, sizeof sPath, "data/scr.data");
+	Server_GetIPString(sIP, sizeof sIP);
+	
+	BuildPath(Path_SM, sPath, sizeof sPath, "data/%s:%d.data", sIP, Server_GetPort());
 	
 	if (FileExists(sPath, false))
 	{
@@ -338,48 +341,10 @@ void ParseMessageFrame(const char[] frame)
 	CPrintToChatAll("{purple}[%s] {lightgreen}%s{white}: {grey}%s", hostname, name, sContent);
 }
 
-stock void String_Trim(const char[] str, char[] output, int size, const char[] chrs=" \t\r\n")
-{
-	int x = 0;
-	
-	while (str[x] != '\0' && FindCharInString(chrs, str[x]) != -1) {
-		x++;
-	}
-
-	x = strcopy(output, size, str[x]);
-	x--;
-
-	while (x >= 0 && FindCharInString(chrs, output[x]) != -1) {
-		x--;
-	}
-
-	output[++x] = '\0';
-}
-
-stock void EscapeBreak(char[] buffer, int buffersize)
-{
-	ReplaceString(buffer, buffersize, "\n", "", false);
-}
-
 stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
 {
 	char charset[] = "adefghijstuv6789!@#$%^klmwxyz01bc2345nopqr&+=";
 	
 	for (int i = 0; i < len; i++)
 		Format(buffer, buffersize, "%s%c", buffer, charset[GetRandomInt(0, sizeof charset)]);
-}
-
-stock bool Client_IsValid(int iClient, bool bAlive = false)
-{
-	if (iClient >= 1 &&
-	iClient <= MaxClients &&
-	IsClientConnected(iClient) &&
-	IsClientInGame(iClient) &&
-	!IsFakeClient(iClient) &&
-	(bAlive == false || IsPlayerAlive(iClient)))
-	{
-		return true;
-	}
-
-	return false;
 }
