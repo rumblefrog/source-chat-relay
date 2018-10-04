@@ -8,7 +8,7 @@ import (
 )
 
 func FetchEntity(id string, eType EntityType) (*Entity, error) {
-	row := database.DBConnection.QueryRow("SELECT `id`, `type`, `receive_channels`, `send_channels`, `created_at` FROM `relay_entities` WHERE `id` = ? AND `type` = ?", id, eType)
+	row := database.DBConnection.QueryRow("SELECT `id`, `display_name`, `type`, `receive_channels`, `send_channels`, `created_at` FROM `relay_entities` WHERE `id` = ? AND `type` = ?", id, eType)
 
 	var (
 		entity          = &Entity{}
@@ -18,6 +18,7 @@ func FetchEntity(id string, eType EntityType) (*Entity, error) {
 
 	err := row.Scan(
 		&entity.ID,
+		&entity.DisplayName,
 		&entity.Type,
 		&receiveChannels,
 		&sendChannels,
@@ -47,8 +48,9 @@ func (entity *Entity) UpdateEntity() (sql.Result, error) {
 
 func (entity *Entity) CreateEntity() (sql.Result, error) {
 	return database.DBConnection.Exec(
-		"INSERT INTO `relay_entities` (`id`, `type`, `receive_channels`, `send_channels`) VALUES (?, ?, ?, ?)",
+		"INSERT INTO `relay_entities` (`id`, `display_name`, `type`, `receive_channels`, `send_channels`) VALUES (?, ?, ?, ?)",
 		entity.ID,
+		entity.DisplayName,
 		entity.Type,
 		EncodeChannels(entity.ReceiveChannels),
 		EncodeChannels(entity.SendChannels),
@@ -56,7 +58,7 @@ func (entity *Entity) CreateEntity() (sql.Result, error) {
 }
 
 func FetchEntities(eType EntityType) ([]*Entity, error) {
-	rows, err := database.DBConnection.Query("SELECT `id`, `type`, `receive_channels`, `send_channels`, `created_at` FROM `relay_entities` WHERE `type` != ?", eType.Polarize())
+	rows, err := database.DBConnection.Query("SELECT `id`, `display_name`, `type`, `receive_channels`, `send_channels`, `created_at` FROM `relay_entities` WHERE `type` != ?", eType.Polarize())
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +74,7 @@ func FetchEntities(eType EntityType) ([]*Entity, error) {
 
 		if err = rows.Scan(
 			&entity.ID,
+			&entity.DisplayName,
 			&entity.Type,
 			&receiveChannels,
 			&sendChannels,
