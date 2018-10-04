@@ -10,12 +10,13 @@
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Getting started](#getting-started)
-  - [Relay Server](#relay-server)
-  - [Game server](#game-server)
+    - [Relay Server](#relay-server)
+    - [Game server](#game-server)
 - [Bot Commands](#bot-commands)
 - [Troubleshooting](#troubleshooting)
-  - [Game server is not connecting to the relay server?](#game-server-is-not-connecting-to-the-relay-server)
-  - [I'm getting errno 3 from the plugin](#im-getting-errno-3-from-the-plugin)
+    - [Game server is not connecting to the relay server?](#game-server-is-not-connecting-to-the-relay-server)
+    - [I'm getting errno 3 from the plugin](#im-getting-errno-3-from-the-plugin)
+- [Recommended hosts](#recommended-hosts)
 - [Credits](#credits)
 - [License](#license)
 
@@ -35,6 +36,9 @@
     </a>
     <a href="https://github.com/rumblefrog/source-chat-relay/blob/master/LICENSE">
         <img src="https://img.shields.io/github/license/rumblefrog/source-chat-relay.svg?style=for-the-badge">
+    </a>
+    <a href="https://www.patreon.com/bePatron?u=962681">
+        <img src="assets/become_a_patron_button.png" height="28">
     </a>
 </p>
 
@@ -57,6 +61,8 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
  1. Download the latest release from [releases](https://github.com/rumblefrog/source-chat-relay/releases) for your operating system
  
 #### Relay Server
+
+See [Recommended hosts](#recommended-hosts) if you are looking for hosts
 
 1. Upload the binary (server[.exe]) to the server
 2. Configure `config.toml.example` and rename it to `config.toml`
@@ -99,6 +105,13 @@ This can be numerous amount of things, check the game server log for errors emit
 #### I'm getting errno 3 from the plugin
 
 Either the server is not started or your firewall is not configured to allow connections to it
+
+## Recommended hosts
+
+Many people ask me what host this can work on, so here are some referrals
+
+- [Vultr](https://www.vultr.com/?ref=7553630)
+- [Digitalocean](https://m.do.co/c/87ffbbdddbe9)
 
 ## Credits
  - Ron for being a human linter
