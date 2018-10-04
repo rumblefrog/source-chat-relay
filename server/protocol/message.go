@@ -32,20 +32,28 @@ type OverwriteData struct {
 }
 
 func (m *ClientManager) HandleMessage(b []byte, h *Header) {
-	Message := ParseMessage(b, h)
+	message := ParseMessage(b, h)
 
-	if Message.Header.Sender.ID == "" {
+	if message.Header.Sender.ID == "" {
 		return
 	}
 
+	if message.Overwrite == nil {
+		sender, err := repoEntity.GetEntity(message.Header.Sender.ID, repoEntity.Server)
+
+		if err == nil && sender.DisplayName != message.Hostname {
+			sender.DisplayName = message.Hostname
+		}
+	}
+
 	log.WithFields(log.Fields{
-		"Hostname":    Message.Hostname,
-		"Client ID":   Message.ClientID,
-		"Client Name": Message.ClientName,
-		"Content":     Message.Content,
+		"Hostname":    message.Hostname,
+		"Client ID":   message.ClientID,
+		"Client Name": message.ClientName,
+		"Content":     message.Content,
 	}).Debug()
 
-	NetManager.Router <- Message
+	NetManager.Router <- message
 }
 
 func ParseMessage(b []byte, h *Header) *Message {

@@ -44,19 +44,25 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 	entity, err := entity.GetEntity(id, eType)
 
 	if err == sql.ErrNoRows && channel != "" {
+		entity = &repoEntity.Entity{
+			ID:        id,
+			Type:      eType,
+			CreatedAt: time.Now(),
+		}
+
 		if cmdType == Receive {
-			entity = &repoEntity.Entity{
-				ID:              id,
-				Type:            eType,
-				ReceiveChannels: repoEntity.ParseChannels(channel),
-				CreatedAt:       time.Now(),
-			}
+			entity.ReceiveChannels = repoEntity.ParseChannels(channel)
 		} else if cmdType == Send {
-			entity = &repoEntity.Entity{
-				ID:           id,
-				Type:         eType,
-				SendChannels: repoEntity.ParseChannels(channel),
-				CreatedAt:    time.Now(),
+			entity.SendChannels = repoEntity.ParseChannels(channel)
+		}
+
+		if eType == repoEntity.Channel {
+			dChannel, err := ctx.Ses.Channel(id)
+
+			if err != nil {
+				log.WithField("error", err).Warn("Unable to fetch channel for insertion")
+			} else {
+				entity.DisplayName = dChannel.Name
 			}
 		}
 

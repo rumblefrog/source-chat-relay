@@ -34,7 +34,7 @@ func GetEntities(eType EntityType) (entities []*Entity) {
 	return
 }
 
-func (entity *Entity) DisplayName() string {
+func (entity *Entity) GetIDTitle() string {
 	if entity.Type == Server {
 		return "Entity ID (Keep Private) :key:"
 	}
@@ -47,8 +47,12 @@ func (entity *Entity) Embed() *discordgo.MessageEmbed {
 		Color: 0xE1C15C,
 		Fields: []*discordgo.MessageEmbedField{
 			&discordgo.MessageEmbedField{
-				Name:  entity.DisplayName(),
+				Name:  entity.GetIDTitle(),
 				Value: entity.ID,
+			},
+			&discordgo.MessageEmbedField{
+				Name:  "Display Name",
+				Value: entity.DisplayName,
 			},
 			&discordgo.MessageEmbedField{
 				Name:  "Entity Type :gear:",

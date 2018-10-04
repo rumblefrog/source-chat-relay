@@ -12,6 +12,7 @@ const (
 
 type Entity struct {
 	ID              string
+	DisplayName     string
 	Type            EntityType
 	ReceiveChannels []int
 	SendChannels    []int

@@ -15,7 +15,7 @@ func (entity *Entity) Insert() error {
 func (entity *Entity) SetReceiveChannels(channels []int) error {
 	entity.ReceiveChannels = channels
 
-	_, err := entity.UpdateChannels()
+	_, err := entity.UpdateEntity()
 
 	if err != nil {
 		return err
@@ -29,7 +29,7 @@ func (entity *Entity) SetReceiveChannels(channels []int) error {
 func (entity *Entity) SetSendChannels(channels []int) error {
 	entity.SendChannels = channels
 
-	_, err := entity.UpdateChannels()
+	_, err := entity.UpdateEntity()
 
 	if err != nil {
 		return err

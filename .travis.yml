@@ -22,7 +22,7 @@ install:
     - wget $SMPACKAGE
     - tar -xzf $(basename "$SMPACKAGE")
     - cp client/Source-Chat-Relay.sp addons/sourcemod/scripting/
-    - cp client/include/* addons/sourcemod/scripting/include
+    - cp -r client/include/* addons/sourcemod/scripting/include
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 before_script:
