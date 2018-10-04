@@ -14,6 +14,10 @@ func EntitiesCMD(ctx *exrouter.Context) {
 
 	entities := repoEntity.GetEntities(eType)
 
+	if len(entities) <= 0 {
+		ctx.Reply("No entities found in database")
+	}
+
 	p := dgwidgets.NewPaginator(ctx.Ses, ctx.Msg.ChannelID)
 
 	for _, entity := range entities {
