@@ -8,7 +8,7 @@
 #include <smlib/general>
 
 //#include <smlib/arrays>
-//#include <smlib/clients>
+#include <smlib/clients>
 //#include <smlib/colors>
 //#include <smlib/concommands>
 //#include <smlib/convars>
