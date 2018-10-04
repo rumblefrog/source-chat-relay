@@ -24,7 +24,7 @@
 //#include <smlib/menus>
 //#include <smlib/pluginmanager>
 #include <smlib/server>
-//#include <smlib/strings>
+#include <smlib/strings>
 //#include <smlib/sql>
 //#include <smlib/teams>
 //#include <smlib/vehicles>
