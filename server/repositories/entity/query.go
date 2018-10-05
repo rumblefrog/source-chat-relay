@@ -48,7 +48,7 @@ func (entity *Entity) UpdateEntity() (sql.Result, error) {
 
 func (entity *Entity) CreateEntity() (sql.Result, error) {
 	return database.DBConnection.Exec(
-		"INSERT INTO `relay_entities` (`id`, `display_name`, `type`, `receive_channels`, `send_channels`) VALUES (?, ?, ?, ?)",
+		"INSERT INTO `relay_entities` (`id`, `display_name`, `type`, `receive_channels`, `send_channels`) VALUES (?, ?, ?, ?, ?)",
 		entity.ID,
 		entity.DisplayName,
 		entity.Type,
@@ -95,7 +95,7 @@ func FetchEntities(eType EntityType) ([]*Entity, error) {
 }
 
 func CreateTable() {
-	_, err := database.DBConnection.Exec("CREATE TABLE IF NOT EXISTS `relay_entities` ( `id` VARCHAR(64) NOT NULL , `display_name` VARCHAR(64) NOT NULL , `type` TINYINT NOT NULL DEFAULT '0' , `receive_channels` VARCHAR(32) NOT NULL DEFAULT '' , `send_channels` VARCHAR(32) NOT NULL DEFAULT '' , `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`), INDEX (`type`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;")
+	_, err := database.DBConnection.Exec("CREATE TABLE IF NOT EXISTS `relay_entities` ( `id` VARCHAR(64) NOT NULL , `display_name` VARCHAR(64) NOT NULL DEFAULT '' , `type` TINYINT NOT NULL DEFAULT '0' , `receive_channels` VARCHAR(32) NOT NULL DEFAULT '' , `send_channels` VARCHAR(32) NOT NULL DEFAULT '' , `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`), INDEX (`type`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;")
 
 	if err != nil {
 		log.WithField("error", err).Fatal("Unable to create tables")

@@ -8,7 +8,7 @@ import (
 func (entity *Entity) CanReceive(channels []int) bool {
 	for _, c := range entity.ReceiveChannels {
 		for _, c1 := range channels {
-			if c == c1 || (c == -1 && c1 != -2) || (c1 == -1 && c != -2) {
+			if c == c1 || (c == -1 && c1 != 0) || (c1 == -1 && c != 0) {
 				return true
 			}
 		}
@@ -42,6 +42,10 @@ func ChannelString(channels []int) string {
 	var s []string
 
 	for _, c := range channels {
+		if c == 0 {
+			continue
+		}
+
 		s = append(s, strconv.Itoa(c))
 	}
 

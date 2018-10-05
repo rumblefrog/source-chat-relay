@@ -39,5 +39,5 @@ func Sync() {
 		Cache.Controller <- e
 	}
 
-	log.WithField("len", len(Cache.Entities)).Info("Relay channel cache synced")
+	log.WithField("len", len(entities)).Info("Relay channel cache synced")
 }

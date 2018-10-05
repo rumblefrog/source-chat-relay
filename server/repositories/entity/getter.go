@@ -42,6 +42,14 @@ func (entity *Entity) GetIDTitle() string {
 	return "Entity ID :key:"
 }
 
+func (entity *Entity) GetDisplayName() string {
+	if entity.DisplayName == "" {
+		return "N/A"
+	}
+
+	return entity.DisplayName
+}
+
 func (entity *Entity) Embed() *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Color: 0xE1C15C,
@@ -51,7 +59,7 @@ func (entity *Entity) Embed() *discordgo.MessageEmbed {
 				Value: entity.ID,
 			},
 			&discordgo.MessageEmbedField{
-				Name:  "Display Name",
+				Name:  "Display Name :page_facing_up:",
 				Value: entity.DisplayName,
 			},
 			&discordgo.MessageEmbedField{
