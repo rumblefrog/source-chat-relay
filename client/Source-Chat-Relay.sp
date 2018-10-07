@@ -1,16 +1,16 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "0.0.8"
+#define PLUGIN_VERSION "0.0.9"
 
 #include <sourcemod>
-#include <morecolors>
 #include <socket>
 #include <smlib>
 
 #pragma newdecls required
 
 #define HEADER_LEN 161
+#define MAX_MESSAGE_LENGTH 256
 
 enum RelayFrame {
 	Authenticate,
@@ -338,7 +338,7 @@ void ParseMessageFrame(const char[] frame)
 		PrintToConsoleAll("===================");
 	#endif
 	
-	CPrintToChatAll("{purple}[%s] {lightgreen}%s{white}: {grey}%s", hostname, name, sContent);
+	PrintToChatAll("\x10 \x10[%s] \x0C%s\x01: \x08%s", hostname, name, sContent);
 }
 
 stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
