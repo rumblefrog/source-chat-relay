@@ -346,7 +346,7 @@ void ParseMessageFrame(const char[] frame)
 	if (eVer == Engine_CSGO)
 		PrintToChatAll("\x10 \x10[%s] \x0C%s\x01: \x08%s", hostname, name, sContent);
 	else
-		CPrintToChatAll("{gold}[%s] {midnightblue}%s{white}: {grey}%s", hostname, name, sContent);
+		CPrintToChatAll("{gold}[%s] {darkblue}%s{white}: {grey}%s", hostname, name, sContent);
 }
 
 stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
