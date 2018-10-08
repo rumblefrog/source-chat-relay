@@ -4,6 +4,7 @@
 #define PLUGIN_VERSION "0.0.9"
 
 #include <sourcemod>
+#include <morecolors>
 #include <socket>
 #include <smlib>
 
@@ -29,6 +30,8 @@ int iFlag;
 
 bool bFlag;
 
+EngineVersion eVer;
+
 ConVar cHost;
 ConVar cPort;
 ConVar cPrefix;
@@ -40,7 +43,7 @@ public Plugin myinfo =
 {
 	name = "Source Chat Relay",
 	author = PLUGIN_AUTHOR,
-	description = "Prototype Stage",
+	description = "Communicate between Discord & In-Game, monitor server without being in-game, control the flow of messages and user base engagement!",
 	version = PLUGIN_VERSION,
 	url = "https://keybase.io/RumbleFrog"
 };
@@ -58,6 +61,8 @@ public void OnPluginStart()
 	cFlag = CreateConVar("rf_scr_flag", "", "If prefix is enabled, this admin flag is required to send message using the prefix", FCVAR_PROTECTED);
 
 	AutoExecConfig(true, "Source-Server-Relay");
+	
+	eVer = GetEngineVersion();
 
 	hSocket = SocketCreate(SOCKET_TCP, OnSocketError);
 
@@ -96,7 +101,7 @@ public void OnConfigsExecuted()
 	
 	Server_GetIPString(sIP, sizeof sIP);
 	
-	BuildPath(Path_SM, sPath, sizeof sPath, "data/%s:%d.data", sIP, Server_GetPort());
+	BuildPath(Path_SM, sPath, sizeof sPath, "data/%s_%d.data", sIP, Server_GetPort());
 	
 	if (FileExists(sPath, false))
 	{
@@ -338,7 +343,10 @@ void ParseMessageFrame(const char[] frame)
 		PrintToConsoleAll("===================");
 	#endif
 	
-	PrintToChatAll("\x10 \x10[%s] \x0C%s\x01: \x08%s", hostname, name, sContent);
+	if (eVer == Engine_CSGO)
+		PrintToChatAll("\x10 \x10[%s] \x0C%s\x01: \x08%s", hostname, name, sContent);
+	else
+		CPrintToChatAll("{gold}[%s] {midnightblue}%s{white}: {grey}%s", hostname, name, sContent);
 }
 
 stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
