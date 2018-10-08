@@ -60,7 +60,7 @@ func (entity *Entity) Embed() *discordgo.MessageEmbed {
 			},
 			&discordgo.MessageEmbedField{
 				Name:  "Display Name :page_facing_up:",
-				Value: entity.DisplayName,
+				Value: entity.GetDisplayName(),
 			},
 			&discordgo.MessageEmbedField{
 				Name:  "Entity Type :gear:",
