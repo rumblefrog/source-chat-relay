@@ -13,6 +13,7 @@
     - [Relay Server](#relay-server)
     - [Game server](#game-server)
 - [Bot Commands](#bot-commands)
+- [Filter](#filter)
 - [Troubleshooting](#troubleshooting)
     - [Game server is not connecting to the relay server?](#game-server-is-not-connecting-to-the-relay-server)
     - [I'm getting errno 3 from the plugin](#im-getting-errno-3-from-the-plugin)
@@ -51,6 +52,8 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
  - Channel configuration for powerful setups
  - Setup is incrediblily easy with Discord bot commands and simple config files
  - Upon disconnect, game servers will attempt to reconnect at a fixed interval
+ - Filter out certain unwanted messages using regex expressions
+ - Set ingame prefixes to send a message with ability to configure flag permission for the prefix
 
 ## Prerequisites
  - Server to host the relay binary on (with MySQL if not external)
@@ -93,6 +96,14 @@ Before any clients can send messages, you must set the receive/send channels on 
 
  - r/entities ?channel/server
     - ?channel/server - Optional argument, allows you filter the return results by either channel or server type
+
+## Filter
+
+The filter is useful if you wish to drop certain messages whether it be commands or just unsolicited messages
+
+1. Set `Filter` to `true` in the `config.toml` file
+2. Create a `filter.txt` in the same directory as the binary
+3. Populate each line of the file with a regex expression (Note: if you have a blank line, it will filter everything out)
 
 ## Troubleshooting
 
