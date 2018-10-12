@@ -2,7 +2,7 @@
 
 ![](.gitbook/assets/cloud-computing_256.png)
 
- [![](https://img.shields.io/travis/com/rumblefrog/source-chat-relay.svg?style=for-the-badge)](https://travis-ci.com/rumblefrog/source-chat-relay) [![](https://img.shields.io/discord/443915420324331521.svg?style=for-the-badge)](https://discord.gg/TZ4BsrQ) [![](https://img.shields.io/github/issues/rumblefrog/source-chat-relay.svg?style=for-the-badge)](https://github.com/rumblefrog/source-chat-relay/issues) [![](https://img.shields.io/github/license/rumblefrog/source-chat-relay.svg?style=for-the-badge)](https://github.com/rumblefrog/source-chat-relay/blob/master/LICENSE) [![](.gitbook/assets/become_a_patron_button.png)](https://www.patreon.com/bePatron?u=962681)
+ [![](https://img.shields.io/travis/com/rumblefrog/source-chat-relay.svg?style=for-the-badge)](https://travis-ci.com/rumblefrog/source-chat-relay) [![](https://img.shields.io/discord/443915420324331521.svg?style=for-the-badge)](https://discord.gg/TZ4BsrQ) [![](https://img.shields.io/github/issues/rumblefrog/source-chat-relay.svg?style=for-the-badge)](https://github.com/rumblefrog/source-chat-relay/issues) [![](https://img.shields.io/github/license/rumblefrog/source-chat-relay.svg?style=for-the-badge)](https://github.com/rumblefrog/source-chat-relay/blob/master/LICENSE) ![](.gitbook/assets/become_a_patron_button.png)
 
 ![](.gitbook/assets/preview.gif)
 
