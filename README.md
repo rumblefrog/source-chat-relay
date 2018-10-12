@@ -10,12 +10,12 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
 
 ## Features
 
-* Receive and send messages bidrectionally
+* Receive and send messages bidirectionally
 * Channel configuration for powerful setups
-* Setup is incrediblily easy with Discord bot commands and simple config files
+* Setup is incredibly easy with Discord bot commands and simple config files
 * Upon disconnect, game servers will attempt to reconnect at a fixed interval
 * Filter out certain unwanted messages using regex expressions
-* Set ingame prefixes to send a message with ability to configure flag permission for the prefix
+* Set in-game prefixes to send a message with ability to configure flag permission for the prefix
 
 ## Prerequisites
 
