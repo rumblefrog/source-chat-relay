@@ -1,0 +1,14 @@
+# Tips-And-Tricks
+
+Some miscellaneous tips & tricks
+
+## Global Broadcast
+
+If you wish to either receive or send on all channels, simply set `-1` as the receive/send channel
+
+This is especially useful if you wish to have an announcement channel in your Discord server, you can simply set the send channel to -1, and it will broadcast to every single channel, serving the announcement to everyone
+
+## Cross-Entities
+
+By setting two game server/text channel on the same channel, you can enable cross-talk across servers/text channels
+
