@@ -53,7 +53,7 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
  - A Discord bot token (https://discordapp.com/developers/applications/)
 
 ## Getting started
- - [Setup Wiki](https://github.com/rumblefrog/source-chat-relay/wiki/Setup)
+ - [Setup](https://rumblefrog.gitbook.io/source-chat-relay/getting-started/setup)
 
 ## Credits
  - Ron for being a human linter
