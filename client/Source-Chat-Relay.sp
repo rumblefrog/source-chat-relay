@@ -11,7 +11,6 @@
 #pragma newdecls required
 
 #define HEADER_LEN 161
-#define MAX_MESSAGE_LENGTH 256
 
 enum RelayFrame {
 	Authenticate,
