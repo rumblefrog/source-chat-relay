@@ -10,5 +10,5 @@ This can be numerous amount of things, check the Sourcemod error log for errors 
 
 Ensure that the relay server is running and the Discord bot is online
 
-If else, ensure that you have corrected port fowarded if necessary and that your firewall rules has been configured to allow the traffic
+If else, ensure that you have corrected port forwarded if necessary and that your firewall rules has been configured to allow the traffic
 

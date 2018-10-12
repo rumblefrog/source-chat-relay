@@ -2,7 +2,7 @@
 
 Prefix requirement with optional permission flag
 
-With this feature, you may optionally require a prefix to be prefixed infront of the message for it to send to the relay server, ontop of that, you may also require a flag to use that prefix
+With this feature, you may optionally require a prefix to be prefixed in front of the message for it to send to the relay server, on top of that, you may also require a flag to use that prefix
 
 Use cases:
 
