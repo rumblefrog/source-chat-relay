@@ -1,11 +1,9 @@
 package filter
 
-import (
-	"github.com/rumblefrog/source-chat-relay/server/helper"
-)
+import "github.com/rumblefrog/source-chat-relay/server/config"
 
 func IsInFilter(s string) bool {
-	if !helper.Conf.General.Filter {
+	if !config.Conf.General.Filter {
 		return false
 	}
 

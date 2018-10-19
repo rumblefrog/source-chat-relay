@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rumblefrog/source-chat-relay/server/helper"
+	"github.com/rumblefrog/source-chat-relay/server/config"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rumblefrog/source-chat-relay/server/protocol"
@@ -19,7 +19,7 @@ func (b *DiscordBot) Listen() {
 
 			var embed *discordgo.MessageEmbed
 
-			if !helper.Conf.Bot.SimpleMessage {
+			if !config.Conf.Bot.SimpleMessage {
 				embed = &discordgo.MessageEmbed{
 					Color:       message.GetClientColor(),
 					Description: message.Content,
@@ -36,7 +36,7 @@ func (b *DiscordBot) Listen() {
 
 			for _, e := range repoEntity.GetEntities(repoEntity.All) {
 				if e.Type == repoEntity.Channel && e.CanReceive(message.GetSendChannels()) {
-					if !helper.Conf.Bot.SimpleMessage {
+					if !config.Conf.Bot.SimpleMessage {
 						b.Session.ChannelMessageSendEmbed(e.ID, embed)
 					} else {
 						b.Session.ChannelMessageSend(e.ID, fmt.Sprintf("%s: %s", message.ClientName, message.Content))

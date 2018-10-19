@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/rumblefrog/source-chat-relay/server/config"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/rumblefrog/source-chat-relay/server/helper"
 )
 
 var (
@@ -17,7 +16,7 @@ var (
 func init() {
 	var err error
 
-	NetListener, err = net.Listen("tcp", fmt.Sprintf(":%d", helper.Conf.General.Port))
+	NetListener, err = net.Listen("tcp", fmt.Sprintf(":%d", config.Conf.General.Port))
 
 	if err != nil {
 		log.WithField("error", err).Fatal("Unable to start socket server")

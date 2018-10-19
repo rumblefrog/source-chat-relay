@@ -5,12 +5,12 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/rumblefrog/source-chat-relay/server/helper"
+	"github.com/rumblefrog/source-chat-relay/server/config"
 	log "github.com/sirupsen/logrus"
 )
 
 func init() {
-	if !helper.Conf.General.Filter {
+	if !config.Conf.General.Filter {
 		return
 	}
 

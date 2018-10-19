@@ -6,7 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/rumblefrog/source-chat-relay/server/helper"
+	"github.com/rumblefrog/source-chat-relay/server/config"
 	"github.com/rumblefrog/source-chat-relay/server/protocol"
 
 	repoEntity "github.com/rumblefrog/source-chat-relay/server/repositories/entity"
@@ -19,7 +19,7 @@ type DiscordBot struct {
 var RelayBot *DiscordBot
 
 func init() {
-	session, err := discordgo.New("Bot " + helper.Conf.Bot.Token)
+	session, err := discordgo.New("Bot " + config.Conf.Bot.Token)
 
 	if err != nil {
 		log.WithField("error", err).Fatal("Unable to initiate bot session")

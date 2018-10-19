@@ -1,10 +1,4 @@
-package helper
-
-import (
-	log "github.com/sirupsen/logrus"
-
-	"github.com/BurntSushi/toml"
-)
+package config
 
 type GeneralConfig struct {
 	Port   int  `toml:"Port"`
@@ -29,12 +23,4 @@ type Config struct {
 	General  GeneralConfig
 	Bot      BotConfig
 	Database DatabaseConfig
-}
-
-var Conf Config
-
-func init() {
-	if _, err := toml.DecodeFile("config.toml", &Conf); err != nil {
-		log.WithField("error", err).Fatal("Unable to parse config")
-	}
 }
