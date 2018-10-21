@@ -39,7 +39,7 @@ func (b *DiscordBot) Listen() {
 					if !config.Conf.Bot.SimpleMessage {
 						b.Session.ChannelMessageSendEmbed(e.ID, embed)
 					} else {
-						b.Session.ChannelMessageSend(e.ID, fmt.Sprintf("%s: %s", message.ClientName, message.Content))
+						b.Session.ChannelMessageSend(e.ID, fmt.Sprintf("**<%s>** %s", message.ClientName, message.Content))
 					}
 				}
 			}
