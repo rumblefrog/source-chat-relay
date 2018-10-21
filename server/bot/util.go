@@ -107,7 +107,7 @@ func TransformMentions(session *discordgo.Session, cid string, body string) stri
 		user, err := session.User(userID)
 
 		if err == nil {
-			body = ChannelRegex.ReplaceAllString(body, fmt.Sprintf("@%s", user.Username))
+			body = ChannelRegex.ReplaceAllString(body, user.Username)
 		}
 	}
 
