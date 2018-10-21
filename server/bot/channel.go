@@ -2,6 +2,7 @@ package bot
 
 import (
 	"database/sql"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -38,7 +39,7 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 	)
 
 	id := ctx.Args.Get(1)
-	channel := ctx.Args.After(2)
+	channel := strings.TrimSpace(ctx.Args.After(2))
 	eType := repoEntity.Server
 
 	pid, ok := ParseChannel(id)
