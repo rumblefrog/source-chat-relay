@@ -2,6 +2,7 @@ package bot
 
 import (
 	"database/sql"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -38,7 +39,7 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 	)
 
 	id := ctx.Args.Get(1)
-	channel := ctx.Args.After(2)
+	channel := strings.TrimSpace(ctx.Args.After(2))
 	eType := repoEntity.Server
 
 	pid, ok := ParseChannel(id)
@@ -49,7 +50,11 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		dChannel, err = ctx.Ses.Channel(id)
 
 		if err != nil {
-			log.WithField("error", err).Warn("Unable to fetch channel for insertion")
+			log.WithField("error", err).Warn("Unable to fetch channel")
+
+			ctx.Reply("Unable to fetch channel")
+
+			return
 		}
 	}
 
@@ -84,7 +89,7 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		ctx.Reply("Unable to fetch entity")
 
 		return
-	} else {
+	} else if channel != "" {
 		if entity.Type == repoEntity.Channel && dChannel != nil {
 			entity.DisplayName = dChannel.Name
 		}
