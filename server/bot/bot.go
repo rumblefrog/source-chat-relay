@@ -67,7 +67,7 @@ func init() {
 				Hostname:   CapitalChannelName(channel),
 				ClientName: m.Author.Username,
 				ClientID:   m.Author.ID,
-				Content:    m.Content,
+				Content:    TransformMentions(session, m.ChannelID, m.Content),
 			}
 
 			protocol.NetManager.Router <- message
