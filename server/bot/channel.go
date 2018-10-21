@@ -51,6 +51,10 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 
 		if err != nil {
 			log.WithField("error", err).Warn("Unable to fetch channel")
+
+			ctx.Reply("Unable to fetch channel")
+
+			return
 		}
 	}
 
@@ -85,7 +89,7 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		ctx.Reply("Unable to fetch entity")
 
 		return
-	} else {
+	} else if channel != "" {
 		if entity.Type == repoEntity.Channel && dChannel != nil {
 			entity.DisplayName = dChannel.Name
 		}
