@@ -50,7 +50,7 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		dChannel, err = ctx.Ses.Channel(id)
 
 		if err != nil {
-			log.WithField("error", err).Warn("Unable to fetch channel for insertion")
+			log.WithField("error", err).Warn("Unable to fetch channel")
 		}
 	}
 
