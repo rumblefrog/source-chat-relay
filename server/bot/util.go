@@ -95,7 +95,7 @@ func TransformMentions(session *discordgo.Session, cid string, body string) stri
 		channel, err := session.Channel(cid)
 
 		if err == nil {
-			matches := UserRegex.FindAllStringSubmatch(body, -1)
+			matches := RoleRegex.FindAllStringSubmatch(body, -1)
 
 			n := len(matches)
 
