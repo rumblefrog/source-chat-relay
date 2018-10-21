@@ -90,20 +90,7 @@ func TransformMentions(session *discordgo.Session, cid string, body string) stri
 		}
 	}
 
-	if UserRegex.Match([]byte(body)) {
-		matches := UserRegex.FindAllStringSubmatch(body, -1)
-
-		n := len(matches)
-
-		for i := 0; i < n; i++ {
-			user, err := session.User(matches[i][1])
-
-			if err == nil {
-				body = strings.Replace(body, matches[i][0], user.Username, -1)
-			}
-		}
-	}
-
+	// Role match has to be before user, otherwise UserRegex will partial match role
 	if RoleRegex.Match([]byte(body)) {
 		channel, err := session.Channel(cid)
 
@@ -113,11 +100,25 @@ func TransformMentions(session *discordgo.Session, cid string, body string) stri
 			n := len(matches)
 
 			for i := 0; i < n; i++ {
-				role, err := session.State.Role(channel.ID, matches[i][1])
+				role, err := session.State.Role(channel.GuildID, matches[i][1])
 
 				if err == nil {
 					body = strings.Replace(body, matches[i][0], fmt.Sprintf("@%s", role.Name), -1)
 				}
+			}
+		}
+	}
+
+	if UserRegex.Match([]byte(body)) {
+		matches := UserRegex.FindAllStringSubmatch(body, -1)
+
+		n := len(matches)
+
+		for i := 0; i < n; i++ {
+			user, err := session.User(matches[i][1])
+
+			if err == nil {
+				body = strings.Replace(body, matches[i][0], fmt.Sprintf("@%s", user.Username), -1)
 			}
 		}
 	}
