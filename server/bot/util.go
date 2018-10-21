@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/bwmarrin/discordgo"
@@ -74,53 +75,49 @@ func ParseChannel(arg string) (string, bool) {
 	return "", false
 }
 
-func ParseUser(arg string) (string, bool) {
-	if UserRegex.Match([]byte(arg)) {
-		return UserRegex.FindStringSubmatch(arg)[1], true
-	}
-
-	return "", false
-}
-
-func ParseRole(arg string) (string, bool) {
-	if RoleRegex.Match([]byte(arg)) {
-		return RoleRegex.FindStringSubmatch(arg)[1], true
-	}
-
-	return "", false
-}
-
 func TransformMentions(session *discordgo.Session, cid string, body string) string {
-	channelID, found := ParseChannel(body)
+	if ChannelRegex.Match([]byte(body)) {
+		matches := ChannelRegex.FindAllStringSubmatch(body, -1)
 
-	if found {
-		channel, err := session.Channel(channelID)
+		n := len(matches)
 
-		if err == nil {
-			body = ChannelRegex.ReplaceAllString(body, fmt.Sprintf("#%s", channel.Name))
+		for i := 0; i < n; i++ {
+			channel, err := session.Channel(matches[i][1])
+
+			if err == nil {
+				body = strings.Replace(body, matches[i][0], fmt.Sprintf("#%s", channel.Name), -1)
+			}
 		}
 	}
 
-	userID, found := ParseUser(body)
+	if UserRegex.Match([]byte(body)) {
+		matches := UserRegex.FindAllStringSubmatch(body, -1)
 
-	if found {
-		user, err := session.User(userID)
+		n := len(matches)
 
-		if err == nil {
-			body = ChannelRegex.ReplaceAllString(body, user.Username)
+		for i := 0; i < n; i++ {
+			user, err := session.User(matches[i][1])
+
+			if err == nil {
+				body = strings.Replace(body, matches[i][0], user.Username, -1)
+			}
 		}
 	}
 
-	roleID, found := ParseRole(body)
-
-	if found && session.StateEnabled {
+	if RoleRegex.Match([]byte(body)) {
 		channel, err := session.Channel(cid)
 
 		if err == nil {
-			role, err := session.State.Role(channel.ID, roleID)
+			matches := UserRegex.FindAllStringSubmatch(body, -1)
 
-			if err == nil {
-				body = ChannelRegex.ReplaceAllString(body, fmt.Sprintf("@%s", role.Name))
+			n := len(matches)
+
+			for i := 0; i < n; i++ {
+				role, err := session.State.Role(channel.ID, matches[i][1])
+
+				if err == nil {
+					body = strings.Replace(body, matches[i][0], fmt.Sprintf("@%s", role.Name), -1)
+				}
 			}
 		}
 	}
