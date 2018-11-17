@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	ChannelRegex = regexp.MustCompile("(?:<#)?([0-9]+)>?")
-	UserRegex    = regexp.MustCompile("(?:<@!?)?([0-9]+)>?")
-	RoleRegex    = regexp.MustCompile("(?:<@&)?([0-9]+)>?")
+	ChannelRegex = regexp.MustCompile("^(?:<#)?([0-9]+)>?$")
+	UserRegex    = regexp.MustCompile("^(?:<@!?)?([0-9]+)>?$")
+	RoleRegex    = regexp.MustCompile("^(?:<@&)?([0-9]+)>?$")
 )
 
 func GuildMemberPermissions(member *discordgo.Member, guild *discordgo.Guild) (apermissions int) {
