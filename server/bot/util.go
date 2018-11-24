@@ -11,9 +11,10 @@ import (
 )
 
 var (
-	ChannelRegex = regexp.MustCompile("^(?:<#)?([0-9]+)>?$")
-	UserRegex    = regexp.MustCompile("^(?:<@!?)?([0-9]+)>?$")
-	RoleRegex    = regexp.MustCompile("^(?:<@&)?([0-9]+)>?$")
+	ChannelRegex         = regexp.MustCompile("(?:<#)?([0-9]+)>?")
+	ChannelRegexExplicit = regexp.MustCompile("^(?:<#)?([0-9]+)>?$")
+	UserRegex            = regexp.MustCompile("(?:<@!?)?([0-9]+)>?")
+	RoleRegex            = regexp.MustCompile("(?:<@&)?([0-9]+)>?")
 )
 
 func GuildMemberPermissions(member *discordgo.Member, guild *discordgo.Guild) (apermissions int) {
@@ -68,8 +69,8 @@ func CapitalChannelName(c *discordgo.Channel) string {
 }
 
 func ParseChannel(arg string) (string, bool) {
-	if ChannelRegex.Match([]byte(arg)) {
-		return ChannelRegex.FindStringSubmatch(arg)[1], true
+	if ChannelRegexExplicit.Match([]byte(arg)) {
+		return ChannelRegexExplicit.FindStringSubmatch(arg)[1], true
 	}
 
 	return "", false

@@ -12,6 +12,10 @@ import (
 	"github.com/rumblefrog/source-chat-relay/server/protocol"
 )
 
+const (
+	SCRVER = "1.1.2"
+)
+
 func init() {
 	log.SetLevel(log.InfoLevel)
 }
