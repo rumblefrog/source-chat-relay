@@ -34,7 +34,7 @@ script:
     - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
 
 before_deploy:
-    - tar -czf linux-amd64.tar.gz $TRAVIS_BUILD_DIR/out/server $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx $TRAVIS_BUILD_DIR/config.toml.example
+    - tar -czf linux-amd64.tar.gz -C $TRAVIS_BUILD_DIR/out/ server Source-Chat-Relay.smx -C $TRAVIS_BUILD_DIR/ config.toml.example
     - 7zr a windows-amd64.7z $TRAVIS_BUILD_DIR/out/server.exe $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx $TRAVIS_BUILD_DIR/config.toml.example
 
 deploy:
