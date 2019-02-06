@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	SCRVER = "1.1.4"
+	SCRVER = "1.1.5"
 )
 
 func init() {

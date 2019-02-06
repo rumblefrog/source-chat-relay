@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "1.1.4"
+#define PLUGIN_VERSION "1.1.5"
 
 #include <sourcemod>
 #include <morecolors>

@@ -29,19 +29,22 @@ before_script:
     - chmod +x addons/sourcemod/scripting/spcomp
 
 script:
-    - go get -d ./server && go build -o ./out/server ./server
-    - export GOOS=windows && go get -d ./server && go build -o ./out/server.exe ./server
+    - go get -d ./server && go build -o ./out/linux-amd64/server ./server
+    - export GOARCH=arm && export GOARM=7 && go build -o ./out/arm-v7/server ./server
+    - export GOARCH=amd64 && GOOS=windows && go get -d ./server && go build -o ./out/windows/server.exe ./server
     - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
 
 before_deploy:
-    - tar -czf linux-amd64.tar.gz -C $TRAVIS_BUILD_DIR/out/ server Source-Chat-Relay.smx -C $TRAVIS_BUILD_DIR/ config.toml.example
-    - 7zr a windows-amd64.7z $TRAVIS_BUILD_DIR/out/server.exe $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx $TRAVIS_BUILD_DIR/config.toml.example
+    - tar -czf linux-amd64.tar.gz -C $TRAVIS_BUILD_DIR/out/linux-amd64 server Source-Chat-Relay.smx -C $TRAVIS_BUILD_DIR/ config.toml.example
+    - tar -czf arm-v7.tar.gz -C $TRAVIS_BUILD_DIR/out/arm-v7 server Source-Chat-Relay.smx -C $TRAVIS_BUILD_DIR/ config.toml.example
+    - 7zr a windows-amd64.7z $TRAVIS_BUILD_DIR/out/windows/server.exe $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx $TRAVIS_BUILD_DIR/config.toml.example
 
 deploy:
     provider: releases
     api_key: "$githubkey"
     file:
         - $TRAVIS_BUILD_DIR/linux-amd64.tar.gz
+        - $TRAVIS_BUILD_DIR/arm-v7.tar.gz
         - $TRAVIS_BUILD_DIR/windows-amd64.7z
     skip_cleanup: true
     on:
