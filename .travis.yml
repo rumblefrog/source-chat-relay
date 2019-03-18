@@ -31,7 +31,7 @@ before_script:
 script:
     - go get -d ./server && go build -o ./out/linux-amd64/server ./server
     - export GOARCH=arm && export GOARM=7 && go build -o ./out/arm-v7/server ./server
-    - export GOARCH=amd64 && GOOS=windows && go get -d ./server && go build -o ./out/windows/server.exe ./server
+    - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -o ./out/windows/server.exe ./server
     - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/out/Source-Chat-Relay.smx
 
 before_deploy:
