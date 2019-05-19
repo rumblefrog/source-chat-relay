@@ -40,7 +40,7 @@ func init() {
 	router := exrouter.New()
 
 	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
-		if m.Author.Bot {
+		if m.Author.Bot && !config.Conf.Bot.ListenToBots {
 			return
 		}
 

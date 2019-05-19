@@ -18,6 +18,10 @@ Token = "Bot Token"
 # Takes up less room but with less detail
 SimpleMessage = false
 
+# If the bot should also listen and transmit other bot's message
+# Please beware of an infinite loop with other bots this may cause
+ListenToBots = false
+
 [Database]
 # MySQL Database host
 Host = "127.0.0.1"
