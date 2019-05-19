@@ -7,8 +7,6 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	"github.com/rumblefrog/source-chat-relay/server/repositories/entity"
-
 	"github.com/Necroforger/dgrouter/exrouter"
 	log "github.com/sirupsen/logrus"
 
@@ -58,7 +56,7 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		}
 	}
 
-	entity, err := entity.GetEntity(id, eType)
+	entity, err := repoEntity.GetEntity(id, eType)
 
 	if err == sql.ErrNoRows && channel != "" {
 		entity = &repoEntity.Entity{
