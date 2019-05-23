@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "1.1.5"
+#define PLUGIN_VERSION "1.2.1"
 
 #include <sourcemod>
 #include <morecolors>
@@ -341,11 +341,14 @@ void ParseMessageFrame(const char[] frame)
 	
 		PrintToConsoleAll("===================");
 	#endif
-	
-	if (eVer == Engine_CSGO)
-		PrintToChatAll("\x10 \x10[%s] \x0C%s\x01: \x08%s", hostname, name, sContent);
-	else
-		CPrintToChatAll("{gold}[%s] {azure}%s{white}: {grey}%s", hostname, name, sContent);
+
+	switch (eVer)
+	{
+		case Engine_TF2, Engine_CSS, Engine_HL2DM, Engine_DODS:
+			CPrintToChatAll("{gold}[%s] {azure}%s{white}: {grey}%s", hostname, name, sContent);
+		default:
+			PrintToChatAll("\x10 \x10[%s] \x0C%s\x01: \x08%s", hostname, name, sContent);
+	}
 }
 
 stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
