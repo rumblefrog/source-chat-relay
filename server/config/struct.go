@@ -8,7 +8,7 @@ type GeneralConfig struct {
 type BotConfig struct {
 	Token         string `toml:"Token"`
 	SimpleMessage bool   `toml:"SimpleMessage"`
-	ListenToBots bool `toml:"ListenToBots"`
+	ListenToBots  bool   `toml:"ListenToBots"`
 }
 
 type DatabaseConfig struct {
