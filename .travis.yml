@@ -3,10 +3,10 @@ sudo: false
 language: go
 
 env:
-  - SMVERSION=1.9
+  - SMVERSION=1.10
 
 go:
-  - "1.11.x"
+  - "1.12.x"
 
 matrix:
     fast_finish: true
