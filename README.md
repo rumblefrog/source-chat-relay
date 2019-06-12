@@ -10,6 +10,7 @@
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Getting started](#getting-started)
+- [Alliedmods Thread](#alliedmods-thread)
 - [Credits](#credits)
 - [License](#license)
 
@@ -54,6 +55,9 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
 
 ## Getting started
  - [Setup](https://rumblefrog.gitbook.io/source-chat-relay/getting-started/setup)
+
+## Alliedmods Thread
+ - [Thread](https://forums.alliedmods.net/showthread.php?t=311079)
 
 ## Credits
  - Ron for being a human linter

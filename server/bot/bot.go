@@ -89,9 +89,30 @@ func init() {
 	router.Group(func(r *exrouter.Route) {
 		r.Cat("other")
 
+		r.On("about", func(ctx *exrouter.Context) {
+			ctx.Ses.ChannelMessageSendEmbed(ctx.Msg.ChannelID, &discordgo.MessageEmbed{
+				Author: &discordgo.MessageEmbedAuthor{
+					Name:    "Fishy!",
+					URL:     "https://github.com/rumblefrog",
+					IconURL: "https://avatars2.githubusercontent.com/u/6960234?s=32",
+				},
+				Color: 0x3395D6,
+				Fields: []*discordgo.MessageEmbedField{
+					&discordgo.MessageEmbedField{
+						Name:  "SCR Version",
+						Value: config.SCRVER,
+					},
+					&discordgo.MessageEmbedField{
+						Name:  "Repository",
+						Value: "https://github.com/rumblefrog/source-chat-relay/",
+					},
+				},
+			})
+		}).Desc("Version and source information").Alias("info")
+
 		r.On("ping", func(ctx *exrouter.Context) {
 			ctx.Reply("pong")
-		}).Desc("Responds with pong").Cat("other")
+		}).Desc("Responds with pong")
 	})
 }
 

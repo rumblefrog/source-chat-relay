@@ -8,12 +8,9 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/rumblefrog/source-chat-relay/server/bot"
+	"github.com/rumblefrog/source-chat-relay/server/config"
 	"github.com/rumblefrog/source-chat-relay/server/database"
 	"github.com/rumblefrog/source-chat-relay/server/protocol"
-)
-
-const (
-	SCRVER = "1.2.1"
 )
 
 func init() {
@@ -21,7 +18,7 @@ func init() {
 }
 
 func main() {
-	log.Info("Server is now running. Press CTRL-C to exit.")
+	log.Infof("Server is now running on version %s. Press CTRL-C to exit.", config.SCRVER)
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
