@@ -43,9 +43,9 @@ deploy:
     provider: releases
     api_key: "$githubkey"
     file:
-        - $TRAVIS_BUILD_DIR/linux-amd64.tar.gz
-        - $TRAVIS_BUILD_DIR/arm-v7.tar.gz
-        - $TRAVIS_BUILD_DIR/windows-amd64.7z
+        - $TRAVIS_BUILD_DIR/scr-linux-amd64.tar.gz
+        - $TRAVIS_BUILD_DIR/scr-arm-v7.tar.gz
+        - $TRAVIS_BUILD_DIR/scr-windows-amd64.7z
     skip_cleanup: true
     on:
         tags: true
