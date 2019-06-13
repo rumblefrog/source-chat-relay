@@ -3,7 +3,7 @@ sudo: false
 language: go
 
 env:
-  - SMVERSION=1.10
+  - SMVERSION=1.9
 
 go:
   - "1.12.x"
