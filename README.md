@@ -47,6 +47,7 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
  - Upon disconnect, game servers will attempt to reconnect at a fixed interval
  - Filter out certain unwanted messages using regex expressions
  - Set ingame prefixes to send a message with ability to configure flag permission for the prefix
+ - Native to expand upon the functionality of the plugin
 
 ## Prerequisites
  - Server to host the relay binary on (with MySQL if not external)
@@ -58,6 +59,10 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
 
 ## Alliedmods Thread
  - [Thread](https://forums.alliedmods.net/showthread.php?t=311079)
+
+## Native
+
+A simple message dispatcher native is available within `client/include/`
 
 ## Credits
  - Ron for being a human linter
