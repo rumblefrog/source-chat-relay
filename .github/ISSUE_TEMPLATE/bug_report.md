@@ -23,7 +23,7 @@ If applicable, add screenshots to help explain your problem.
 **Info (please complete the following information):**
  - OS: [e.g. Ubuntu]
  - Sourcemod Version [e.g. 1.9.6260]
- - Relay Version [e.g. 1.3.2]
+ - Relay Version [e.g. 1.4.0]
 
 **Additional context**
 Add any other context about the problem here.

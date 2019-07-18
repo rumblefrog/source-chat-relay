@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "1.3.2"
+#define PLUGIN_VERSION "1.4.0"
 
 #include <sourcemod>
 #include <morecolors>
@@ -46,6 +46,15 @@ public Plugin myinfo =
 	version = PLUGIN_VERSION,
 	url = "https://keybase.io/RumbleFrog"
 };
+
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+	RegPluginLibrary("Source-Chat-Relay");
+
+	CreateNative("SCR_SendMessage", Native_SendMessage);
+
+	return APLRes_Success;
+}
 
 public void OnPluginStart()
 {
@@ -357,4 +366,16 @@ stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
 	
 	for (int i = 0; i < len; i++)
 		Format(buffer, buffersize, "%s%c", buffer, charset[GetRandomInt(0, sizeof charset)]);
+}
+
+public int Native_SendMessage(Handle plugin, int numParams)
+{
+	char sBuffer[512];
+	int iWritten;
+
+	int iClient = GetNativeCell(1);
+
+	FormatNativeString(0, 2, 3, sizeof sBuffer, iWritten, sBuffer);
+
+	PackMessage(iClient, sBuffer);
 }
