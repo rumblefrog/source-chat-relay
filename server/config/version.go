@@ -1,5 +1,5 @@
 package config
 
 const (
-	SCRVER = "1.4.0"
+	SCRVER = "2.0.0"
 )
