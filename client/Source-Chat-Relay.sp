@@ -1,5 +1,4 @@
 #include <sourcemod>
-#include <morecolors>
 #include <socket>
 #include <smlib>
 #include <bytebuffer>
@@ -8,6 +7,8 @@
 
 #define PLUGIN_AUTHOR "Fishy"
 #define PLUGIN_VERSION "2.0.0"
+
+#define MAX_MESSAGE_LENGTH 128
 
 #pragma newdecls required
 
@@ -538,7 +539,7 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 		
 		char sBuffer[MAX_MESSAGE_LENGTH];
 		
-		for (int i = iLen; i < strlen(sArgs); i++)
+		for (int i = strlen(g_sPrefix); i < strlen(sArgs); i++)
 			Format(sBuffer, sizeof sBuffer, "%s%c", sBuffer, sArgs[i]);
 		
 		DispatchMessage(client, sBuffer);
