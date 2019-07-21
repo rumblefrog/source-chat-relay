@@ -380,7 +380,9 @@ public void OnConfigsExecuted()
 		
 		g_iFlag = FlagToBit(aFlag);
 	}
-		
+	
+	File tFile;
+
 	char sPath[PLATFORM_MAX_PATH], sIP[64];
 	
 	Server_GetIPString(sIP, sizeof sIP);
@@ -389,21 +391,19 @@ public void OnConfigsExecuted()
 	
 	if (FileExists(sPath, false))
 	{
-		File tFile = OpenFile(sPath, "r", false);
+		tFile = OpenFile(sPath, "r", false);
 		
 		tFile.ReadString(g_sToken, sizeof g_sToken, -1);
-		
-		delete tFile;
 	} else
 	{
-		File tFile = OpenFile(sPath, "w", false);
+		tFile = OpenFile(sPath, "w", false);
 	
 		GenerateRandomChars(g_sToken, sizeof g_sToken, 64);
 	
 		tFile.WriteString(g_sToken, true);
-	
-		delete tFile;
 	}
+
+	delete tFile;
 
 	if (!SocketIsConnected(g_hSocket))
 		ConnectRelay();
