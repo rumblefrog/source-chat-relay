@@ -1,13 +1,13 @@
-#pragma semicolon 1
-
-#define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "2.0.0"
-
 #include <sourcemod>
 #include <morecolors>
 #include <socket>
 #include <smlib>
 #include <bytebuffer>
+
+#pragma semicolon 1
+
+#define PLUGIN_AUTHOR "Fishy"
+#define PLUGIN_VERSION "2.0.0"
 
 #pragma newdecls required
 
@@ -319,7 +319,7 @@ public void OnPluginStart()
 
 	g_cPort = CreateConVar("rf_scr_port", "57452", "Relay Server Port", FCVAR_PROTECTED);
 	
-	g_cPrefix = CreateConVar("rf_scr_prefix", "", "Prefix required to send message to Discord", FCVAR_NONE);
+	g_cPrefix = CreateConVar("rf_scr_prefix", "", "Prefix required to send message to Discord. If empty, none is required.", FCVAR_NONE);
 	
 	g_cFlag = CreateConVar("rf_scr_flag", "", "If prefix is enabled, this admin flag is required to send message using the prefix", FCVAR_PROTECTED);
 
@@ -333,7 +333,7 @@ public void OnPluginStart()
 	SocketSetOption(g_hSocket, SocketKeepAlive, 1);
 	
 	#if defined DEBUG
-		SocketSetOption(g_hSocket, DebugMode, 1);
+	SocketSetOption(g_hSocket, DebugMode, 1);
 	#endif
 
 	// ClientIndex, EntityName, ClientID, ClientName, Message
@@ -372,7 +372,7 @@ public void OnConfigsExecuted()
 	
 	g_cFlag.GetString(sFlag, sizeof sFlag);
 	
-	if (!StrEqual(sFlag, ""))
+	if (strlen(sFlag) != 0)
 	{
 		AdminFlag aFlag;
 		
@@ -398,7 +398,7 @@ public void OnConfigsExecuted()
 	{
 		File tFile = OpenFile(sPath, "w", false);
 	
-		GenerateRandomChars(g_sToken, sizeof g_sToken, 32);
+		GenerateRandomChars(g_sToken, sizeof g_sToken, 64);
 	
 		tFile.WriteString(g_sToken, true);
 	
@@ -470,7 +470,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 
 			Action aResult;
 
-			char sEntity[64], sID[64], sName[64], sMessage[64];
+			char sEntity[64], sID[64], sName[MAX_NAME_LENGTH], sMessage[64];
 
 			m.GetEntityName(sEntity, sizeof sEntity);
 			m.GetUserID(sID, sizeof sID);
@@ -532,21 +532,8 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 	{
 		if (g_bFlag && !CheckCommandAccess(client, "arandomcommandthatsnotregistered", g_iFlag, true))
 			return;
-		
-		int iLen = strlen(g_sPrefix);
-		
-		bool bMatch = true;
-		
-		for (int i = 0; i < iLen; i++)
-		{
-			if (g_sPrefix[i] != sArgs[i])
-			{
-				bMatch = false;
-				break;
-			}
-		}
 
-		if (!bMatch)
+		if (StrContains(sArgs, g_sPrefix) != 0)
 			return;
 		
 		char sBuffer[MAX_MESSAGE_LENGTH];
