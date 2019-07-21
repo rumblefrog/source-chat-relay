@@ -63,7 +63,7 @@ enum IdenticationType
  * 
  * @note The type is declared on every derived message type
  * 
- * @field type - short(4) - The message type (enum MessageType)
+ * @field type - byte - The message type (enum MessageType)
  */
 methodmap BaseMessage < ByteBuffer
 {
@@ -83,7 +83,7 @@ methodmap BaseMessage < ByteBuffer
 	public void DataCursor()
 	{
 		// Skip the message type field
-		this.Cursor = 4;
+		this.Cursor = 1;
 	}
 
 	public int ReadDiscardString()
@@ -132,7 +132,7 @@ methodmap AuthenticateMessage < BaseMessage
 	{
 		BaseMessage m = BaseMessage();
 
-		m.WriteInt(view_as<int>(MessageAuthenticate));
+		m.WriteByte(view_as<int>(MessageAuthenticate));
 		m.WriteString(sHostname);
 		m.WriteString(sToken);
 
@@ -143,7 +143,7 @@ methodmap AuthenticateMessage < BaseMessage
 /**
  * This message is only received from the server
  * 
- * @field Response - short(4) - The state of the authentication request (enum AuthenticateResponse)
+ * @field Response - byte - The state of the authentication request (enum AuthenticateResponse)
  */
 methodmap AuthenticateMessageResponse < BaseMessage
 {
@@ -162,7 +162,7 @@ methodmap AuthenticateMessageResponse < BaseMessage
  * Bi-directional messaging structure
  * 
  * @field EntityName - string - The entity's name that it's sending from
- * @field IDType - short(4) - Type of ID (enum IdenticationType)
+ * @field IDType - byte - Type of ID (enum IdenticationType)
  * @field ID - string - The unique identication of the user (SteamID/Discord Snowflake/etc)
  * @field Username - string - The name of the user
  * @field Message - string - The message
@@ -197,7 +197,7 @@ methodmap ChatMessage < BaseMessage
 		this.ReadDiscardString();
 
 		// Skip ID type
-		this.Cursor += 4;
+		this.Cursor++;
 
 		return this.ReadString(sID, iSize);
 	}
@@ -210,7 +210,7 @@ methodmap ChatMessage < BaseMessage
 		this.ReadDiscardString();
 
 		// Skip ID type
-		this.Cursor += 4;
+		this.Cursor++;
 
 		// Skip UserID
 		this.ReadDiscardString();
@@ -226,7 +226,7 @@ methodmap ChatMessage < BaseMessage
 		this.ReadDiscardString();
 
 		// Skip ID type
-		this.Cursor += 4;
+		this.Cursor++;
 
 		// Skip UserID
 		this.ReadDiscardString();
@@ -246,9 +246,9 @@ methodmap ChatMessage < BaseMessage
 	{
 		BaseMessage m = BaseMessage();
 
-		m.WriteInt(view_as<int>(MessageChat));
+		m.WriteByte(view_as<int>(MessageChat));
 		m.WriteString(sEntityName);
-		m.WriteInt(view_as<int>(IDType));
+		m.WriteByte(view_as<int>(IDType));
 		m.WriteString(sUserID);
 		m.WriteString(sUsername);
 		m.WriteString(sMessage);
@@ -286,7 +286,7 @@ methodmap EventMessage < BaseMessage
 	{
 		BaseMessage m = BaseMessage();
 
-		m.WriteInt(view_as<int>(MessageEvent));
+		m.WriteByte(view_as<int>(MessageEvent));
 		m.WriteString(sEvent);
 		m.WriteString(sData);
 
