@@ -1,0 +1,14 @@
+"Phrases"
+{
+    "ChatMessage"
+    {
+        "#format"   "{1:s},{2:s},{3:s}"
+        "en"        "\x10\x10[{1}] \x0C{2}: \x08{3}"
+    }
+    
+    "EventMessage"
+    {
+        "#format"   "{1:s},{2:s}"
+        "en"        "[{1}]: {2}"
+    }
+}

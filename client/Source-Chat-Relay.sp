@@ -31,7 +31,7 @@ ConVar g_cFlag;
 
 Handle g_hSocket;
 Handle g_hMessageSendForward;
-// Handle g_hMessageReceiveForward; TODO:
+Handle g_hMessageReceiveForward;
 
 enum MessageType
 {
@@ -39,6 +39,7 @@ enum MessageType
 	MessageAuthenticate,
 	MessageAuthenticateResponse,
 	MessageChat,
+	MessageEvent,
 	MessageTypeCount,
 }
 
@@ -78,6 +79,12 @@ methodmap BaseMessage < ByteBuffer
 		}
 	}
 
+	public void DataCursor()
+	{
+		// Skip the message type field
+		this.Cursor = 4;
+	}
+
 	public int ReadDiscardString()
 	{
 		char cByte;
@@ -115,7 +122,7 @@ methodmap AuthenticateMessage < BaseMessage
 {
 	public int GetToken(char[] sToken, int iSize)
 	{
-		this.Cursor = 4;
+		this.DataCursor();
 
 		return this.ReadString(sToken, iSize);
 	}
@@ -143,8 +150,7 @@ methodmap AuthenticateMessageResponse < BaseMessage
 	{
 		public get()
 		{
-			// Skip the message type
-			this.Cursor = 4;
+			this.DataCursor();
 
 			return view_as<AuthenticateResponse>(this.ReadInt());
 		}
@@ -154,19 +160,29 @@ methodmap AuthenticateMessageResponse < BaseMessage
 /**
  * Bi-directional messaging structure
  * 
+ * @field EntityName - string - The entity's name that it's sending from
  * @field IDType - short(4) - Type of ID (enum IdenticationType)
  * @field ID - string - The unique identication of the user (SteamID/Discord Snowflake/etc)
- * @field Name - string - The name of the user
+ * @field Username - string - The name of the user
  * @field Message - string - The message
  */
 methodmap ChatMessage < BaseMessage
 {
+	public int GetEntityName(char[] sName, int iSize)
+	{
+		this.DataCursor();
+
+		return this.ReadString(sName, iSize);
+	}
+
 	property IdenticationType IDType
 	{
 		public get()
 		{
-			// Skip the message type
-			this.Cursor = 4;
+			this.DataCursor();
+
+			// Skip EntityName
+			this.ReadDiscardString();
 
 			return view_as<IdenticationType>(this.ReadInt());
 		}
@@ -174,18 +190,28 @@ methodmap ChatMessage < BaseMessage
 
 	public int GetUserID(char[] sID, int iSize)
 	{
-		// Skip the message and ID type
-		this.Cursor = 8;
+		this.DataCursor();
+
+		// Skip EntityName
+		this.ReadDiscardString();
+
+		// Skip ID type
+		this.Cursor += 4;
 
 		return this.ReadString(sID, iSize);
 	}
 
 	public int GetUsername(char[] sUsername, int iSize)
 	{
-		// Skip the message and ID type
-		this.Cursor = 8;
+		this.DataCursor();
 
-		// Skip the ID field
+		// Skip EntityName
+		this.ReadDiscardString();
+
+		// Skip ID type
+		this.Cursor += 4;
+
+		// Skip UserID
 		this.ReadDiscardString();
 
 		return this.ReadString(sUsername, iSize);
@@ -193,29 +219,77 @@ methodmap ChatMessage < BaseMessage
 
 	public int GetMessage(char[] sMessage, int iSize)
 	{
-		// Skip the message and ID type
-		this.Cursor = 8;
+		this.DataCursor();
 
-		// Skip the ID field
+		// Skip EntityName
 		this.ReadDiscardString();
 
-		// Skip the username field
+		// Skip ID type
+		this.Cursor += 4;
+
+		// Skip UserID
+		this.ReadDiscardString();
+
+		// Skip Name
 		this.ReadDiscardString();
 
 		return this.ReadString(sMessage, iSize);
 	}
 
-	public ChatMessage(IdenticationType IDType, const char[] sUserID, const char[] sUsername, const char[] sMessage)
+	public ChatMessage(
+		const char[] sEntityName,
+		IdenticationType IDType,
+		const char[] sUserID,
+		const char[] sUsername,
+		const char[] sMessage)
 	{
 		BaseMessage m = BaseMessage();
 
 		m.WriteInt(view_as<int>(MessageChat));
+		m.WriteString(sEntityName);
 		m.WriteInt(view_as<int>(IDType));
 		m.WriteString(sUserID);
 		m.WriteString(sUsername);
 		m.WriteString(sMessage);
 
 		return view_as<ChatMessage>(m);
+	}
+}
+
+/**
+ * Bi-directional event data
+ * 
+ * @field Event - string - The name of the event
+ * @field Data - string - The data of the event
+ */
+methodmap EventMessage < BaseMessage
+{
+	public int GetEvent(char[] sEvent, int iSize)
+	{
+		this.DataCursor();
+
+		return this.ReadString(sEvent, iSize);
+	}
+
+	public int GetData(char[] sData, int iSize)
+	{
+		this.DataCursor();
+
+		// Skip event string
+		this.ReadDiscardString();
+
+		return this.ReadString(sData, iSize);
+	}
+
+	public EventMessage(const char[] sEvent, const char[] sData)
+	{
+		BaseMessage m = BaseMessage();
+
+		m.WriteInt(view_as<int>(MessageEvent));
+		m.WriteString(sEvent);
+		m.WriteString(sData);
+
+		return view_as<EventMessage>(m);
 	}
 }
 
@@ -262,7 +336,26 @@ public void OnPluginStart()
 		SocketSetOption(g_hSocket, DebugMode, 1);
 	#endif
 
-	g_hMessageSendForward = CreateGlobalForward("SCR_OnMessageSend", ET_Event, Param_String, Param_String, Param_String);
+	// ClientIndex, EntityName, ClientID, ClientName, Message
+	g_hMessageSendForward = CreateGlobalForward(
+		"SCR_OnMessageSend",
+		ET_Event,
+		Param_Cell,
+		Param_String,
+		Param_String,
+		Param_String,
+		Param_String);
+
+	// EntityName, ClientID, ClientName, Message
+	g_hMessageReceiveForward = CreateGlobalForward(
+		"SCR_OnMessageReceive",
+		ET_Event,
+		Param_String,
+		Param_String,
+		Param_String,
+		Param_String);
+
+	LoadTranslations("sourcechatrelay.phrases");
 }
 
 public void OnConfigsExecuted()
@@ -375,12 +468,37 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 		{
 			ChatMessage m = view_as<ChatMessage>(base);
 
-			char sMessage[64];
+			Action aResult;
 
+			char sEntity[64], sID[64], sName[64], sMessage[64];
+
+			m.GetEntityName(sEntity, sizeof sEntity);
+			m.GetUserID(sID, sizeof sID);
+			m.GetUsername(sName, sizeof sName);
 			m.GetMessage(sMessage, sizeof sMessage);
 
-			// TODO: Temporary
-			PrintToChatAll(sMessage);
+			Call_StartForward(g_hMessageReceiveForward);
+			Call_PushString(sEntity);
+			Call_PushString(sID);
+			Call_PushString(sName);
+			Call_PushString(sMessage);
+			Call_Finish(aResult);
+
+			if (aResult >= Plugin_Handled)
+				return;
+
+			PrintToChatAll("%T", "ChatMessage", sEntity, sName, sMessage);
+		}
+		case MessageEvent:
+		{
+			EventMessage m = view_as<EventMessage>(base);
+
+			char sEvent[64], sData[64];
+
+			m.GetEvent(sEvent, sizeof sEvent);
+			m.GetData(sData, sizeof sData);
+
+			PrintToChatAll("%T", "EventMessage", sEvent, sData);
 		}
 		case MessageAuthenticateResponse:
 		{
@@ -442,15 +560,18 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 
 void DispatchMessage(int iClient, const char[] sMessage)
 {
-	char sID[64], sName[MAX_NAME_LENGTH];
+	char sEntity[64], sID[64], sName[MAX_NAME_LENGTH];
 
 	Action aResult;
+
+	strcopy(sEntity, sizeof sEntity, g_sHostname);
 
 	GetClientAuthId(iClient, AuthId_SteamID64, sID, sizeof sID);
 	GetClientName(iClient, sName, sizeof sName);
 
 	Call_StartForward(g_hMessageSendForward);
 	Call_PushCell(iClient);
+	Call_PushString(sEntity);
 	Call_PushString(sID);
 	Call_PushString(sName);
 	Call_PushString(sMessage);
@@ -459,7 +580,7 @@ void DispatchMessage(int iClient, const char[] sMessage)
 	if (aResult >= Plugin_Handled)
 		return;
 
-	ChatMessage(IdenticationSteam, sID, sName, sMessage).Dispatch();
+	ChatMessage(g_sHostname, IdenticationSteam, sID, sName, sMessage).Dispatch();
 }
 
 stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
