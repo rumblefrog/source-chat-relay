@@ -76,7 +76,7 @@ methodmap BaseMessage < ByteBuffer
 	{
 		public get()
 		{
-			return view_as<MessageType>(this.ReadInt());
+			return view_as<MessageType>(this.ReadByte());
 		}
 	}
 
@@ -153,7 +153,7 @@ methodmap AuthenticateMessageResponse < BaseMessage
 		{
 			this.DataCursor();
 
-			return view_as<AuthenticateResponse>(this.ReadInt());
+			return view_as<AuthenticateResponse>(this.ReadByte());
 		}
 	}
 }
@@ -185,7 +185,7 @@ methodmap ChatMessage < BaseMessage
 			// Skip EntityName
 			this.ReadDiscardString();
 
-			return view_as<IdenticationType>(this.ReadInt());
+			return view_as<IdenticationType>(this.ReadByte());
 		}
 	}
 
