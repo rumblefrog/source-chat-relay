@@ -78,13 +78,8 @@ func FetchEntities() ([]*Entity, error) {
 }
 
 func (entity *Entity) UpdateEntity() (sql.Result, error) {
-	stmt, err := database.Connection.Prepare("UPDATE `relay_entities` SET `display_name` = ?, `receive_channels` = ?, `send_channels` = ? WHERE `id` = ?")
-
-	if err != nil {
-		return nil, err
-	}
-
-	return stmt.Exec(
+	return database.Connection.Exec(
+		"UPDATE `relay_entities` SET `display_name` = ?, `receive_channels` = ?, `send_channels` = ? WHERE `id` = ?",
 		entity.DisplayName,
 		EncodeDelimitedChannels(entity.ReceiveChannels),
 		EncodeDelimitedChannels(entity.SendChannels),
@@ -93,13 +88,8 @@ func (entity *Entity) UpdateEntity() (sql.Result, error) {
 }
 
 func (entity *Entity) CreateEntity() (sql.Result, error) {
-	stmt, err := database.Connection.Prepare("INSERT INTO `relay_entities` (`id`, `display_name`, `receive_channels`, `send_channels`) VALUES (?, ?, ?, ?)")
-
-	if err != nil {
-		return nil, err
-	}
-
-	return stmt.Exec(
+	return database.Connection.Exec(
+		"INSERT INTO `relay_entities` (`id`, `display_name`, `receive_channels`, `send_channels`) VALUES (?, ?, ?, ?)",
 		entity.ID,
 		entity.DisplayName,
 		EncodeDelimitedChannels(entity.ReceiveChannels),
