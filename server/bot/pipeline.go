@@ -1,6 +1,9 @@
 package bot
 
 import (
+	"log"
+
+	"github.com/rumblefrog/source-chat-relay/server/config"
 	"github.com/rumblefrog/source-chat-relay/server/entity"
 	"github.com/rumblefrog/source-chat-relay/server/relay"
 )
@@ -17,9 +20,13 @@ func Listen() {
 						continue
 					}
 
-					if channel.ID != message.Author() &&
-						tEntity.ReceiveIntersectsWith(entity.DeliverableSendChannels(message)) {
-						// log.Println("Gottttt it")
+					if channel.ID != message.Author() && tEntity.ReceiveIntersectsWith(entity.DeliverableSendChannels(message)) {
+						if !config.Config.Bot.SimpleMessage {
+							RelayBot.ChannelMessageSendEmbed(channel.ID, message.Embed())
+							log.Println(err)
+						} else {
+							RelayBot.ChannelMessageSend(channel.ID, message.Plain())
+						}
 					}
 				}
 			}

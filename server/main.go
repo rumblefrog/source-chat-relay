@@ -28,7 +28,7 @@ func main() {
 	bot.Initialize()
 
 	relay.Instance = relay.NewRelay()
-	relay.Instance.Listen(config.Conf.General.Port)
+	relay.Instance.Listen(config.Config.General.Port)
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)

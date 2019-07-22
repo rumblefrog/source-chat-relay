@@ -1,11 +1,16 @@
 package protocol
 
-import "github.com/rumblefrog/source-chat-relay/server/packet"
+import (
+	"github.com/bwmarrin/discordgo"
+	"github.com/rumblefrog/source-chat-relay/server/packet"
+)
 
 type Deliverable interface {
 	Marshal() []byte
 	Content() string
 	Author() string
+	Plain() string
+	Embed() *discordgo.MessageEmbed
 }
 
 type BaseMessage struct {
@@ -13,6 +18,7 @@ type BaseMessage struct {
 
 	// Internal relay purposes only
 	SenderID string
+	Hostname string
 }
 
 func (b BaseMessage) Author() string {

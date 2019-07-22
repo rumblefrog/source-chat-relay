@@ -14,7 +14,7 @@ import (
 var RelayBot *discordgo.Session
 
 func Initialize() {
-	session, err := discordgo.New("Bot " + config.Conf.Bot.Token)
+	session, err := discordgo.New("Bot " + config.Config.Bot.Token)
 
 	if err != nil {
 		logrus.WithField("error", err).Fatal("Unable to initiate bot session")
@@ -37,7 +37,7 @@ func Initialize() {
 	router := exrouter.New()
 
 	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
-		if m.Author.Bot && !config.Conf.Bot.ListenToBots {
+		if m.Author.Bot && !config.Config.Bot.ListenToBots {
 			return
 		}
 
@@ -50,16 +50,22 @@ func Initialize() {
 				return
 			}
 
+			transformed, err := m.ContentWithMoreMentionsReplaced(session)
+
+			if err != nil {
+				transformed = m.Content
+			}
+
 			message := &protocol.ChatMessage{
 				BaseMessage: protocol.BaseMessage{
 					Type:     protocol.MessageChat,
 					SenderID: m.ChannelID,
+					Hostname: CapitalChannelName(channel),
 				},
-				EntityName: CapitalChannelName(channel),
-				IDType:     protocol.IdentificationDiscord,
-				ID:         m.Author.ID,
-				Username:   m.Author.Username,
-				Message:    TransformMentions(session, m.ChannelID, m.Content),
+				IDType:   protocol.IdentificationDiscord,
+				ID:       m.Author.ID,
+				Username: m.Author.Username,
+				Message:  transformed,
 			}
 
 			relay.Instance.Router <- message

@@ -5,10 +5,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var Conf Config
+var Config Config_t
 
 func ParseConfig() {
-	if _, err := toml.DecodeFile("config.toml", &Conf); err != nil {
+	if _, err := toml.DecodeFile("config.toml", &Config); err != nil {
 		logrus.WithField("error", err).Fatal("Unable to parse config")
 	}
 }

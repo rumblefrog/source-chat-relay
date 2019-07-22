@@ -3,7 +3,7 @@ package filter
 import "github.com/rumblefrog/source-chat-relay/server/config"
 
 func IsInFilter(s string) bool {
-	if !config.Conf.General.Filter {
+	if !config.Config.General.Filter {
 		return false
 	}
 

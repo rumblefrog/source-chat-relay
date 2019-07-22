@@ -167,7 +167,6 @@ methodmap AuthenticateMessageResponse < BaseMessage
 /**
  * Bi-directional messaging structure
  * 
- * @field EntityName - string - The entity's name that it's sending from
  * @field IDType - byte - Type of ID (enum IdenticationType)
  * @field ID - string - The unique identication of the user (SteamID/Discord Snowflake/etc)
  * @field Username - string - The name of the user
@@ -188,9 +187,6 @@ methodmap ChatMessage < BaseMessage
 		{
 			this.DataCursor();
 
-			// Skip EntityName
-			this.ReadDiscardString();
-
 			IdentificationType tByte = view_as<IdentificationType>(this.ReadByte());
 
 			return tByte >= IdentificationTypeCount ? IdentificationInvalid : tByte;
@@ -201,9 +197,6 @@ methodmap ChatMessage < BaseMessage
 	{
 		this.DataCursor();
 
-		// Skip EntityName
-		this.ReadDiscardString();
-
 		// Skip ID type
 		this.Cursor++;
 
@@ -213,9 +206,6 @@ methodmap ChatMessage < BaseMessage
 	public int GetUsername(char[] sUsername, int iSize)
 	{
 		this.DataCursor();
-
-		// Skip EntityName
-		this.ReadDiscardString();
 
 		// Skip ID type
 		this.Cursor++;
@@ -230,9 +220,6 @@ methodmap ChatMessage < BaseMessage
 	{
 		this.DataCursor();
 
-		// Skip EntityName
-		this.ReadDiscardString();
-
 		// Skip ID type
 		this.Cursor++;
 
@@ -246,7 +233,6 @@ methodmap ChatMessage < BaseMessage
 	}
 
 	public ChatMessage(
-		const char[] sEntityName,
 		IdentificationType IDType,
 		const char[] sUserID,
 		const char[] sUsername,
@@ -255,7 +241,6 @@ methodmap ChatMessage < BaseMessage
 		BaseMessage m = BaseMessage();
 
 		m.WriteByte(view_as<int>(MessageChat));
-		m.WriteString(sEntityName);
 		m.WriteByte(view_as<int>(IDType));
 		m.WriteString(sUserID);
 		m.WriteString(sUsername);
@@ -576,7 +561,7 @@ void DispatchMessage(int iClient, const char[] sMessage)
 	if (aResult >= Plugin_Handled)
 		return;
 
-	ChatMessage(g_sHostname, IdentificationSteam, sID, sName, sMessage).Dispatch();
+	ChatMessage(IdentificationSteam, sID, sName, sMessage).Dispatch();
 }
 
 stock void GenerateRandomChars(char[] buffer, int buffersize, int len)

@@ -23,9 +23,14 @@ type Relay struct {
 }
 
 type RelayClient struct {
-	Socket net.Conn
-	Data   chan []byte
-	ID     string
+	Socket   net.Conn
+	Data     chan []byte
+	ID       string
+	Hostname string
+}
+
+func (c *RelayClient) Authenticated() bool {
+	return len(c.ID) != 0
 }
 
 func NewRelay() *Relay {
@@ -148,11 +153,10 @@ func (r *Relay) HandlePacket(client *RelayClient, buffer []byte) {
 
 	base := protocol.ParseBaseMessage(reader)
 
-	switch base.Type {
-	case protocol.MessageAuthenticate:
+	if base.Type == protocol.MessageAuthenticate {
 		authenticateMessage := protocol.ParseAuthenticateMessage(base, reader)
 
-		r.AuthenticateClient(client, authenticateMessage.Token)
+		r.AuthenticateClient(client, authenticateMessage)
 
 		// For now, this is the only possible response
 		authenticateResponseMessage := &protocol.AuthenticateMessageResponse{
@@ -160,6 +164,20 @@ func (r *Relay) HandlePacket(client *RelayClient, buffer []byte) {
 		}
 
 		client.Socket.Write(authenticateResponseMessage.Marshal())
+
+		return
+	}
+
+	// Switch case for everything else that requires auth prior
+
+	if !client.Authenticated() {
+		return
+	}
+
+	base.SenderID = client.ID
+	base.Hostname = client.Hostname
+
+	switch base.Type {
 	case protocol.MessageChat:
 		r.Router <- protocol.ParseChatMessage(base, reader)
 	case protocol.MessageEvent:
@@ -182,12 +200,12 @@ func (r *Relay) RemoveClient(c *RelayClient) {
 	}
 }
 
-func (r *Relay) AuthenticateClient(c *RelayClient, token string) {
-	tEntity, err := entity.GetEntity(token)
+func (r *Relay) AuthenticateClient(c *RelayClient, packet *protocol.AuthenticateMessage) {
+	tEntity, err := entity.GetEntity(packet.Token)
 
 	if err == sql.ErrNoRows {
 		tEntity = &entity.Entity{
-			ID: token,
+			ID: packet.Token,
 		}
 
 		if err = tEntity.Insert(); err != nil {
@@ -198,5 +216,9 @@ func (r *Relay) AuthenticateClient(c *RelayClient, token string) {
 		logrus.WithField("error", err).Warn("Failed to fetch entity from database")
 	}
 
-	c.ID = string(token)
+	// Update database with new name upon auth
+	tEntity.SetDisplayName(packet.Hostname)
+
+	c.ID = string(packet.Token)
+	c.Hostname = packet.Hostname
 }

@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	if !config.Conf.General.Filter {
+	if !config.Config.General.Filter {
 		return
 	}
 
