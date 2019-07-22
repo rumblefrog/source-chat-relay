@@ -23,6 +23,8 @@ install:
     - tar -xzf $(basename "$SMPACKAGE")
     - cp client/Source-Chat-Relay.sp addons/sourcemod/scripting/
     - cp -r client/include/* addons/sourcemod/scripting/include
+    - wget https://raw.githubusercontent.com/nefarius/sm-ext-socket/master/socket.inc -P addons/sourcemod/scripting/include/
+    - wget https://raw.githubusercontent.com/rumblefrog/SM-ByteBuffer-Inc/master/bytebuffer.inc -P addons/sourcemod/scripting/include/
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 before_script:
