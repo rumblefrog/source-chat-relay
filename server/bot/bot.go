@@ -3,38 +3,35 @@ package bot
 import (
 	"github.com/Necroforger/dgrouter"
 	"github.com/Necroforger/dgrouter/exrouter"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rumblefrog/source-chat-relay/server/config"
 	"github.com/rumblefrog/source-chat-relay/server/protocol"
-
-	repoEntity "github.com/rumblefrog/source-chat-relay/server/repositories/entity"
+	"github.com/rumblefrog/source-chat-relay/server/relay"
 )
 
-type DiscordBot struct {
-	Session *discordgo.Session
-}
+var RelayBot *discordgo.Session
 
-var RelayBot *DiscordBot
-
-func init() {
+func Initialize() {
 	session, err := discordgo.New("Bot " + config.Conf.Bot.Token)
 
 	if err != nil {
-		log.WithField("error", err).Fatal("Unable to initiate bot session")
+		logrus.WithField("error", err).Fatal("Unable to initiate bot session")
 	}
 
-	RelayBot = &DiscordBot{
-		Session: session,
-	}
+	RelayBot = session
 
 	session.AddHandler(ready)
+
+	session.State.TrackEmojis = false
+	session.State.TrackPresences = false
+	session.State.TrackVoice = false
 
 	err = session.Open()
 
 	if err != nil {
-		log.WithField("error", err).Fatal("Unable to open bot session")
+		logrus.WithField("error", err).Fatal("Unable to open bot session")
 	}
 
 	router := exrouter.New()
@@ -47,30 +44,25 @@ func init() {
 		err := router.FindAndExecute(session, "r/", session.State.User.ID, m.Message)
 
 		if err == dgrouter.ErrCouldNotFindRoute {
-
-			relayChannel, err := repoEntity.GetEntity(m.ChannelID, repoEntity.Channel)
-
-			if err != nil {
-				return
-			}
-
 			channel, err := session.Channel(m.ChannelID)
 
 			if err != nil {
 				return
 			}
 
-			message := &protocol.Message{
-				Overwrite: &protocol.OverwriteData{
-					SendChannels: relayChannel.SendChannels,
+			message := &protocol.ChatMessage{
+				BaseMessage: protocol.BaseMessage{
+					Type:     protocol.MessageChat,
+					SenderID: m.ChannelID,
 				},
-				Hostname:   CapitalChannelName(channel),
-				ClientName: m.Author.Username,
-				ClientID:   m.Author.ID,
-				Content:    TransformMentions(session, m.ChannelID, m.Content),
+				EntityName: CapitalChannelName(channel),
+				IDType:     protocol.IdentificationDiscord,
+				ID:         m.Author.ID,
+				Username:   m.Author.Username,
+				Message:    TransformMentions(session, m.ChannelID, m.Content),
 			}
 
-			protocol.NetManager.Router <- message
+			relay.Instance.Router <- message
 		}
 	})
 
@@ -117,9 +109,9 @@ func init() {
 }
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
-	go RelayBot.Listen()
+	go Listen()
 
-	log.WithFields(log.Fields{
+	logrus.WithFields(logrus.Fields{
 		"Username":    event.User.Username,
 		"Guild Count": len(event.Guilds),
 	}).Info("Bot is now running")

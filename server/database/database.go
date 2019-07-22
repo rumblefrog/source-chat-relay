@@ -4,15 +4,15 @@ import (
 	"database/sql"
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/rumblefrog/source-chat-relay/server/config"
 )
 
-var DBConnection *sql.DB
+var Connection *sql.DB
 
-func init() {
+func InitializeDatabase() {
 	c := mysql.NewConfig()
 
 	c.Net = config.Conf.Database.Protocol
@@ -37,9 +37,9 @@ func init() {
 
 	var err error
 
-	DBConnection, err = sql.Open("mysql", c.FormatDSN())
+	Connection, err = sql.Open("mysql", c.FormatDSN())
 
 	if err != nil {
-		log.WithField("error", err).Fatal("Unable to connect to database")
+		logrus.WithField("error", err).Fatal("Unable to connect to database")
 	}
 }

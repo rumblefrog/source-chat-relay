@@ -49,13 +49,15 @@ enum AuthenticateResponse
 	AuthenticateInvalid = 0,
 	AuthenticateSuccess,
 	AuthenticateDenied,
+	AuthenticateResponseCount,
 }
 
-enum IdenticationType
+enum IdentificationType
 {
-	IdenticationInvalid = 0,
-	IdenticationSteam,
-	IdenticationDiscord,
+	IdentificationInvalid = 0,
+	IdentificationSteam,
+	IdentificationDiscord,
+	IdentificationTypeCount,
 }
 
 /**
@@ -76,7 +78,9 @@ methodmap BaseMessage < ByteBuffer
 	{
 		public get()
 		{
-			return view_as<MessageType>(this.ReadByte());
+			MessageType tByte = view_as<MessageType>(this.ReadByte());
+
+			return tByte >= MessageTypeCount ? MessageInvalid : tByte;
 		}
 	}
 
@@ -153,7 +157,9 @@ methodmap AuthenticateMessageResponse < BaseMessage
 		{
 			this.DataCursor();
 
-			return view_as<AuthenticateResponse>(this.ReadByte());
+			AuthenticateResponse tByte = view_as<AuthenticateResponse>(this.ReadByte());
+
+			return tByte >= AuthenticateResponseCount ? AuthenticateInvalid : tByte;
 		}
 	}
 }
@@ -176,7 +182,7 @@ methodmap ChatMessage < BaseMessage
 		return this.ReadString(sName, iSize);
 	}
 
-	property IdenticationType IDType
+	property IdentificationType IDType
 	{
 		public get()
 		{
@@ -185,7 +191,9 @@ methodmap ChatMessage < BaseMessage
 			// Skip EntityName
 			this.ReadDiscardString();
 
-			return view_as<IdenticationType>(this.ReadByte());
+			IdentificationType tByte = view_as<IdentificationType>(this.ReadByte());
+
+			return tByte >= IdentificationTypeCount ? IdentificationInvalid : tByte;
 		}
 	}
 
@@ -239,7 +247,7 @@ methodmap ChatMessage < BaseMessage
 
 	public ChatMessage(
 		const char[] sEntityName,
-		IdenticationType IDType,
+		IdentificationType IDType,
 		const char[] sUserID,
 		const char[] sUsername,
 		const char[] sMessage)
@@ -568,7 +576,7 @@ void DispatchMessage(int iClient, const char[] sMessage)
 	if (aResult >= Plugin_Handled)
 		return;
 
-	ChatMessage(g_sHostname, IdenticationSteam, sID, sName, sMessage).Dispatch();
+	ChatMessage(g_sHostname, IdentificationSteam, sID, sName, sMessage).Dispatch();
 }
 
 stock void GenerateRandomChars(char[] buffer, int buffersize, int len)

@@ -6,14 +6,13 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/rumblefrog/source-chat-relay/server/entity"
 
 	"github.com/Necroforger/dgrouter/exrouter"
-	log "github.com/sirupsen/logrus"
-
-	repoEntity "github.com/rumblefrog/source-chat-relay/server/repositories/entity"
+	"github.com/sirupsen/logrus"
 )
 
-type ChannelCmdType int
+type ChannelCmdType uint8
 
 const (
 	Receive ChannelCmdType = iota
@@ -38,17 +37,15 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 
 	id := ctx.Args.Get(1)
 	channel := strings.TrimSpace(ctx.Args.After(2))
-	eType := repoEntity.Server
 
 	pid, ok := ParseChannel(id)
 
 	if ok {
-		eType = repoEntity.Channel
 		id = pid
 		dChannel, err = ctx.Ses.Channel(id)
 
 		if err != nil {
-			log.WithField("error", err).Warn("Unable to fetch channel")
+			logrus.WithField("error", err).Warn("Unable to fetch channel")
 
 			ctx.Reply("Unable to fetch channel")
 
@@ -56,50 +53,49 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		}
 	}
 
-	entity, err := repoEntity.GetEntity(id, eType)
+	tEntity, err := entity.GetEntity(id)
 
 	if err == sql.ErrNoRows && channel != "" {
-		entity = &repoEntity.Entity{
+		tEntity = &entity.Entity{
 			ID:        id,
-			Type:      eType,
 			CreatedAt: time.Now(),
 		}
 
 		if cmdType == Receive {
-			entity.ReceiveChannels = repoEntity.ParseChannels(channel)
+			tEntity.ReceiveChannels = entity.ParseDelimitedChannels(channel)
 		} else if cmdType == Send {
-			entity.SendChannels = repoEntity.ParseChannels(channel)
+			tEntity.SendChannels = entity.ParseDelimitedChannels(channel)
 		}
 
-		if eType == repoEntity.Channel && dChannel != nil {
-			entity.DisplayName = dChannel.Name
+		if ok {
+			tEntity.DisplayName = dChannel.Name
 		}
 
-		err = entity.Insert()
+		err = tEntity.Insert()
 
 		if err != nil {
 			ctx.Reply("Unable to create entity")
 			return
 		}
 	} else if err != nil {
-		log.WithField("error", err).Warn("Unable to fetch entity")
+		logrus.WithField("error", err).Warn("Unable to fetch entity")
 
 		ctx.Reply("Unable to fetch entity")
 
 		return
 	} else if channel != "" {
-		if entity.Type == repoEntity.Channel && dChannel != nil {
-			entity.DisplayName = dChannel.Name
+		if cmdType == Receive {
+			err = tEntity.SetReceiveChannels(entity.ParseDelimitedChannels(channel))
+		} else if cmdType == Send {
+			err = tEntity.SetSendChannels(entity.ParseDelimitedChannels(channel))
 		}
 
-		if cmdType == Receive {
-			err = entity.SetReceiveChannels(repoEntity.ParseChannels(channel))
-		} else if cmdType == Send {
-			err = entity.SetSendChannels(repoEntity.ParseChannels(channel))
+		if ok {
+			tEntity.DisplayName = dChannel.Name
 		}
 
 		if err != nil {
-			log.WithField("error", err).Warn("Unable to update entity")
+			logrus.WithField("error", err).Warn("Unable to update entity")
 
 			ctx.Reply("Unable to update entity")
 
@@ -107,5 +103,5 @@ func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 		}
 	}
 
-	ctx.Ses.ChannelMessageSendEmbed(ctx.Msg.ChannelID, entity.Embed())
+	ctx.Ses.ChannelMessageSendEmbed(ctx.Msg.ChannelID, tEntity.Embed())
 }
