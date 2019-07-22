@@ -155,13 +155,19 @@ func (r *Relay) HandlePacket(client *RelayClient, buffer []byte) {
 
 	if base.Type == protocol.MessageAuthenticate {
 		authenticateMessage := protocol.ParseAuthenticateMessage(base, reader)
+		authenticateResponseMessage := &protocol.AuthenticateMessageResponse{}
+
+		if len(authenticateMessage.Token) == 0 || len(authenticateMessage.Hostname) == 0 {
+			authenticateResponseMessage.Response = protocol.AuthenticateDenied
+
+			client.Socket.Write(authenticateResponseMessage.Marshal())
+
+			return
+		}
 
 		r.AuthenticateClient(client, authenticateMessage)
 
-		// For now, this is the only possible response
-		authenticateResponseMessage := &protocol.AuthenticateMessageResponse{
-			Response: protocol.AuthenticateSuccess,
-		}
+		authenticateResponseMessage.Response = protocol.AuthenticateSuccess
 
 		client.Socket.Write(authenticateResponseMessage.Marshal())
 
