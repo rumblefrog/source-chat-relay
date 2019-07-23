@@ -487,7 +487,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			if (IsSource2009())
 				CPrintToChatAll("{gold}[%s] {azure}%s{white}: {grey}%s", sEntity, sName, sMessage);
 			else
-				CPrintToChatAll("\x10 \x10[%s] \x0C%s\x01: \x08%s", sEntity, sName, sMessage);
+				CPrintToChatAll("\x10[%s] \x0C%s\x01: \x08%s", sEntity, sName, sMessage);
 		}
 		case MessageEvent:
 		{
@@ -503,7 +503,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			if (IsSource2009())
 				CPrintToChatAll("{gold}[%s]{white}: {grey}%s", sEvent, sData);
 			else
-				CPrintToChatAll("\x10 \x10[%s]\x01: \x08%s", sEvent, sData);
+				CPrintToChatAll("\x10[%s]\x01: \x08%s", sEvent, sData);
 		}
 		case MessageAuthenticateResponse:
 		{
