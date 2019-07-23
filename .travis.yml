@@ -51,9 +51,9 @@ script:
     - cp -R build/game_server build/scr-windows-amd64/
 
 before_deploy:
-    - cd $TRAVIS_BUILD_DIR/build/scr-linux-amd64/ && tar -czf $TRAVIS_BUILD_DIR/scr-linux-amd64.tar.gz .
-    - cd $TRAVIS_BUILD_DIR/build/scr-arm-v7/ && tar -czf $TRAVIS_BUILD_DIR/scr-arm-v7.tar.gz .
-    - cd $TRAVIS_BUILD_DIR/build/scr-windows-amd64/ && 7zr a $TRAVIS_BUILD_DIR/scr-windows-amd64.7z .
+    - cd $TRAVIS_BUILD_DIR/build/scr-linux-amd64/ && tar -czf $TRAVIS_BUILD_DIR/scr-linux-amd64.tar.gz *
+    - cd $TRAVIS_BUILD_DIR/build/scr-arm-v7/ && tar -czf $TRAVIS_BUILD_DIR/scr-arm-v7.tar.gz *
+    - cd $TRAVIS_BUILD_DIR/build/scr-windows-amd64/ && 7zr a $TRAVIS_BUILD_DIR/scr-windows-amd64.7z *
 
 deploy:
     provider: releases
