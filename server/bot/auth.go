@@ -3,7 +3,7 @@ package bot
 import (
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/bwmarrin/discordgo"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 func Auth(fn exrouter.HandlerFunc) exrouter.HandlerFunc {
@@ -11,7 +11,7 @@ func Auth(fn exrouter.HandlerFunc) exrouter.HandlerFunc {
 		guild, err := GetMessageGuild(ctx, ctx.Msg)
 
 		if err != nil {
-			log.WithField("error", err).Warn()
+			logrus.WithField("error", err).Warn()
 			ctx.Reply("Could not fetch guild: ", err)
 		}
 

@@ -7,7 +7,7 @@ func (entity *Entity) Insert() error {
 		return err
 	}
 
-	Cache.Controller <- entity
+	WriteCache(entity)
 
 	return nil
 }
@@ -37,7 +37,7 @@ func (entity *Entity) Propagate() error {
 		return err
 	}
 
-	Cache.Controller <- entity
+	WriteCache(entity)
 
 	return nil
 }

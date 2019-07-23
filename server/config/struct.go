@@ -20,7 +20,7 @@ type DatabaseConfig struct {
 	Protocol string `toml:"Protocol"`
 }
 
-type Config struct {
+type Config_t struct {
 	General  GeneralConfig
 	Bot      BotConfig
 	Database DatabaseConfig

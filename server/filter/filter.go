@@ -6,18 +6,18 @@ import (
 	"regexp"
 
 	"github.com/rumblefrog/source-chat-relay/server/config"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 func init() {
-	if !config.Conf.General.Filter {
+	if !config.Config.General.Filter {
 		return
 	}
 
 	file, err := os.Open("filter.txt")
 
 	if err != nil {
-		log.Warn("Unable to open filter file. Skipping.")
+		logrus.Warn("Unable to open filter file. Skipping.")
 	}
 
 	defer file.Close()
@@ -35,6 +35,6 @@ func init() {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.WithField("error", err).Warn("Unable to scan filter file")
+		logrus.WithField("error", err).Warn("Unable to scan filter file")
 	}
 }

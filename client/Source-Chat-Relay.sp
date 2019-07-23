@@ -1,42 +1,301 @@
+#include <sourcemod>
+#include <socket>
+#include <morecolors> // Morecolors defines a max buffer as well as bytebuffer but bytebuffer does if defined check
+#include <bytebuffer>
+
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "1.4.0"
-
-#include <sourcemod>
-#include <morecolors>
-#include <socket>
-#include <smlib>
+#define PLUGIN_VERSION "2.0.0-rc1"
 
 #pragma newdecls required
 
-#define HEADER_LEN 161
-
-enum RelayFrame {
-	Authenticate,
-	Message,
-	Unknown
-}
-
-char sHostname[64];
-char sHost[64] = "127.0.0.1";
-char sToken[64];
-char sPrefix[8];
+char g_sHostname[64];
+char g_sHost[64] = "127.0.0.1";
+char g_sToken[64];
+char g_sPrefix[8];
 
 // Randomly selected port
-int iPort = 57452;
-int iFlag;
+int g_iPort = 57452;
+int g_iFlag;
 
-bool bFlag;
+bool g_bFlag;
 
-EngineVersion eVer;
+ConVar g_cHost;
+ConVar g_cPort;
+ConVar g_cPrefix;
+ConVar g_cFlag;
 
-ConVar cHost;
-ConVar cPort;
-ConVar cPrefix;
-ConVar cFlag;
+Handle g_hSocket;
+Handle g_hMessageSendForward;
+Handle g_hMessageReceiveForward;
 
-Handle hSocket;
+enum MessageType
+{
+	MessageInvalid = 0,
+	MessageAuthenticate,
+	MessageAuthenticateResponse,
+	MessageChat,
+	MessageEvent,
+	MessageTypeCount,
+}
+
+enum AuthenticateResponse
+{
+	AuthenticateInvalid = 0,
+	AuthenticateSuccess,
+	AuthenticateDenied,
+	AuthenticateResponseCount,
+}
+
+enum IdentificationType
+{
+	IdentificationInvalid = 0,
+	IdentificationSteam,
+	IdentificationDiscord,
+	IdentificationTypeCount,
+}
+
+/**
+ * Base message structure
+ * 
+ * @note The type is declared on every derived message type
+ * 
+ * @field type - byte - The message type (enum MessageType)
+ * @field EntityName - string - Entity name that's sending the message
+ */
+methodmap BaseMessage < ByteBuffer
+{
+	public BaseMessage()
+	{
+		return view_as<BaseMessage>(CreateByteBuffer());
+	}
+
+	property MessageType Type
+	{
+		public get()
+		{
+			MessageType tByte = view_as<MessageType>(this.ReadByte());
+
+			return tByte >= MessageTypeCount ? MessageInvalid : tByte;
+		}
+	}
+
+	public int ReadDiscardString()
+	{
+		char cByte;
+
+		for(int i = 0; i < MAX_BUFFER_LENGTH; i++) {
+			cByte = this.ReadByte();
+			
+			if(cByte == '\0') {
+				return i + 1;
+			}
+		}
+		
+		return MAX_BUFFER_LENGTH;
+	}
+
+	public void DataCursor()
+	{
+		// Skip the message type field
+		this.Cursor = 1;
+
+		this.ReadDiscardString();
+	}
+
+	public void GetEntityName(char[] sEntityName, int iSize)
+	{
+		// Skip the message type field
+		this.Cursor = 1;
+
+		this.ReadString(sEntityName, iSize);
+	}
+
+	public void WriteEntityName() {
+		this.WriteString(g_sHostname);
+	}
+
+	public void Dispatch()
+	{
+		char sDump[MAX_BUFFER_LENGTH];
+
+		int iLen = this.Dump(sDump, MAX_BUFFER_LENGTH);
+
+		// Len required
+		// If len is not included, \0 terminator will not be included
+		SocketSend(g_hSocket, sDump, iLen);
+
+		this.Close();
+	}
+}
+
+/**
+ * Should only sent by clients
+ * 
+ * @field Token - string - The authentication token
+ */
+methodmap AuthenticateMessage < BaseMessage
+{
+	public int GetToken(char[] sToken, int iSize)
+	{
+		this.DataCursor();
+
+		return this.ReadString(sToken, iSize);
+	}
+
+	public AuthenticateMessage(const char[] sToken)
+	{
+		BaseMessage m = BaseMessage();
+
+		m.WriteByte(view_as<int>(MessageAuthenticate));
+		m.WriteEntityName();
+
+		m.WriteString(sToken);
+
+		return view_as<AuthenticateMessage>(m);
+	}
+}
+
+/**
+ * This message is only received from the server
+ * 
+ * @field Response - byte - The state of the authentication request (enum AuthenticateResponse)
+ */
+methodmap AuthenticateMessageResponse < BaseMessage
+{
+	property AuthenticateResponse Response
+	{
+		public get()
+		{
+			this.DataCursor();
+
+			AuthenticateResponse tByte = view_as<AuthenticateResponse>(this.ReadByte());
+
+			return tByte >= AuthenticateResponseCount ? AuthenticateInvalid : tByte;
+		}
+	}
+}
+
+/**
+ * Bi-directional messaging structure
+ * 
+ * @field IDType - byte - Type of ID (enum IdenticationType)
+ * @field ID - string - The unique identication of the user (SteamID/Discord Snowflake/etc)
+ * @field Username - string - The name of the user
+ * @field Message - string - The message
+ */
+methodmap ChatMessage < BaseMessage
+{
+	property IdentificationType IDType
+	{
+		public get()
+		{
+			this.DataCursor();
+
+			IdentificationType tByte = view_as<IdentificationType>(this.ReadByte());
+
+			return tByte >= IdentificationTypeCount ? IdentificationInvalid : tByte;
+		}
+	}
+
+	public int GetUserID(char[] sID, int iSize)
+	{
+		this.DataCursor();
+
+		// Skip ID type
+		this.Cursor++;
+
+		return this.ReadString(sID, iSize);
+	}
+
+	public int GetUsername(char[] sUsername, int iSize)
+	{
+		this.DataCursor();
+
+		// Skip ID type
+		this.Cursor++;
+
+		// Skip UserID
+		this.ReadDiscardString();
+
+		return this.ReadString(sUsername, iSize);
+	}
+
+	public int GetMessage(char[] sMessage, int iSize)
+	{
+		this.DataCursor();
+
+		// Skip ID type
+		this.Cursor++;
+
+		// Skip UserID
+		this.ReadDiscardString();
+
+		// Skip Name
+		this.ReadDiscardString();
+
+		return this.ReadString(sMessage, iSize);
+	}
+
+	public ChatMessage(
+		IdentificationType IDType,
+		const char[] sUserID,
+		const char[] sUsername,
+		const char[] sMessage)
+	{
+		BaseMessage m = BaseMessage();
+
+		m.WriteByte(view_as<int>(MessageChat));
+		m.WriteEntityName();
+
+		m.WriteByte(view_as<int>(IDType));
+		m.WriteString(sUserID);
+		m.WriteString(sUsername);
+		m.WriteString(sMessage);
+
+		return view_as<ChatMessage>(m);
+	}
+}
+
+/**
+ * Bi-directional event data
+ * 
+ * @field Event - string - The name of the event
+ * @field Data - string - The data of the event
+ */
+methodmap EventMessage < BaseMessage
+{
+	public int GetEvent(char[] sEvent, int iSize)
+	{
+		this.DataCursor();
+
+		return this.ReadString(sEvent, iSize);
+	}
+
+	public int GetData(char[] sData, int iSize)
+	{
+		this.DataCursor();
+
+		// Skip event string
+		this.ReadDiscardString();
+
+		return this.ReadString(sData, iSize);
+	}
+
+	public EventMessage(const char[] sEvent, const char[] sData)
+	{
+		BaseMessage m = BaseMessage();
+
+		m.WriteByte(view_as<int>(MessageEvent));
+		m.WriteEntityName();
+
+		m.WriteString(sEvent);
+		m.WriteString(sData);
+
+		return view_as<EventMessage>(m);
+	}
+}
 
 public Plugin myinfo = 
 {
@@ -60,51 +319,71 @@ public void OnPluginStart()
 {
 	CreateConVar("rf_scr_version", PLUGIN_VERSION, "Source Chat Relay Version", FCVAR_REPLICATED | FCVAR_SPONLY | FCVAR_DONTRECORD | FCVAR_NOTIFY);
 
-	cHost = CreateConVar("rf_scr_host", "127.0.0.1", "Relay Server Host", FCVAR_PROTECTED);
+	g_cHost = CreateConVar("rf_scr_host", "127.0.0.1", "Relay Server Host", FCVAR_PROTECTED);
 
-	cPort = CreateConVar("rf_scr_port", "57452", "Relay Server Port", FCVAR_PROTECTED);
+	g_cPort = CreateConVar("rf_scr_port", "57452", "Relay Server Port", FCVAR_PROTECTED);
 	
-	cPrefix = CreateConVar("rf_scr_prefix", "", "Prefix required to send message to Discord", FCVAR_NONE);
+	g_cPrefix = CreateConVar("rf_scr_prefix", "", "Prefix required to send message to Discord. If empty, none is required.", FCVAR_NONE);
 	
-	cFlag = CreateConVar("rf_scr_flag", "", "If prefix is enabled, this admin flag is required to send message using the prefix", FCVAR_PROTECTED);
+	g_cFlag = CreateConVar("rf_scr_flag", "", "If prefix is enabled, this admin flag is required to send message using the prefix", FCVAR_PROTECTED);
 
 	AutoExecConfig(true, "Source-Server-Relay");
 	
-	eVer = GetEngineVersion();
+	// eVer = GetEngineVersion();
 
-	hSocket = SocketCreate(SOCKET_TCP, OnSocketError);
+	g_hSocket = SocketCreate(SOCKET_TCP, OnSocketError);
 
-	SocketSetOption(hSocket, SocketReuseAddr, 1);
-	SocketSetOption(hSocket, SocketKeepAlive, 1);
+	SocketSetOption(g_hSocket, SocketReuseAddr, 1);
+	SocketSetOption(g_hSocket, SocketKeepAlive, 1);
 	
 	#if defined DEBUG
-		SocketSetOption(hSocket, DebugMode, 1);
+	SocketSetOption(g_hSocket, DebugMode, 1);
 	#endif
+
+	// ClientIndex, EntityName, ClientID, ClientName, Message
+	g_hMessageSendForward = CreateGlobalForward(
+		"SCR_OnMessageSend",
+		ET_Event,
+		Param_Cell,
+		Param_String,
+		Param_String,
+		Param_String,
+		Param_String);
+
+	// EntityName, ClientName, Message
+	g_hMessageReceiveForward = CreateGlobalForward(
+		"SCR_OnMessageReceive",
+		ET_Event,
+		Param_String,
+		Param_String,
+		Param_String);
 }
 
 public void OnConfigsExecuted()
 {
-	GetConVarString(FindConVar("hostname"), sHostname, sizeof sHostname);
+	GetConVarString(FindConVar("hostname"), g_sHostname, sizeof g_sHostname);
 
-	cHost.GetString(sHost, sizeof sHost);
+	g_cHost.GetString(g_sHost, sizeof g_sHost);
 	
-	cPrefix.GetString(sPrefix, sizeof sPrefix);
+	g_cPrefix.GetString(g_sPrefix, sizeof g_sPrefix);
 	
-	iPort = cPort.IntValue;
+	g_iPort = g_cPort.IntValue;
 	
 	char sFlag[8];
 	
-	cFlag.GetString(sFlag, sizeof sFlag);
+	g_cFlag.GetString(sFlag, sizeof sFlag);
 	
-	if (!StrEqual(sFlag, ""))
+	if (strlen(sFlag) != 0)
 	{
 		AdminFlag aFlag;
 		
-		bFlag = FindFlagByChar(sFlag[0], aFlag);
+		g_bFlag = FindFlagByChar(sFlag[0], aFlag);
 		
-		iFlag = FlagToBit(aFlag);
+		g_iFlag = FlagToBit(aFlag);
 	}
-		
+	
+	File tFile;
+
 	char sPath[PLATFORM_MAX_PATH], sIP[64];
 	
 	Server_GetIPString(sIP, sizeof sIP);
@@ -113,32 +392,30 @@ public void OnConfigsExecuted()
 	
 	if (FileExists(sPath, false))
 	{
-		File tFile = OpenFile(sPath, "r", false);
+		tFile = OpenFile(sPath, "r", false);
 		
-		tFile.ReadString(sToken, sizeof sToken, -1);
-		
-		delete tFile;
+		tFile.ReadString(g_sToken, sizeof g_sToken, -1);
 	} else
 	{
-		File tFile = OpenFile(sPath, "w", false);
+		tFile = OpenFile(sPath, "w", false);
 	
-		GenerateRandomChars(sToken, sizeof sToken, 32);
+		GenerateRandomChars(g_sToken, sizeof g_sToken, 64);
 	
-		tFile.WriteString(sToken, true);
-	
-		delete tFile;
+		tFile.WriteString(g_sToken, true);
 	}
 
-	if (!SocketIsConnected(hSocket))
+	delete tFile;
+
+	if (!SocketIsConnected(g_hSocket))
 		ConnectRelay();
 }
 
 void ConnectRelay()
 {	
-	if (!SocketIsConnected(hSocket))
-		SocketConnect(hSocket, OnSocketConnected, OnSocketReceive, OnSocketDisconnected, sHost, iPort);
+	if (!SocketIsConnected(g_hSocket))
+		SocketConnect(g_hSocket, OnSocketConnected, OnSocketReceive, OnSocketDisconnected, g_sHost, g_iPort);
 	else
-		PrintToServer("Socket is already connected?");
+		PrintToServer("Source Chat Relay: Socket is already connected?");
 }
 
 public Action Timer_Reconnect(Handle timer)
@@ -148,8 +425,8 @@ public Action Timer_Reconnect(Handle timer)
 
 void StartReconnectTimer()
 {
-	if (SocketIsConnected(hSocket))
-		SocketDisconnect(hSocket);
+	if (SocketIsConnected(g_hSocket))
+		SocketDisconnect(g_hSocket);
 		
 	CreateTimer(10.0, Timer_Reconnect);
 }
@@ -158,28 +435,92 @@ public int OnSocketDisconnected(Handle socket, any arg)
 {	
 	StartReconnectTimer();
 	
-	PrintToServer("Socket disconnected");
+	PrintToServer("Source Chat Relay: Socket disconnected");
 }
 
 public int OnSocketError(Handle socket, int errorType, int errorNum, any ary)
 {
 	StartReconnectTimer();
 	
-	LogError("Socket error %i (errno %i)", errorType, errorNum);
+	LogError("Source Chat Relay socket error %i (errno %i)", errorType, errorNum);
 }
 
 public int OnSocketConnected(Handle socket, any arg)
 {
-	PackFrame(Authenticate, sToken);
-	
-	PrintToServer("Successfully Connected");
+	AuthenticateMessage(g_sToken).Dispatch();
+
+	PrintToServer("Source Chat Relay: Socket Connected");
 }
 
 public int OnSocketReceive(Handle socket, const char[] receiveData, int dataSize, any arg)
+{	
+	HandlePackets(receiveData, dataSize);
+}
+
+public void HandlePackets(const char[] sBuffer, int iSize)
 {
-	PrintToServer(receiveData);
-	
-	ParseMessageFrame(receiveData);
+	BaseMessage base = view_as<BaseMessage>(CreateByteBuffer(true, sBuffer, iSize));
+
+	switch(base.Type)
+	{
+		case MessageChat:
+		{
+			ChatMessage m = view_as<ChatMessage>(base);
+
+			Action aResult;
+
+			char sEntity[64], sName[MAX_NAME_LENGTH], sMessage[64];
+
+			m.GetEntityName(sEntity, sizeof sEntity);
+			m.GetUsername(sName, sizeof sName);
+			m.GetMessage(sMessage, sizeof sMessage);
+
+			Call_StartForward(g_hMessageReceiveForward);
+			Call_PushString(sEntity);
+			Call_PushString(sName);
+			Call_PushString(sMessage);
+			Call_Finish(aResult);
+
+			if (aResult >= Plugin_Handled)
+				return;
+
+			if (IsSource2009())
+				CPrintToChatAll("{gold}[%s] {azure}%s{white}: {grey}%s", sEntity, sName, sMessage);
+			else
+				CPrintToChatAll("\x10[%s] \x0C%s\x01: \x08%s", sEntity, sName, sMessage);
+		}
+		case MessageEvent:
+		{
+			EventMessage m = view_as<EventMessage>(base);
+
+			char sEvent[64], sData[64];
+
+			m.GetEvent(sEvent, sizeof sEvent);
+			m.GetData(sData, sizeof sData);
+
+			PrintToChatAll("%T", "EventMessage", LANG_SERVER, sEvent, sData);
+
+			if (IsSource2009())
+				CPrintToChatAll("{gold}[%s]{white}: {grey}%s", sEvent, sData);
+			else
+				CPrintToChatAll("\x10[%s]\x01: \x08%s", sEvent, sData);
+		}
+		case MessageAuthenticateResponse:
+		{
+			AuthenticateMessageResponse m = view_as<AuthenticateMessageResponse>(base);
+
+			if (m.Response == AuthenticateDenied)
+				SetFailState("Server denied our token. Stopping.");
+
+			PrintToServer("Source Chat Relay: Successfully authenticated");
+		}
+		default:
+		{
+			// They crazy
+		}
+	}
+
+	base.Close();
 }
 
 public void OnClientSayCommand_Post(int client, const char[] command, const char[] sArgs)
@@ -187,185 +528,51 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 	if (!Client_IsValid(client))
 		return;
 		
-	if (!SocketIsConnected(hSocket))
+	if (!SocketIsConnected(g_hSocket))
 		return;
 		
-	if (StrEqual(sPrefix, ""))
-		PackMessage(client, sArgs);
+	if (StrEqual(g_sPrefix, ""))
+		DispatchMessage(client, sArgs);
 	else
 	{
-		if (bFlag && !CheckCommandAccess(client, "arandomcommandthatsnotregistered", iFlag, true))
+		if (g_bFlag && !CheckCommandAccess(client, "arandomcommandthatsnotregistered", g_iFlag, true))
 			return;
-		
-		int iLen = strlen(sPrefix);
-		
-		bool bMatch = true;
-		
-		for (int i = 0; i < iLen; i++)
-		{
-			if (sPrefix[i] != sArgs[i])
-			{
-				bMatch = false;
-				break;
-			}
-		}
+
+		if (StrContains(sArgs, g_sPrefix) != 0)
+			return;
 		
 		char sBuffer[MAX_MESSAGE_LENGTH];
 		
-		for (int i = iLen; i < strlen(sArgs); i++)
+		for (int i = strlen(g_sPrefix); i < strlen(sArgs); i++)
 			Format(sBuffer, sizeof sBuffer, "%s%c", sBuffer, sArgs[i]);
 		
-		if (bMatch)
-			PackMessage(client, sBuffer);
+		DispatchMessage(client, sBuffer);
 	}
 }
 
-void PackMessage(int client, const char[] message)
+void DispatchMessage(int iClient, const char[] sMessage)
 {
-	// 64 - Hostname
-	// 64 - ClientID (Snowflake / SteamID64)
-	// 32 - ClientName
-	// remaining
-	
-	int iMessageLen = strlen(message);
-	
-	int iFrameLen = HEADER_LEN + iMessageLen;
-	
-	char[] sFrame = new char[iFrameLen];
-	
-	char sName[32], sID64[64];
-	
-	Format(sFrame, iFrameLen, "%s%-64s", sFrame, sHostname);
-	
-	GetClientAuthId(client, AuthId_SteamID64, sID64, sizeof sID64);
-	
-	GetClientName(client, sName, sizeof sName);
-	
-	Format(sFrame, iFrameLen, "%s%-64s", sFrame, sID64);
-	
-	Format(sFrame, iFrameLen, "%s%-32s", sFrame, sName);
-	
-	Format(sFrame, iFrameLen, "%s%s", sFrame, message);
-	
-	PackFrame(Message, sFrame);
-}
+	char sEntity[64], sID[64], sName[MAX_NAME_LENGTH];
 
-void PackFrame(RelayFrame opcode, const char[] payload)
-{
-	int iPayloadLen = strlen(payload);
-	int iLen = iPayloadLen + 4;
-	
-	char[] sFrame = new char[iLen];
-	
-	switch (opcode)
-	{
-		case Authenticate:
-		{
-			sFrame[0] = '0';
-			
-			Format(sFrame, iLen, "%s%s", sFrame, payload);
-		}
-		case Message:
-		{
-			sFrame[0] = '1';
-				
-			Format(sFrame, iLen, "%s%s", sFrame, payload);
-		}
-	}
-	
-	#if defined DEBUG
-		PrintToServer("%s", sFrame);
-	#endif
-	
-	SendFrame(sFrame);
-}
+	Action aResult;
 
-void SendFrame(const char[] frame)
-{
-	SocketSend(hSocket, frame);
-	
-	#if defined DEBUG
-		PrintToConsoleAll(frame);
-	#endif
-}
+	strcopy(sEntity, sizeof sEntity, g_sHostname);
 
-void ParseMessageFrame(const char[] frame)
-{
-	if (frame[0] != '1')
+	GetClientAuthId(iClient, AuthId_SteamID64, sID, sizeof sID);
+	GetClientName(iClient, sName, sizeof sName);
+
+	Call_StartForward(g_hMessageSendForward);
+	Call_PushCell(iClient);
+	Call_PushString(sEntity);
+	Call_PushString(sID);
+	Call_PushString(sName);
+	Call_PushString(sMessage);
+	Call_Finish(aResult);
+
+	if (aResult >= Plugin_Handled)
 		return;
-	
-	char b1[64], b2[64], b3[32], hostname[64], id64[64], name[32];
-	
-	int iLen = strlen(frame);
-	
-	int iOffset = 1;
-	
-	for (int i = 0; i < 64; i++)
-	{
-		Format(b1, sizeof b1, "%s%c", b1, frame[iOffset]);
-		iOffset++;
-	}
-	
-	String_Trim(b1, hostname, sizeof hostname);
-	
-	for (int i = 0; i < 64; i++)
-	{
-		Format(b2, sizeof b2, "%s%c", b2, frame[iOffset]);
-		iOffset++;
-	}
-	
-	
-	String_Trim(b2, id64, sizeof id64);
-	
-	for (int i = 0; i < 32; i++)
-	{
-		Format(b3, sizeof b3, "%s%c", b3, frame[iOffset]);
-		iOffset++;
-	}
-	
-	String_Trim(b3, name, sizeof name);
-	
-	int iContentLen = iLen - iOffset;
-	
-	char[] sContent = new char[iContentLen];
-	
-	for (int i = 0; i < iContentLen; i++)
-	{
-		Format(sContent, iContentLen + 1, "%s%c", sContent, frame[iOffset]);
-		iOffset++;
-	}
-	
-	#if defined DEBUG
-		PrintToConsoleAll("===== PARSING =====");
-	
-		PrintToConsoleAll("hostname: %s", hostname);
-	
-		PrintToConsoleAll("id64: %s", id64);
-	
-		PrintToConsoleAll("name: %s", name);
-	
-		PrintToConsoleAll("sContentLen: %d", iContentLen);
-	
-		PrintToConsoleAll("sContent: %s", sContent);
-	
-		PrintToConsoleAll("===================");
-	#endif
 
-	switch (eVer)
-	{
-		case Engine_TF2, Engine_CSS, Engine_HL2DM, Engine_DODS:
-			CPrintToChatAll("{gold}[%s] {azure}%s{white}: {grey}%s", hostname, name, sContent);
-		default:
-			PrintToChatAll("\x10 \x10[%s] \x0C%s\x01: \x08%s", hostname, name, sContent);
-	}
-}
-
-stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
-{
-	char charset[] = "adefghijstuv6789!@#$%^klmwxyz01bc2345nopqr&+=";
-	
-	for (int i = 0; i < len; i++)
-		Format(buffer, buffersize, "%s%c", buffer, charset[GetRandomInt(0, sizeof charset)]);
+	ChatMessage(IdentificationSteam, sID, sName, sMessage).Dispatch();
 }
 
 public int Native_SendMessage(Handle plugin, int numParams)
@@ -377,5 +584,162 @@ public int Native_SendMessage(Handle plugin, int numParams)
 
 	FormatNativeString(0, 2, 3, sizeof sBuffer, iWritten, sBuffer);
 
-	PackMessage(iClient, sBuffer);
+	DispatchMessage(iClient, sBuffer);
 }
+
+stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
+{
+	char charset[] = "adefghijstuv6789!@#$%^klmwxyz01bc2345nopqr&+=";
+	
+	for (int i = 0; i < len; i++)
+		Format(buffer, buffersize, "%s%c", buffer, charset[GetRandomInt(0, sizeof charset)]);
+}
+
+static int localIPRanges[] =
+{
+	10	<< 24,				// 10.
+	127	<< 24 | 1		,	// 127.0.0.1
+	127	<< 24 | 16	<< 16,	// 127.16.
+	192	<< 24 | 168	<< 16,	// 192.168.
+};
+
+stock int Server_GetIP(bool public_=true)
+{
+	int ip = 0;
+
+	static ConVar cvHostip;
+
+	if (cvHostip == null) {
+		cvHostip = FindConVar("hostip");
+		MarkNativeAsOptional("Steam_GetPublicIP");
+	}
+
+	if (cvHostip != null) {
+		ip = cvHostip.IntValue;
+	}
+
+	if (ip != 0 && IsIPLocal(ip) == public_) {
+		ip = 0;
+	}
+
+#if defined _steamtools_included
+	if (ip == 0) {
+		if (CanTestFeatures() && GetFeatureStatus(FeatureType_Native, "Steam_GetPublicIP") == FeatureStatus_Available) {
+			int octets[4];
+			Steam_GetPublicIP(octets);
+
+			ip =
+				octets[0] << 24	|
+				octets[1] << 16	|
+				octets[2] << 8	|
+				octets[3];
+
+			if (IsIPLocal(ip) == public_) {
+				ip = 0;
+			}
+		}
+	}
+#endif
+
+	return ip;
+}
+
+stock bool Server_GetIPString(char[] buffer, int size, bool public_=true)
+{
+	int ip;
+
+	if ((ip = Server_GetIP(public_)) == 0) {
+		buffer[0] = '\0';
+		return false;
+	}
+
+	LongToIP(ip, buffer, size);
+
+	return true;
+}
+
+stock int Server_GetPort()
+{
+	static ConVar cvHostport;
+
+	if (cvHostport == null) {
+		cvHostport = FindConVar("hostport");
+	}
+
+	if (cvHostport == null) {
+		return 0;
+	}
+
+	int port = cvHostport.IntValue;
+
+	return port;
+}
+
+stock bool IsIPLocal(int ip)
+{
+	int range, bits, move;
+	bool matches;
+
+	for (int i=0; i < sizeof(localIPRanges); i++) {
+
+		range = localIPRanges[i];
+		matches = true;
+
+		for (int j=0; j < 4; j++) {
+			move = j * 8;
+			bits = (range >> move) & 0xFF;
+
+			if (bits && bits != ((ip >> move) & 0xFF)) {
+				matches = false;
+			}
+		}
+
+		if (matches) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+stock void LongToIP(int ip, char[] buffer, int size)
+{
+	Format(
+		buffer, size,
+		"%d.%d.%d.%d",
+			(ip >> 24)	& 0xFF,
+			(ip >> 16)	& 0xFF,
+			(ip >> 8 )	& 0xFF,
+			ip        	& 0xFF
+		);
+}
+
+
+stock bool Client_IsValid(int client, bool checkConnected=true)
+{
+	if (client > 4096) {
+		client = EntRefToEntIndex(client);
+	}
+
+	if (client < 1 || client > MaxClients) {
+		return false;
+	}
+
+	if (checkConnected && !IsClientConnected(client)) {
+		return false;
+	}
+
+	return true;
+}
+
+stock bool IsSource2009()
+{
+	if(GetEngineVersion() == Engine_CSS || GetEngineVersion() == Engine_HL2DM || GetEngineVersion() == Engine_DODS || GetEngineVersion() == Engine_TF2)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+} 

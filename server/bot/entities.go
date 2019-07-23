@@ -5,14 +5,11 @@ import (
 
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/Necroforger/dgwidgets"
-
-	repoEntity "github.com/rumblefrog/source-chat-relay/server/repositories/entity"
+	"github.com/rumblefrog/source-chat-relay/server/entity"
 )
 
 func EntitiesCMD(ctx *exrouter.Context) {
-	eType := repoEntity.EntityTypeFromString(ctx.Args.Get(1))
-
-	entities := repoEntity.GetEntities(eType)
+	entities := entity.GetEntities()
 
 	if len(entities) <= 0 {
 		ctx.Reply("No entities found in database")

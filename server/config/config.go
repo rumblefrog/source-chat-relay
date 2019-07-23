@@ -1,15 +1,14 @@
 package config
 
 import (
-	log "github.com/sirupsen/logrus"
-
 	"github.com/BurntSushi/toml"
+	"github.com/sirupsen/logrus"
 )
 
-var Conf Config
+var Config Config_t
 
-func init() {
-	if _, err := toml.DecodeFile("config.toml", &Conf); err != nil {
-		log.WithField("error", err).Fatal("Unable to parse config")
+func ParseConfig() {
+	if _, err := toml.DecodeFile("config.toml", &Config); err != nil {
+		logrus.WithField("error", err).Fatal("Unable to parse config")
 	}
 }

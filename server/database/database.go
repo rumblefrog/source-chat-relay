@@ -4,24 +4,24 @@ import (
 	"database/sql"
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/rumblefrog/source-chat-relay/server/config"
 )
 
-var DBConnection *sql.DB
+var Connection *sql.DB
 
-func init() {
+func InitializeDatabase() {
 	c := mysql.NewConfig()
 
-	c.Net = config.Conf.Database.Protocol
+	c.Net = config.Config.Database.Protocol
 
-	c.User = config.Conf.Database.Username
+	c.User = config.Config.Database.Username
 
-	c.Passwd = config.Conf.Database.Password
+	c.Passwd = config.Config.Database.Password
 
-	c.DBName = config.Conf.Database.Database
+	c.DBName = config.Config.Database.Database
 
 	c.Collation = "utf8mb4_general_ci"
 
@@ -29,17 +29,17 @@ func init() {
 
 	c.ParseTime = true
 
-	if config.Conf.Database.Protocol == "tcp" {
-		c.Addr = fmt.Sprintf("%s:%d", config.Conf.Database.Host, config.Conf.Database.Port)
+	if config.Config.Database.Protocol == "tcp" {
+		c.Addr = fmt.Sprintf("%s:%d", config.Config.Database.Host, config.Config.Database.Port)
 	} else {
-		c.Addr = config.Conf.Database.Host
+		c.Addr = config.Config.Database.Host
 	}
 
 	var err error
 
-	DBConnection, err = sql.Open("mysql", c.FormatDSN())
+	Connection, err = sql.Open("mysql", c.FormatDSN())
 
 	if err != nil {
-		log.WithField("error", err).Fatal("Unable to connect to database")
+		logrus.WithField("error", err).Fatal("Unable to connect to database")
 	}
 }
