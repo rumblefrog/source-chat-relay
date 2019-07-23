@@ -3,6 +3,27 @@
 #endif
 #define _Source_Chat_Relay_included
 
+
+/**
+ * Called upon sending a message via chat triggers
+ * 
+ * @param iClient 		Index of client that is sending the message
+ * @param sEntityName	Hostname of the server
+ * @param sClientID 	SteamID64 of the client sending the message
+ * @param sClientName	Name of the client sending the message
+ * @param sMessage		Message content
+ */
+forward Action SCR_OnMessageSend(int iClient, char[] sEntityName, char[] sClientID, char[] sClientName, char[] sMessage);
+
+/**
+ * Called upon receiving a message
+ * 
+ * @param sEntityName	Entity name/hostname of the sending client
+ * @param sClientName	Name of the client that sent the message
+ * @param sMessage		Message content
+ */
+forward Action SCR_OnMessageReceive(char[] sEntityName, char[] sClientName, char[] sMessage);
+
 /**
  * Sends a message to the router
  * 
