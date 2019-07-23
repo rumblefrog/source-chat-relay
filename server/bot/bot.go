@@ -58,9 +58,9 @@ func Initialize() {
 
 			message := &protocol.ChatMessage{
 				BaseMessage: protocol.BaseMessage{
-					Type:     protocol.MessageChat,
-					SenderID: m.ChannelID,
-					Hostname: CapitalChannelName(channel),
+					Type:       protocol.MessageChat,
+					SenderID:   m.ChannelID,
+					EntityName: CapitalChannelName(channel),
 				},
 				IDType:   protocol.IdentificationDiscord,
 				ID:       m.Author.ID,

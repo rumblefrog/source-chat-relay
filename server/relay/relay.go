@@ -23,10 +23,10 @@ type Relay struct {
 }
 
 type RelayClient struct {
-	Socket   net.Conn
-	Data     chan []byte
-	ID       string
-	Hostname string
+	Socket     net.Conn
+	Data       chan []byte
+	ID         string
+	EntityName string
 }
 
 func (c *RelayClient) Authenticated() bool {
@@ -151,16 +151,22 @@ func (r *Relay) ListenClientSend(c *RelayClient) {
 func (r *Relay) HandlePacket(client *RelayClient, buffer []byte) {
 	reader := packet.NewPacketReader(buffer)
 
-	base := protocol.ParseBaseMessage(reader)
+	base, err := protocol.ParseBaseMessage(reader)
+
+	if err != nil {
+		return
+	}
 
 	if base.Type == protocol.MessageAuthenticate {
-		authenticateMessage := protocol.ParseAuthenticateMessage(base, reader)
+		authenticateMessage, err := protocol.ParseAuthenticateMessage(base, reader)
 		authenticateResponseMessage := &protocol.AuthenticateMessageResponse{}
 
-		if len(authenticateMessage.Token) == 0 || len(authenticateMessage.Hostname) == 0 {
+		if err != nil || len(authenticateMessage.Token) == 0 {
 			authenticateResponseMessage.Response = protocol.AuthenticateDenied
 
 			client.Socket.Write(authenticateResponseMessage.Marshal())
+
+			logrus.WithField("address", client.Socket.RemoteAddr()).Warn("Client authentication failed")
 
 			return
 		}
@@ -170,6 +176,12 @@ func (r *Relay) HandlePacket(client *RelayClient, buffer []byte) {
 		authenticateResponseMessage.Response = protocol.AuthenticateSuccess
 
 		client.Socket.Write(authenticateResponseMessage.Marshal())
+
+		logrus.WithFields(logrus.Fields{
+			"address":  client.Socket.RemoteAddr(),
+			"hostname": client.EntityName,
+			"id":       client.ID,
+		}).Info("Client authenticated")
 
 		return
 	}
@@ -181,13 +193,27 @@ func (r *Relay) HandlePacket(client *RelayClient, buffer []byte) {
 	}
 
 	base.SenderID = client.ID
-	base.Hostname = client.Hostname
+
+	// Reupdate entity name
+	client.EntityName = base.EntityName
 
 	switch base.Type {
 	case protocol.MessageChat:
-		r.Router <- protocol.ParseChatMessage(base, reader)
+		msg, err := protocol.ParseChatMessage(base, reader)
+
+		if err != nil {
+			return
+		}
+
+		r.Router <- msg
 	case protocol.MessageEvent:
-		r.Router <- protocol.ParseEventMessage(base, reader)
+		msg, err := protocol.ParseEventMessage(base, reader)
+
+		if err != nil {
+			return
+		}
+
+		r.Router <- msg
 	default:
 		// Malformed packet, we should not get anything else
 		r.RemoveClient(client)
@@ -223,8 +249,8 @@ func (r *Relay) AuthenticateClient(c *RelayClient, packet *protocol.Authenticate
 	}
 
 	// Update database with new name upon auth
-	tEntity.SetDisplayName(packet.Hostname)
+	tEntity.SetDisplayName(packet.BaseMessage.EntityName)
 
 	c.ID = string(packet.Token)
-	c.Hostname = packet.Hostname
+	c.EntityName = packet.BaseMessage.EntityName
 }

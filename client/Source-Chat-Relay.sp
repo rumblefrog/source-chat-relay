@@ -1,13 +1,12 @@
 #include <sourcemod>
 #include <socket>
+#include <morecolors> // Morecolors defines a max buffer as well as bytebuffer but bytebuffer does if defined check
 #include <bytebuffer>
 
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "2.0.0"
-
-#define MAX_MESSAGE_LENGTH 128
+#define PLUGIN_VERSION "2.0.0-rc1"
 
 #pragma newdecls required
 
@@ -21,8 +20,6 @@ int g_iPort = 57452;
 int g_iFlag;
 
 bool g_bFlag;
-
-// EngineVersion eVer;
 
 ConVar g_cHost;
 ConVar g_cPort;
@@ -65,6 +62,7 @@ enum IdentificationType
  * @note The type is declared on every derived message type
  * 
  * @field type - byte - The message type (enum MessageType)
+ * @field EntityName - string - Entity name that's sending the message
  */
 methodmap BaseMessage < ByteBuffer
 {
@@ -83,12 +81,6 @@ methodmap BaseMessage < ByteBuffer
 		}
 	}
 
-	public void DataCursor()
-	{
-		// Skip the message type field
-		this.Cursor = 1;
-	}
-
 	public int ReadDiscardString()
 	{
 		char cByte;
@@ -104,13 +96,35 @@ methodmap BaseMessage < ByteBuffer
 		return MAX_BUFFER_LENGTH;
 	}
 
+	public void DataCursor()
+	{
+		// Skip the message type field
+		this.Cursor = 1;
+
+		this.ReadDiscardString();
+	}
+
+	public void GetEntityName(char[] sEntityName, int iSize)
+	{
+		// Skip the message type field
+		this.Cursor = 1;
+
+		this.ReadString(sEntityName, iSize);
+	}
+
+	public void WriteEntityName() {
+		this.WriteString(g_sHostname);
+	}
+
 	public void Dispatch()
 	{
 		char sDump[MAX_BUFFER_LENGTH];
 
-		this.Dump(sDump, MAX_BUFFER_LENGTH);
+		int iLen = this.Dump(sDump, MAX_BUFFER_LENGTH);
 
-		SocketSend(g_hSocket, sDump);
+		// Len required
+		// If len is not included, \0 terminator will not be included
+		SocketSend(g_hSocket, sDump, iLen);
 
 		this.Close();
 	}
@@ -119,7 +133,6 @@ methodmap BaseMessage < ByteBuffer
 /**
  * Should only sent by clients
  * 
- * @field Hostname - string - The hostname
  * @field Token - string - The authentication token
  */
 methodmap AuthenticateMessage < BaseMessage
@@ -131,12 +144,13 @@ methodmap AuthenticateMessage < BaseMessage
 		return this.ReadString(sToken, iSize);
 	}
 
-	public AuthenticateMessage(const char[] sHostname, const char[] sToken)
+	public AuthenticateMessage(const char[] sToken)
 	{
 		BaseMessage m = BaseMessage();
 
 		m.WriteByte(view_as<int>(MessageAuthenticate));
-		m.WriteString(sHostname);
+		m.WriteEntityName();
+
 		m.WriteString(sToken);
 
 		return view_as<AuthenticateMessage>(m);
@@ -173,13 +187,6 @@ methodmap AuthenticateMessageResponse < BaseMessage
  */
 methodmap ChatMessage < BaseMessage
 {
-	public int GetEntityName(char[] sName, int iSize)
-	{
-		this.DataCursor();
-
-		return this.ReadString(sName, iSize);
-	}
-
 	property IdentificationType IDType
 	{
 		public get()
@@ -240,6 +247,8 @@ methodmap ChatMessage < BaseMessage
 		BaseMessage m = BaseMessage();
 
 		m.WriteByte(view_as<int>(MessageChat));
+		m.WriteEntityName();
+
 		m.WriteByte(view_as<int>(IDType));
 		m.WriteString(sUserID);
 		m.WriteString(sUsername);
@@ -279,6 +288,8 @@ methodmap EventMessage < BaseMessage
 		BaseMessage m = BaseMessage();
 
 		m.WriteByte(view_as<int>(MessageEvent));
+		m.WriteEntityName();
+
 		m.WriteString(sEvent);
 		m.WriteString(sData);
 
@@ -339,16 +350,13 @@ public void OnPluginStart()
 		Param_String,
 		Param_String);
 
-	// EntityName, ClientID, ClientName, Message
+	// EntityName, ClientName, Message
 	g_hMessageReceiveForward = CreateGlobalForward(
 		"SCR_OnMessageReceive",
 		ET_Event,
 		Param_String,
 		Param_String,
-		Param_String,
 		Param_String);
-
-	LoadTranslations("sourcechatrelay.phrases");
 }
 
 public void OnConfigsExecuted()
@@ -407,7 +415,7 @@ void ConnectRelay()
 	if (!SocketIsConnected(g_hSocket))
 		SocketConnect(g_hSocket, OnSocketConnected, OnSocketReceive, OnSocketDisconnected, g_sHost, g_iPort);
 	else
-		PrintToServer("Socket is already connected?");
+		PrintToServer("Source Chat Relay: Socket is already connected?");
 }
 
 public Action Timer_Reconnect(Handle timer)
@@ -427,27 +435,25 @@ public int OnSocketDisconnected(Handle socket, any arg)
 {	
 	StartReconnectTimer();
 	
-	PrintToServer("Socket disconnected");
+	PrintToServer("Source Chat Relay: Socket disconnected");
 }
 
 public int OnSocketError(Handle socket, int errorType, int errorNum, any ary)
 {
 	StartReconnectTimer();
 	
-	LogError("Socket error %i (errno %i)", errorType, errorNum);
+	LogError("Source Chat Relay socket error %i (errno %i)", errorType, errorNum);
 }
 
 public int OnSocketConnected(Handle socket, any arg)
 {
-	AuthenticateMessage(g_sHostname, g_sToken).Dispatch();
+	AuthenticateMessage(g_sToken).Dispatch();
 
-	PrintToServer("Successfully Connected");
+	PrintToServer("Source Chat Relay: Socket Connected");
 }
 
 public int OnSocketReceive(Handle socket, const char[] receiveData, int dataSize, any arg)
-{
-	PrintToServer(receiveData);
-	
+{	
 	HandlePackets(receiveData, dataSize);
 }
 
@@ -463,16 +469,14 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 
 			Action aResult;
 
-			char sEntity[64], sID[64], sName[MAX_NAME_LENGTH], sMessage[64];
+			char sEntity[64], sName[MAX_NAME_LENGTH], sMessage[64];
 
 			m.GetEntityName(sEntity, sizeof sEntity);
-			m.GetUserID(sID, sizeof sID);
 			m.GetUsername(sName, sizeof sName);
 			m.GetMessage(sMessage, sizeof sMessage);
 
 			Call_StartForward(g_hMessageReceiveForward);
 			Call_PushString(sEntity);
-			Call_PushString(sID);
 			Call_PushString(sName);
 			Call_PushString(sMessage);
 			Call_Finish(aResult);
@@ -480,7 +484,10 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			if (aResult >= Plugin_Handled)
 				return;
 
-			PrintToChatAll("%T", "ChatMessage", sEntity, sName, sMessage);
+			if (IsSource2009())
+				CPrintToChatAll("{gold}[%s] {azure}%s{white}: {grey}%s", sEntity, sName, sMessage);
+			else
+				CPrintToChatAll("\x10 \x10[%s] \x0C%s\x01: \x08%s", sEntity, sName, sMessage);
 		}
 		case MessageEvent:
 		{
@@ -491,7 +498,12 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			m.GetEvent(sEvent, sizeof sEvent);
 			m.GetData(sData, sizeof sData);
 
-			PrintToChatAll("%T", "EventMessage", sEvent, sData);
+			PrintToChatAll("%T", "EventMessage", LANG_SERVER, sEvent, sData);
+
+			if (IsSource2009())
+				CPrintToChatAll("{gold}[%s]{white}: {grey}%s", sEvent, sData);
+			else
+				CPrintToChatAll("\x10 \x10[%s]\x01: \x08%s", sEvent, sData);
 		}
 		case MessageAuthenticateResponse:
 		{
@@ -500,7 +512,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			if (m.Response == AuthenticateDenied)
 				SetFailState("Server denied our token. Stopping.");
 
-			PrintToServer("Successfully authenticated");
+			PrintToServer("Source Chat Relay: Successfully authenticated");
 		}
 		default:
 		{
@@ -719,3 +731,15 @@ stock bool Client_IsValid(int client, bool checkConnected=true)
 
 	return true;
 }
+
+stock bool IsSource2009()
+{
+	if(GetEngineVersion() == Engine_CSS || GetEngineVersion() == Engine_HL2DM || GetEngineVersion() == Engine_DODS || GetEngineVersion() == Engine_TF2)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+} 

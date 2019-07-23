@@ -53,6 +53,10 @@ func (r *PacketReader) SetPos(newPos int) {
 	r.pos = newPos
 }
 
+func (r *PacketReader) Dump() []byte {
+	return r.buffer
+}
+
 func (r *PacketReader) ReadIPv4() (net.IP, error) {
 	if err := r.CanRead(net.IPv4len); err != nil {
 		return nil, err

@@ -1,11 +1,11 @@
 package protocol
 
-import "github.com/rumblefrog/source-chat-relay/server/packet"
+import (
+	"github.com/rumblefrog/source-chat-relay/server/packet"
+)
 
 type AuthenticateMessage struct {
 	BaseMessage
-
-	Hostname string
 
 	Token string
 }
@@ -16,14 +16,20 @@ type AuthenticateMessageResponse struct {
 	Response AuthenticateResponse
 }
 
-func ParseAuthenticateMessage(base BaseMessage, r *packet.PacketReader) (m *AuthenticateMessage) {
+func ParseAuthenticateMessage(base BaseMessage, r *packet.PacketReader) (*AuthenticateMessage, error) {
+	m := &AuthenticateMessage{}
+
 	m.BaseMessage = base
 
-	m.Hostname = r.ReadString()
+	var ok bool
 
-	m.Token = r.ReadString()
+	m.Token, ok = r.TryReadString()
 
-	return
+	if !ok {
+		return nil, ErrCannotReadString
+	}
+
+	return m, nil
 }
 
 // No marshal for authenticate message as we are the server and would never use it
@@ -32,7 +38,9 @@ func ParseAuthenticateMessage(base BaseMessage, r *packet.PacketReader) (m *Auth
 func (m *AuthenticateMessageResponse) Marshal() []byte {
 	var builder packet.PacketBuilder
 
-	builder.WriteByte(byte(m.BaseMessage.Type))
+	builder.WriteByte(byte(MessageAuthenticateResponse))
+	builder.WriteCString(m.BaseMessage.EntityName)
+
 	builder.WriteByte(byte(m.Response))
 
 	return builder.Bytes()

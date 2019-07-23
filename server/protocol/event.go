@@ -15,14 +15,26 @@ type EventMessage struct {
 	Data string
 }
 
-func ParseEventMessage(base BaseMessage, r *packet.PacketReader) (m *EventMessage) {
+func ParseEventMessage(base BaseMessage, r *packet.PacketReader) (*EventMessage, error) {
+	m := &EventMessage{}
+
 	m.BaseMessage = base
 
-	m.Event = r.ReadString()
+	var ok bool
 
-	m.Data = r.ReadString()
+	m.Event, ok = r.TryReadString()
 
-	return
+	if !ok {
+		return nil, ErrCannotReadString
+	}
+
+	m.Data, ok = r.TryReadString()
+
+	if !ok {
+		return nil, ErrCannotReadString
+	}
+
+	return m, nil
 }
 
 func (m *EventMessage) Content() string {
@@ -32,7 +44,9 @@ func (m *EventMessage) Content() string {
 func (m *EventMessage) Marshal() []byte {
 	var builder packet.PacketBuilder
 
-	builder.WriteByte(byte(m.BaseMessage.Type))
+	builder.WriteByte(byte(MessageEvent))
+	builder.WriteCString(m.BaseMessage.EntityName)
+
 	builder.WriteString(m.Event)
 	builder.WriteString(m.Data)
 
@@ -48,7 +62,7 @@ func (m *EventMessage) Embed() *discordgo.MessageEmbed {
 		Color:     16777215,
 		Timestamp: time.Now().Format(time.RFC3339),
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: m.BaseMessage.Hostname,
+			Text: m.BaseMessage.EntityName,
 		},
 		Fields: []*discordgo.MessageEmbedField{
 			&discordgo.MessageEmbedField{

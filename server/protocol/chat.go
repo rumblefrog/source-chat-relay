@@ -29,18 +29,34 @@ type ChatMessage struct {
 	Message string
 }
 
-func ParseChatMessage(base BaseMessage, r *packet.PacketReader) (m *ChatMessage) {
+func ParseChatMessage(base BaseMessage, r *packet.PacketReader) (*ChatMessage, error) {
+	m := &ChatMessage{}
+
 	m.BaseMessage = base
 
 	m.IDType = ParseIdentificationType(r.ReadUint8())
 
-	m.ID = r.ReadString()
+	var ok bool
 
-	m.Username = r.ReadString()
+	m.ID, ok = r.TryReadString()
 
-	m.Message = r.ReadString()
+	if !ok {
+		return nil, ErrCannotReadString
+	}
 
-	return
+	m.Username, ok = r.TryReadString()
+
+	if !ok {
+		return nil, ErrCannotReadString
+	}
+
+	m.Message, ok = r.TryReadString()
+
+	if !ok {
+		return nil, ErrCannotReadString
+	}
+
+	return m, nil
 }
 
 func (m *ChatMessage) Content() string {
@@ -50,7 +66,9 @@ func (m *ChatMessage) Content() string {
 func (m *ChatMessage) Marshal() []byte {
 	var builder packet.PacketBuilder
 
-	builder.WriteByte(byte(m.BaseMessage.Type))
+	builder.WriteByte(byte(MessageChat))
+	builder.WriteCString(m.BaseMessage.EntityName)
+
 	builder.WriteByte(byte(m.IDType))
 	builder.WriteCString(m.ID)
 	builder.WriteCString(m.Username)
@@ -67,7 +85,7 @@ func (m *ChatMessage) Embed() *discordgo.MessageEmbed {
 	idColorBytes := []byte(m.ID)
 
 	// Convert to an int with length of 6
-	color := int(binary.BigEndian.Uint32(idColorBytes[len(idColorBytes)-6:])) / 10000
+	color := int(binary.LittleEndian.Uint32(idColorBytes[len(idColorBytes)-6:])) / 10000
 
 	return &discordgo.MessageEmbed{
 		Color:       color,
@@ -78,7 +96,7 @@ func (m *ChatMessage) Embed() *discordgo.MessageEmbed {
 			URL:  m.IDType.FormatURL(m.ID),
 		},
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: m.BaseMessage.Hostname,
+			Text: m.BaseMessage.EntityName,
 		},
 	}
 }

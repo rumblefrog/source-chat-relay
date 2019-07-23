@@ -16,19 +16,30 @@ type Deliverable interface {
 type BaseMessage struct {
 	Type MessageType
 
+	EntityName string
+
 	// Internal relay purposes only
 	SenderID string
-	Hostname string
 }
 
 func (b BaseMessage) Author() string {
 	return b.SenderID
 }
 
-func ParseBaseMessage(r *packet.PacketReader) (m BaseMessage) {
+func ParseBaseMessage(r *packet.PacketReader) (BaseMessage, error) {
+	m := BaseMessage{}
+
 	r.SetPos(0)
 
 	m.Type = ParseMessageType(r.ReadUint8())
 
-	return
+	var ok bool
+
+	m.EntityName, ok = r.TryReadString()
+
+	if !ok {
+		return m, ErrCannotReadString
+	}
+
+	return m, nil
 }
