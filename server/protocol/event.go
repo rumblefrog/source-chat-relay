@@ -47,8 +47,8 @@ func (m *EventMessage) Marshal() []byte {
 	builder.WriteByte(byte(MessageEvent))
 	builder.WriteCString(m.BaseMessage.EntityName)
 
-	builder.WriteString(m.Event)
-	builder.WriteString(m.Data)
+	builder.WriteCString(m.Event)
+	builder.WriteCString(m.Data)
 
 	return builder.Bytes()
 }
