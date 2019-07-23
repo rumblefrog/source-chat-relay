@@ -30,20 +30,19 @@ install:
 
 before_script:
     - chmod +x addons/sourcemod/scripting/spcomp
-    - mkdir -p build/game_server/addons/sourcemod/plugins build/game_server/addons/sourcemod/translations
-    - mkdir -p build/scr-linux-amd64/relay_server/ build/scr-arm-v7/relay_server/ build/scr-windows-amd64/relay_server/
+    - mkdir -p build/game_server/addons/sourcemod/plugins
+    - mkdir -p build/scr-linux-amd64/relay_server/
+    - mkdir -p build/scr-arm-v7/relay_server/
+    - mkdir -p build/scr-windows-amd64/relay_server/
 
 script:
-    - go get -d ./server && go build -ldflags '-extldflags "-static"' -o ./build/scr-linux-amd64/relay_server/server ./server
-    - export GOARCH=arm && export GOARM=7 && go build -ldflags '-extldflags "-static"' -o ./build/scr-arm-v7/relay_server/server ./server
-    - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -ldflags '-extldflags "-static"' -o ./build/scr-windows-amd64/relay_server/server.exe ./server
+    - go get -d ./server && go build -ldflags '-extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-linux-amd64/relay_server/server ./server
+    - export GOARCH=arm && export GOARM=7 && go build -ldflags '-extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-arm-v7/relay_server/server ./server
+    - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -ldflags '-extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-windows-amd64/relay_server/server.exe ./server
     - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/build/game_server/addons/sourcemod/plugins/Source-Chat-Relay.smx
-
-after_script:
-    - cp client/sourcechatrelay.phrases.txt build/game_server/addons/sourcemod/translations
-
-    - cp config.toml.example build/src-linux-amd64/relay_server
-    - cp -R build/game_server build/src-linux-amd64/
+    
+    - cp config.toml.example build/scr-linux-amd64/relay_server
+    - cp -R build/game_server build/scr-linux-amd64/
 
     - cp config.toml.example build/scr-arm-v7/relay_server
     - cp -R build/game_server build/scr-arm-v7/
@@ -52,9 +51,9 @@ after_script:
     - cp -R build/game_server build/scr-windows-amd64/
 
 before_deploy:
-    - tar -czf scr-linux-amd64.tar.gz build/src-linux-amd64/
-    - tar -czf scr-arm-v7.tar.gz build/scr-arm-v7/
-    - 7zr a scr-windows-amd64.7z build/scr-windows-amd64/
+    - cd build/scr-linux-amd64/ && tar -czf ../scr-linux-amd64.tar.gz .
+    - cd build/scr-arm-v7/ && tar -czf ../scr-arm-v7.tar.gz .
+    - cd build/scr-windows-amd64/ && 7zr a ../scr-windows-amd64.7z .
 
 deploy:
     provider: releases
