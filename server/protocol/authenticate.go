@@ -39,7 +39,7 @@ func (m *AuthenticateMessageResponse) Marshal() []byte {
 	var builder packet.PacketBuilder
 
 	builder.WriteByte(byte(MessageAuthenticateResponse))
-	builder.WriteCString(m.BaseMessage.EntityName)
+	builder.WriteCString("RELAY")
 
 	builder.WriteByte(byte(m.Response))
 

@@ -180,8 +180,8 @@ methodmap AuthenticateMessageResponse < BaseMessage
 /**
  * Bi-directional messaging structure
  * 
- * @field IDType - byte - Type of ID (enum IdenticationType)
- * @field ID - string - The unique identication of the user (SteamID/Discord Snowflake/etc)
+ * @field IDType - byte - Type of ID (enum IdentificationType)
+ * @field ID - string - The unique identification of the user (SteamID/Discord Snowflake/etc)
  * @field Username - string - The name of the user
  * @field Message - string - The message
  */
