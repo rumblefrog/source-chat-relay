@@ -475,6 +475,11 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			m.GetUsername(sName, sizeof sName);
 			m.GetMessage(sMessage, sizeof sMessage);
 
+			// Strip anything beyond 4 bytes for character as chat can't render it
+			StripCharsByBytes(sEntity, sizeof sEntity);
+			StripCharsByBytes(sName, sizeof sName);
+			StripCharsByBytes(sMessage, sizeof sMessage);
+
 			Call_StartForward(g_hMessageReceiveForward);
 			Call_PushString(sEntity);
 			Call_PushString(sName);
@@ -497,6 +502,10 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 
 			m.GetEvent(sEvent, sizeof sEvent);
 			m.GetData(sData, sizeof sData);
+
+			// Strip anything beyond 4 bytes for character as chat can't render it
+			StripCharsByBytes(sEvent, sizeof sEvent);
+			StripCharsByBytes(sData, sizeof sData);
 
 			PrintToChatAll("%T", "EventMessage", LANG_SERVER, sEvent, sData);
 
@@ -593,6 +602,35 @@ stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
 	
 	for (int i = 0; i < len; i++)
 		Format(buffer, buffersize, "%s%c", buffer, charset[GetRandomInt(0, sizeof charset)]);
+}
+
+stock void StripCharsByBytes(char[] sBuffer, int iSize, int iMaxBytes = 3)
+{
+	int iBytes;
+
+	char[] sClone = new char[iSize];
+
+	int i = 0;
+	int j = 0;
+
+	while (i < iSize)
+	{
+		iBytes = IsCharMB(sBuffer[i]);
+
+		if (iBytes <= iMaxBytes)
+		{
+			sClone[j] = sBuffer[i];
+
+			j++;
+		}
+
+		if (iBytes == 0)
+			i++;
+		else
+			i += iBytes;
+	}
+
+	Format(sBuffer, iSize, "%s", sClone);
 }
 
 static int localIPRanges[] =
