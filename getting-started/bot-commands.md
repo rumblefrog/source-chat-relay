@@ -2,23 +2,29 @@
 
 Available bot commands
 
-## r/entities ?type\(channel/server\)
+## r/entities
 
-| Argument | Optional |                   Note                   |
-| :------- | :------: | :--------------------------------------- |
-| Type     |    ✔     | Filter by entity type, channel or server |
+Outputs the list of all entities
 
 ## r/receivechannel \#TextChannel/EntityID Channel
 
-|        Argument        | Optional |                                                                 Note                                                                  |
-| :--------------------- | :------: | :------------------------------------------------------------------------------------------------------------------------------------ |
-| \#TextChannel/EntityID |    ❌     | Supply either a text channel mention or an entity ID from a game server                                                               |
-| Channel                |    ✔     | This argument is required if you wish to set the value, otherwise if you leave this argument out, it will simply fetch it if it exist |
+Sets the receive channels of the entity
+
+| Argument | Optional | Note |
+| :--- | :---: | :--- |
+| \#TextChannel/EntityID | ❌ | Supply either a text channel mention or an entity ID from a game server |
+| Channel | ✔ | This argument is required if you wish to set the value, otherwise if you leave this argument out, it will simply fetch it if it exist |
 
 ## r/sendchannel \#TextChannel/EntityID Channel
 
-|        Argument        | Optional |                                                                 Note                                                                  |
-| :--------------------- | :------: | :------------------------------------------------------------------------------------------------------------------------------------ |
-| \#TextChannel/EntityID |    ❌     | Supply either a text channel mention or an entity ID from a game server                                                               |
-| Channel                |    ✔     | This argument is required if you wish to set the value, otherwise if you leave this argument out, it will simply fetch it if it exist |
+Sets the send receive channels of the entity
+
+| Argument | Optional | Note |
+| :--- | :---: | :--- |
+| \#TextChannel/EntityID | ❌ | Supply either a text channel mention or an entity ID from a game server |
+| Channel | ✔ | This argument is required if you wish to set the value, otherwise if you leave this argument out, it will simply fetch it if it exist |
+
+## r/help
+
+Output the version, stats, and author info
 
