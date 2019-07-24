@@ -9,7 +9,7 @@ import (
 
 func FetchEntity(id string) (*Entity, error) {
 	// Specify the column names for backward compat with old database
-	stmt, err := database.Connection.Prepare("SELECT `id`, `display_name`, `receive_channels`, `send_channels`, `created_at` FROM `relay_entities` WHERE `id` = ?")
+	stmt, err := database.Connection.Prepare("SELECT `id`, `display_name`, `receive_channels`, `send_channels`, `disabled_receive_types`, `disabled_send_types`, `created_at` FROM `relay_entities` WHERE `id` = ?")
 
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func FetchEntity(id string) (*Entity, error) {
 
 func FetchEntities() ([]*Entity, error) {
 	// Specify the column names for backward compat with old database
-	rows, err := database.Connection.Query("SELECT `id`, `display_name`, `receive_channels`, `send_channels`, `created_at` FROM `relay_entities`")
+	rows, err := database.Connection.Query("SELECT `id`, `display_name`, `receive_channels`, `send_channels`, `disabled_receive_types`, `disabled_send_types`, `created_at` FROM `relay_entities`")
 
 	if err != nil {
 		return nil, err
