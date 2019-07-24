@@ -1,3 +1,7 @@
+---
+description: Setup instructions
+---
+
 # Setup
 
 ## Prerequisites

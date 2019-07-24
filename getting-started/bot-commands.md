@@ -1,3 +1,7 @@
+---
+description: List of available bot commands
+---
+
 # Bot-Commands
 
 Available bot commands

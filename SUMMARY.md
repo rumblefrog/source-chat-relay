@@ -13,6 +13,7 @@
 * [Filters](extended/filters.md)
 * [In-Game-Prefixes](extended/in-game-prefixes.md)
 * [Tips-And-Tricks](extended/tips-and-tricks.md)
+* [Protocol](extended/protocol.md)
 
 ## Support
 
