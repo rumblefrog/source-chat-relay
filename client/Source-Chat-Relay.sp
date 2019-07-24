@@ -122,11 +122,14 @@ methodmap BaseMessage < ByteBuffer
 
 		int iLen = this.Dump(sDump, MAX_BUFFER_LENGTH);
 
+		this.Close();
+
+		if (!SocketIsConnected(g_hSocket))
+			return;
+
 		// Len required
 		// If len is not included, \0 terminator will not be included
 		SocketSend(g_hSocket, sDump, iLen);
-
-		this.Close();
 	}
 }
 
