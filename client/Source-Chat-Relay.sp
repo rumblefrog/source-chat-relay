@@ -6,7 +6,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "2.0.0-rc2"
+#define PLUGIN_VERSION "2.0.0-rc3"
 
 #pragma newdecls required
 
