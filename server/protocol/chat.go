@@ -59,6 +59,10 @@ func ParseChatMessage(base BaseMessage, r *packet.PacketReader) (*ChatMessage, e
 	return m, nil
 }
 
+func (m *ChatMessage) Type() MessageType {
+	return MessageChat
+}
+
 func (m *ChatMessage) Content() string {
 	return m.Message
 }

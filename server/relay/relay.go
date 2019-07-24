@@ -80,6 +80,7 @@ func (r *Relay) StartRouting() {
 				}
 
 				if client.ID != message.Author() &&
+					tEntity.CanReceiveType(message.Type()) &&
 					tEntity.ReceiveIntersectsWith(entity.DeliverableSendChannels(message)) {
 					select {
 					case client.Data <- message.Marshal():
@@ -203,6 +204,16 @@ func (r *Relay) HandlePacket(client *RelayClient, buffer []byte) {
 	// Switch case for everything else that requires auth prior
 
 	if !client.Authenticated() {
+		return
+	}
+
+	tEntity, err := entity.GetEntity(client.ID)
+
+	if err != nil {
+		return
+	}
+
+	if !tEntity.CanSendType(base.Type) {
 		return
 	}
 

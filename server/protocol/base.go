@@ -6,6 +6,7 @@ import (
 )
 
 type Deliverable interface {
+	Type() MessageType
 	Marshal() []byte
 	Content() string
 	Author() string

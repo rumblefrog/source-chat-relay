@@ -35,6 +35,8 @@ func ParseAuthenticateMessage(base BaseMessage, r *packet.PacketReader) (*Authen
 // No marshal for authenticate message as we are the server and would never use it
 // No parse authenticate message response because we should never receive it
 
+// Does not implement the Deliverable interface as it does not go through the router
+
 func (m *AuthenticateMessageResponse) Marshal() []byte {
 	var builder packet.PacketBuilder
 

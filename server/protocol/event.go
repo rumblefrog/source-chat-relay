@@ -37,6 +37,10 @@ func ParseEventMessage(base BaseMessage, r *packet.PacketReader) (*EventMessage,
 	return m, nil
 }
 
+func (m *EventMessage) Type() MessageType {
+	return MessageEvent
+}
+
 func (m *EventMessage) Content() string {
 	return m.Data
 }
