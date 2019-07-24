@@ -13,7 +13,7 @@ type Entity struct {
 func (e *Entity) ReceiveIntersectsWith(chans []int) bool {
 	for _, e := range e.ReceiveChannels {
 		for _, v := range chans {
-			if e == v {
+			if e == v || (e == -1 && v != 0) || (v == -1 && e != 0) {
 				return true
 			}
 		}
