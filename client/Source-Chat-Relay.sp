@@ -532,6 +532,24 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 	base.Close();
 }
 
+public void OnMapStart()
+{
+	char sMap[64];
+
+	GetCurrentMap(sMap, sizeof sMap);
+
+	EventMessage("Map Start", sMap).Dispatch();
+}
+
+public void OnMapEnd()
+{
+	char sMap[64];
+
+	GetCurrentMap(sMap, sizeof sMap);
+
+	EventMessage("Map Ended", sMap).Dispatch();
+}
+
 public void OnClientSayCommand_Post(int client, const char[] command, const char[] sArgs)
 {
 	if (!Client_IsValid(client))
