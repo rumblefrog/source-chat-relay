@@ -8,7 +8,7 @@ import (
 	"github.com/rumblefrog/source-chat-relay/server/entity"
 )
 
-func EntitiesCMD(ctx *exrouter.Context) {
+func entitiesCMD(ctx *exrouter.Context) {
 	entities := entity.GetEntities()
 
 	if len(entities) <= 0 {

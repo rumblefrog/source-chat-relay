@@ -16,10 +16,11 @@ import (
 var Instance *Relay
 
 type Relay struct {
-	Clients  map[*RelayClient]bool
-	Router   chan protocol.Deliverable
-	Bot      chan protocol.Deliverable
-	Listener net.Listener
+	Clients    map[*RelayClient]bool
+	Router     chan protocol.Deliverable
+	Bot        chan protocol.Deliverable
+	Listener   net.Listener
+	Statistics RelayStats
 }
 
 type RelayClient struct {
@@ -29,8 +30,14 @@ type RelayClient struct {
 	EntityName string
 }
 
-func (c *RelayClient) Authenticated() bool {
-	return len(c.ID) != 0
+type RelayStats struct {
+	Incoming RelayTrafficStats
+	Outgoing RelayTrafficStats
+}
+
+type RelayTrafficStats struct {
+	MessageCount int
+	ByteCount    int
 }
 
 func NewRelay() *Relay {
@@ -127,6 +134,8 @@ func (r *Relay) ListenClientReceive(c *RelayClient) {
 		if length > 0 {
 			buffer = buffer[:length]
 
+			r.Statistics.Incoming.ByteCount += length
+
 			r.HandlePacket(c, buffer)
 		}
 	}
@@ -143,7 +152,10 @@ func (r *Relay) ListenClientSend(c *RelayClient) {
 				return
 			}
 
-			c.Socket.Write(message)
+			b, _ := c.Socket.Write(message)
+
+			r.Statistics.Outgoing.ByteCount += b
+			r.Statistics.Outgoing.MessageCount++
 		}
 	}
 }
@@ -156,6 +168,8 @@ func (r *Relay) HandlePacket(client *RelayClient, buffer []byte) {
 	if err != nil {
 		return
 	}
+
+	r.Statistics.Incoming.MessageCount++
 
 	if base.Type == protocol.MessageAuthenticate {
 		authenticateMessage, err := protocol.ParseAuthenticateMessage(base, reader)

@@ -19,17 +19,17 @@ const (
 	Send
 )
 
-func ChannelCommandRoute(ctx *exrouter.Context) {
+func channelCommandRoute(ctx *exrouter.Context) {
 	cType := ctx.Args.Get(0)
 
 	if cType == "receivechannel" {
-		ChannelCommand(ctx, Receive)
+		channelCommand(ctx, Receive)
 	} else if cType == "sendchannel" {
-		ChannelCommand(ctx, Send)
+		channelCommand(ctx, Send)
 	}
 }
 
-func ChannelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
+func channelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 	var (
 		dChannel *discordgo.Channel
 		err      error

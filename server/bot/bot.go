@@ -77,36 +77,17 @@ func Initialize() {
 
 		r.Use(Auth)
 
-		r.On("receivechannel", ChannelCommandRoute).Desc("Get/Set the receive relay channel of this ID/TextChannel").Alias("rc")
+		r.On("receivechannel", channelCommandRoute).Desc("Get/Set the receive relay channel of this ID/TextChannel").Alias("rc")
 
-		r.On("sendchannel", ChannelCommandRoute).Desc("Get/Set the send relay channel of this ID/TextChannel").Alias("sc")
+		r.On("sendchannel", channelCommandRoute).Desc("Get/Set the send relay channel of this ID/TextChannel").Alias("sc")
 
-		r.On("entities", EntitiesCMD).Desc("Fetch all entities (of certain type)").Alias("e")
+		r.On("entities", entitiesCMD).Desc("Fetch all entities (of certain type)").Alias("e")
 	})
 
 	router.Group(func(r *exrouter.Route) {
 		r.Cat("other")
 
-		r.On("about", func(ctx *exrouter.Context) {
-			ctx.Ses.ChannelMessageSendEmbed(ctx.Msg.ChannelID, &discordgo.MessageEmbed{
-				Author: &discordgo.MessageEmbedAuthor{
-					Name:    "Fishy!",
-					URL:     "https://github.com/rumblefrog",
-					IconURL: "https://avatars2.githubusercontent.com/u/6960234?s=32",
-				},
-				Color: 0x3395D6,
-				Fields: []*discordgo.MessageEmbedField{
-					&discordgo.MessageEmbedField{
-						Name:  "SCR Version",
-						Value: config.SCRVER,
-					},
-					&discordgo.MessageEmbedField{
-						Name:  "Repository",
-						Value: "https://github.com/rumblefrog/source-chat-relay/",
-					},
-				},
-			})
-		}).Desc("Version and source information").Alias("info")
+		r.On("about", aboutCommand).Desc("Version, source, stats information").Alias("info")
 
 		r.On("ping", func(ctx *exrouter.Context) {
 			ctx.Reply("pong")
