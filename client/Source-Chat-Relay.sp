@@ -6,7 +6,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "2.0.0-rc3"
+#define PLUGIN_VERSION "2.0.0-rc4"
 
 #pragma newdecls required
 
@@ -311,6 +311,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	RegPluginLibrary("Source-Chat-Relay");
 
 	CreateNative("SCR_SendMessage", Native_SendMessage);
+	CreateNative("SCR_SendEvent", Native_SendEvent);
 
 	return APLRes_Success;
 }
@@ -522,6 +523,15 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 				SetFailState("Server denied our token. Stopping.");
 
 			PrintToServer("Source Chat Relay: Successfully authenticated");
+
+			if (GetGameTime() <= 20.0)
+			{
+				char sMap[64];
+
+				GetCurrentMap(sMap, sizeof sMap);
+
+				EventMessage("Map Start", sMap).Dispatch();
+			}
 		}
 		default:
 		{
@@ -530,15 +540,6 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 	}
 
 	base.Close();
-}
-
-public void OnMapStart()
-{
-	char sMap[64];
-
-	GetCurrentMap(sMap, sizeof sMap);
-
-	EventMessage("Map Start", sMap).Dispatch();
 }
 
 public void OnMapEnd()
@@ -604,14 +605,39 @@ void DispatchMessage(int iClient, const char[] sMessage)
 
 public int Native_SendMessage(Handle plugin, int numParams)
 {
+	if (numParams < 2)
+	{
+		return ThrowNativeError(SP_ERROR_NATIVE, "Insufficient parameters");
+	}
+
 	char sBuffer[512];
-	int iWritten;
 
 	int iClient = GetNativeCell(1);
 
-	FormatNativeString(0, 2, 3, sizeof sBuffer, iWritten, sBuffer);
+	FormatNativeString(0, 2, 3, sizeof sBuffer, _, sBuffer);
 
 	DispatchMessage(iClient, sBuffer);
+
+	return 0;
+}
+
+public int Native_SendEvent(Handle plugin, int numParams)
+{
+	if (numParams < 2)
+	{
+		return ThrowNativeError(SP_ERROR_NATIVE, "Insufficient parameters");
+	}
+
+
+	char sEvent[128], sData[512];
+
+	GetNativeString(1, sEvent, sizeof sEvent);
+
+	FormatNativeString(0, 2, 3, sizeof sData, _, sData);
+
+	EventMessage(sEvent, sData).Dispatch();
+
+	return 0;
 }
 
 stock void GenerateRandomChars(char[] buffer, int buffersize, int len)

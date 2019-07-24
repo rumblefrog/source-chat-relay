@@ -33,6 +33,15 @@ forward Action SCR_OnMessageReceive(char[] sEntityName, char[] sClientName, char
  */
 native void SCR_SendMessage(int iClient = 0, const char[] fmt, any ...);
 
+/**
+ * Sends an event to the router
+ * 
+ * @param sEvent	Name of the event
+ * @param sData		Data format string
+ * @param ...		Format arguments
+ */
+native void SCR_SendEvent(const char[] sEvent, const char[] sData, any ...);
+
 #if !defined REQUIRE_PLUGIN
 public __pl_Source_Chat_Relay_SetNTVOptional()
 {
