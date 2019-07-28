@@ -6,7 +6,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "2.0.0-rc5"
+#define PLUGIN_VERSION "2.0.0-rc6"
 
 #pragma newdecls required
 
@@ -543,6 +543,24 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 	}
 
 	base.Close();
+}
+
+public void OnClientConnected(int iClient)
+{
+	char sName[MAX_NAME_LENGTH];
+
+	GetClientName(iClient, sName, sizeof sName);
+
+	EventMessage("Player Connected", sName);
+}
+
+public void OnClientDisconnect(int iClient)
+{
+	char sName[MAX_NAME_LENGTH];
+
+	GetClientName(iClient, sName, sizeof sName);
+
+	EventMessage("Player Disconnected", sName);
 }
 
 public void OnMapEnd()
