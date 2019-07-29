@@ -1,3 +1,5 @@
+#include "SCR-Version"
+
 #include <sourcemod>
 #include <socket>
 #include <morecolors> // Morecolors defines a max buffer as well as bytebuffer but bytebuffer does if defined check
@@ -6,7 +8,6 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Fishy"
-#define PLUGIN_VERSION "2.0.0-rc6"
 
 #pragma newdecls required
 

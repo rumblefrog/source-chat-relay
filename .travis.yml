@@ -30,17 +30,18 @@ install:
 
 before_script:
     - chmod +x addons/sourcemod/scripting/spcomp
-    - mkdir -p $TRAVIS_BUILD_DIR/build/game_server/addons/sourcemod/plugins
-    - mkdir -p $TRAVIS_BUILD_DIR/build/scr-linux-amd64/relay_server/
-    - mkdir -p $TRAVIS_BUILD_DIR/build/scr-arm-v7/relay_server/
-    - mkdir -p $TRAVIS_BUILD_DIR/build/scr-windows-amd64/relay_server/
+    - mkdir -p build/game_server/addons/sourcemod/plugins
+    - mkdir -p build/scr-linux-amd64/relay_server/
+    - mkdir -p build/scr-arm-v7/relay_server/
+    - mkdir -p build/scr-windows-amd64/relay_server/
     - export SCRVER=$(git describe --always --long --dirty)
+    - envsubst < client/SCR-Version.inc > client/SCR-Version.inc
 
 script:
-    - go get -d ./server && go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-linux-amd64/relay_server/server ./server
-    - export GOARCH=arm && export GOARM=7 && go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER  -extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-arm-v7/relay_server/server ./server
-    - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER  -extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-windows-amd64/relay_server/server.exe ./server
-    - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/build/game_server/addons/sourcemod/plugins/Source-Chat-Relay.smx
+    - go get -d ./server && go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags "-static"' -o build/scr-linux-amd64/relay_server/server ./server
+    - export GOARCH=arm && export GOARM=7 && go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER  -extldflags "-static"' -o build/scr-arm-v7/relay_server/server ./server
+    - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER  -extldflags "-static"' -o build/scr-windows-amd64/relay_server/server.exe ./server
+    - ./addons/sourcemod/scripting/spcomp client/Source-Chat-Relay -o build/game_server/addons/sourcemod/plugins/Source-Chat-Relay.smx
     
     - cp server/config.toml.example build/scr-linux-amd64/relay_server
     - cp -R build/game_server build/scr-linux-amd64/
