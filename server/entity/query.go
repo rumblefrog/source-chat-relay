@@ -103,7 +103,7 @@ func (entity *Entity) UpdateEntity() (sql.Result, error) {
 
 func (entity *Entity) CreateEntity() (sql.Result, error) {
 	return database.Connection.Exec(
-		"INSERT INTO `relay_entities` (`id`, `display_name`, `receive_channels`, `send_channels`, `disabled_receive_types`, `disabled_send_types`) VALUES (?, ?, ?, ?, ?)",
+		"INSERT INTO `relay_entities` (`id`, `display_name`, `receive_channels`, `send_channels`, `disabled_receive_types`, `disabled_send_types`) VALUES (?, ?, ?, ?, ?, ?)",
 		entity.ID,
 		entity.DisplayName,
 		EncodeDelimitedChannels(entity.ReceiveChannels),
