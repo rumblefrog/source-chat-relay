@@ -7,7 +7,7 @@ import (
 )
 
 func (entity *Entity) GetDisplayName() string {
-	if entity.DisplayName == "" {
+	if len(entity.DisplayName) == 0 {
 		return "N/A"
 	}
 

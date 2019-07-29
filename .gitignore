@@ -36,3 +36,10 @@ out/*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Node
+node_modules
+
+# UI build
+server/ui/build/*
+!server/ui/build/.gitkeep

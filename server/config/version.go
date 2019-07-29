@@ -1,5 +1,5 @@
 package config
 
 var (
-	SCRVER = "n/a"
+	SCRVER string = "n/a"
 )
