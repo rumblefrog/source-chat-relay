@@ -1,5 +1,5 @@
 package config
 
-const (
-	SCRVER = "2.0.0-rc6"
+var (
+	SCRVER = "n/a"
 )

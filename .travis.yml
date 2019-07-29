@@ -36,9 +36,9 @@ before_script:
     - mkdir -p $TRAVIS_BUILD_DIR/build/scr-windows-amd64/relay_server/
 
 script:
-    - go get -d ./server && go build -ldflags '-extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-linux-amd64/relay_server/server ./server
-    - export GOARCH=arm && export GOARM=7 && go build -ldflags '-extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-arm-v7/relay_server/server ./server
-    - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -ldflags '-extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-windows-amd64/relay_server/server.exe ./server
+    - go get -d ./server && go build -ldflags '-X config.SCRVER="git rev-parse HEAD" -extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-linux-amd64/relay_server/server ./server
+    - export GOARCH=arm && export GOARM=7 && go build -ldflags '-X config.SCRVER="git rev-parse HEAD" -extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-arm-v7/relay_server/server ./server
+    - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -ldflags '-X config.SCRVER="git rev-parse HEAD" -extldflags "-static"' -o $TRAVIS_BUILD_DIR/build/scr-windows-amd64/relay_server/server.exe ./server
     - ./addons/sourcemod/scripting/spcomp $TRAVIS_BUILD_DIR/client/Source-Chat-Relay -o $TRAVIS_BUILD_DIR/build/game_server/addons/sourcemod/plugins/Source-Chat-Relay.smx
     
     - cp server/config.toml.example build/scr-linux-amd64/relay_server
