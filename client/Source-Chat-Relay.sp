@@ -552,7 +552,7 @@ public void OnClientConnected(int iClient)
 
 	GetClientName(iClient, sName, sizeof sName);
 
-	EventMessage("Player Connected", sName);
+	EventMessage("Player Connected", sName).Dispatch();
 }
 
 public void OnClientDisconnect(int iClient)
@@ -561,7 +561,7 @@ public void OnClientDisconnect(int iClient)
 
 	GetClientName(iClient, sName, sizeof sName);
 
-	EventMessage("Player Disconnected", sName);
+	EventMessage("Player Disconnected", sName).Dispatch();
 }
 
 public void OnMapEnd()
