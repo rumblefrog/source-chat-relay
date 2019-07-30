@@ -28,6 +28,7 @@ type RelayClient struct {
 	Data       chan []byte
 	ID         string
 	EntityName string
+	Statistics RelayStats
 }
 
 type RelayStats struct {
@@ -137,6 +138,8 @@ func (r *Relay) ListenClientReceive(c *RelayClient) {
 
 			r.Statistics.Incoming.ByteCount += length
 
+			c.Statistics.Incoming.ByteCount += length
+
 			r.HandlePacket(c, buffer)
 		}
 	}
@@ -157,6 +160,9 @@ func (r *Relay) ListenClientSend(c *RelayClient) {
 
 			r.Statistics.Outgoing.ByteCount += b
 			r.Statistics.Outgoing.MessageCount++
+
+			c.Statistics.Outgoing.ByteCount += b
+			c.Statistics.Outgoing.MessageCount++
 		}
 	}
 }
@@ -171,6 +177,7 @@ func (r *Relay) HandlePacket(client *RelayClient, buffer []byte) {
 	}
 
 	r.Statistics.Incoming.MessageCount++
+	client.Statistics.Incoming.MessageCount++
 
 	if base.Type == protocol.MessageAuthenticate {
 		authenticateMessage, err := protocol.ParseAuthenticateMessage(base, reader)
