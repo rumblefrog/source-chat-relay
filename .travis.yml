@@ -34,7 +34,7 @@ before_script:
     - mkdir -p build/scr-arm-v7/relay_server/
     - mkdir -p build/scr-windows-amd64/relay_server/
     - export SCRVER=$(git describe --always --long --dirty)
-    - envsubst < client/SCR-Version.inc > client/SCR-Version.inc
+    - envsubst < client/SCR-Version.inc > client/SCR-Version.inc.temp && mv client/SCR-Version.inc.temp client/SCR-Version.inc
 
 script:
     - go get -d ./server && go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags "-static"' -o build/scr-linux-amd64/relay_server/server ./server
