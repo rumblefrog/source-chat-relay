@@ -19,6 +19,12 @@ addons:
       - lib32stdc++6
       - p7zip
 
+before_install:
+    - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+    - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+    - sudo apt-get update && sudo apt-get install yarn -y
+    - yarn global add postcss-cli
+
 install:
     - SMLATEST=`curl -s "https://www.sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux"`
     - SMPACKAGE="https://www.sourcemod.net/smdrop/$SMVERSION/$SMLATEST"
@@ -29,10 +35,6 @@ install:
     - wget https://raw.githubusercontent.com/rumblefrog/SM-ByteBuffer-Inc/master/bytebuffer.inc -P addons/sourcemod/scripting/include/
     - wget https://www.doctormckay.com/download/scripting/include/morecolors.inc -P addons/sourcemod/scripting/include/
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-    - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-    - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-    - apt-get update && apt-get install yarn -y
-    - yarn global add postcss-cli
 
 before_script:
     - chmod +x addons/sourcemod/scripting/spcomp
