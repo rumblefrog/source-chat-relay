@@ -46,7 +46,7 @@ before_script:
     - envsubst < client/SCR-Version.inc > client/SCR-Version.inc.temp && mv client/SCR-Version.inc.temp client/SCR-Version.inc
 
 script:
-    - cd server/ui && yarn
+    - cd server/ui/template && yarn
     - postcss styles.css -o dist/styles.css
     - cp index.html dist/index.html
     - cd $TRAVIS_BUILD_DIR
