@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="styles.css">
+    </head>
+    <body class="bg-gray-900 antialiased w-10/12 mx-auto">
+        <div class="flex mt-16">
+            <div class="w-1/5 mr-16 shadow">
+                <h2 class="text-white text-2xl mb-2">Route Trace</h2>
+                <div class="bg-gray-100 rounded p-5">
+                    <div>
+                        <label class="block text-sm text-gray-700 font-bold my-2">Send Channels</label>
+                        <input id="schan" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text">
+                    </div>
+
+                    <div>
+                        <button class="w-full bg-blue-500 hover:bg-green-500 rounded py-2 px-4 text-white mt-4">Trace</button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-auto">
+                <h2 class="text-white text-2xl mb-2">Entities</h2>
+                <div class="flex flex-wrap">
+                    {{ range $value := . }}
+                    <div class="w-2/8 bg-gray-100 text-gray-700 rounded p-5 mr-4 block shadow mb-4">
+                        <div>
+                            <label class="block mb-3">{{ $value.DisplayName }}</label>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold my-2">Receive Channels</label>
+                            <input type="text" value="{{ humanizeChannelString $value.ReceiveChannels }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold my-2">Send Channels</label>
+                            <input type="text" value="{{ humanizeChannelString $value.SendChannels }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold my-2">Disabled Receive Types</label>
+                            <input type="text" value="{{ humanizeChannelString $value.DisabledReceiveTypes }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold my-2">Disabled Send Types</label>
+                            <input type="text" value="{{ humanizeChannelString $value.DisabledSendTypes }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+
+                        <div>
+                            <button class="w-full bg-green-500 hover:bg-green-700 rounded py-2 px-4 text-white mt-4">Save</button>
+                        </div>
+                    </div>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

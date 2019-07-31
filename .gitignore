@@ -41,5 +41,6 @@ out/*
 node_modules
 
 # UI build
-server/ui/build/*
-!server/ui/build/.gitkeep
+server/ui/template/dist
+!server/ui/template/dist/.gitkeep
+*-packr.go

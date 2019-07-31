@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/kardianos/service"
 	"github.com/rumblefrog/source-chat-relay/server/relay"
+	"github.com/rumblefrog/source-chat-relay/server/ui"
 	"github.com/sirupsen/logrus"
 
 	"github.com/rumblefrog/source-chat-relay/server/entity"
@@ -24,10 +25,12 @@ func (p *program) Start(s service.Service) error {
 	config.ParseConfig()
 	database.InitializeDatabase()
 	entity.Initialize()
-	bot.Initialize()
 
 	relay.Instance = relay.NewRelay()
 	relay.Instance.Listen(config.Config.General.Port)
+
+	bot.Initialize()
+	ui.UIListen()
 
 	return nil
 }
