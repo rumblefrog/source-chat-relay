@@ -35,6 +35,7 @@ install:
     - wget https://raw.githubusercontent.com/rumblefrog/SM-ByteBuffer-Inc/master/bytebuffer.inc -P addons/sourcemod/scripting/include/
     - wget https://www.doctormckay.com/download/scripting/include/morecolors.inc -P addons/sourcemod/scripting/include/
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+    - go get -u github.com/gobuffalo/packr/v2/packr2
 
 before_script:
     - chmod +x addons/sourcemod/scripting/spcomp
