@@ -55,8 +55,8 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 
 	temp, err := template.New("index").Funcs(template.FuncMap{
 		"humanizeChannelString": entity.HumanizeChannelString,
-		"byteToMB": func(b int) float64 {
-			return float64(b) / (1024 * 1024)
+		"byteToMB": func(b int) string {
+			return fmt.Sprintf("%.6f", float64(b)/(1024*1024))
 		},
 	}).Parse(s)
 
