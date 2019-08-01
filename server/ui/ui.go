@@ -35,6 +35,10 @@ func UIListen() {
 	http.HandleFunc("/", viewHandler)
 	http.HandleFunc("/styles.css", styleHandler)
 
+	if config.Config.UI.Port == 0 {
+		config.Config.UI.Port = 8080
+	}
+
 	logrus.Infof("UI listener started on port %d", config.Config.UI.Port)
 
 	logrus.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Config.UI.Port), nil))
