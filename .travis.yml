@@ -8,6 +8,9 @@ env:
 go:
   - "1.12.x"
 
+node_js:
+  - "node" # Latest stable
+
 matrix:
     fast_finish: true
 
@@ -15,6 +18,12 @@ addons:
     apt_packages:
       - lib32stdc++6
       - p7zip
+
+before_install:
+    - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+    - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+    - sudo apt-get update && sudo apt-get install yarn -y
+    - yarn global add postcss-cli
 
 install:
     - SMLATEST=`curl -s "https://www.sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux"`
@@ -26,6 +35,7 @@ install:
     - wget https://raw.githubusercontent.com/rumblefrog/SM-ByteBuffer-Inc/master/bytebuffer.inc -P addons/sourcemod/scripting/include/
     - wget https://www.doctormckay.com/download/scripting/include/morecolors.inc -P addons/sourcemod/scripting/include/
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+    - go get -u github.com/gobuffalo/packr/v2/packr2
 
 before_script:
     - chmod +x addons/sourcemod/scripting/spcomp
@@ -37,7 +47,15 @@ before_script:
     - envsubst < client/SCR-Version.inc > client/SCR-Version.inc.temp && mv client/SCR-Version.inc.temp client/SCR-Version.inc
 
 script:
-    - go get -d ./server && go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=`$SCRVER` -extldflags "-static"' -o build/scr-linux-amd64/relay_server/server ./server
+    - cd server/ui/template && yarn
+    - postcss styles.css -o dist/styles.css
+    - cp index.html dist/index.html
+    - cd $TRAVIS_BUILD_DIR
+
+    - go get -u ./server
+    - packr2
+
+    - go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=`$SCRVER` -extldflags "-static"' -o build/scr-linux-amd64/relay_server/server ./server
     - export GOARCH=arm && export GOARM=7 && go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=`$SCRVER`  -extldflags "-static"' -o build/scr-arm-v7/relay_server/server ./server
     - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -ldflags '-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=`$SCRVER`  -extldflags "-static"' -o build/scr-windows-amd64/relay_server/server.exe ./server
     
