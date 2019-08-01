@@ -30,7 +30,10 @@ func (p *program) Start(s service.Service) error {
 	relay.Instance.Listen(config.Config.General.Port)
 
 	bot.Initialize()
-	ui.UIListen()
+
+	if config.Config.UI.Enabled {
+		ui.UIListen()
+	}
 
 	return nil
 }

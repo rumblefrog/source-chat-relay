@@ -2,10 +2,12 @@ package ui
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"io"
 	"net/http"
 
+	"github.com/rumblefrog/source-chat-relay/server/config"
 	"github.com/rumblefrog/source-chat-relay/server/relay"
 
 	"github.com/rumblefrog/source-chat-relay/server/entity"
@@ -33,9 +35,9 @@ func UIListen() {
 	http.HandleFunc("/", viewHandler)
 	http.HandleFunc("/styles.css", styleHandler)
 
-	logrus.Info("UI listener started on port 8080")
+	logrus.Infof("UI listener started on port %d", config.Config.UI.Port)
 
-	logrus.Fatal(http.ListenAndServe(":8080", nil))
+	logrus.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Config.UI.Port), nil))
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {

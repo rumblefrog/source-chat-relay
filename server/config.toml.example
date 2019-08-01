@@ -41,3 +41,7 @@ Port = 3306
 # The protocol to parse DSN as.
 # Most users can leave this at the default "tcp"
 Protocol = "tcp"
+
+[UI]
+Enabled = true
+Port = 8080

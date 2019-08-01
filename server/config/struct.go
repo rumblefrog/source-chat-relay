@@ -20,8 +20,14 @@ type DatabaseConfig struct {
 	Protocol string `toml:"Protocol"`
 }
 
+type UIConfig struct {
+	Enabled bool `toml:"Enabled"`
+	Port    int  `toml:"Port"`
+}
+
 type Config_t struct {
 	General  GeneralConfig
 	Bot      BotConfig
 	Database DatabaseConfig
+	UI       UIConfig
 }
