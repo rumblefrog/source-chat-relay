@@ -21,7 +21,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Info (please complete the following information):**
- - OS: [e.g. Ubuntu]
+ - OS: [e.g. Ubuntu 18.04 LTS]
  - Sourcemod Version [e.g. 1.9.6260]
  - Relay Version [e.g. 2.0.0-rc6]
 

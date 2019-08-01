@@ -29,6 +29,8 @@ before_install:
     - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
     - sudo apt-get update && sudo apt-get install yarn -y
     - yarn global add postcss-cli
+    - export SCRVER=$(git describe --always --long --dirty)
+    - envsubst < client/SCR-Version.inc > client/SCR-Version.inc.temp && mv client/SCR-Version.inc.temp client/SCR-Version.inc
 
 install:
     - SMLATEST=`curl -s "https://www.sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux"`
@@ -48,8 +50,6 @@ before_script:
     - mkdir -p build/scr-linux-amd64/relay_server/
     - mkdir -p build/scr-arm-v7/relay_server/
     - mkdir -p build/scr-windows-amd64/relay_server/
-    - export SCRVER=$(git describe --always --long --dirty)
-    - envsubst < client/SCR-Version.inc > client/SCR-Version.inc.temp && mv client/SCR-Version.inc.temp client/SCR-Version.inc
 
 script:
     - cd server/ui/template && yarn
