@@ -43,5 +43,5 @@ Port = 3306
 Protocol = "tcp"
 
 [UI]
-Enabled = true
+Enabled = false
 Port = 8080
