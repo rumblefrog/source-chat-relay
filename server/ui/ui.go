@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"sort"
 
 	"github.com/rumblefrog/source-chat-relay/server/config"
 	"github.com/rumblefrog/source-chat-relay/server/relay"
@@ -79,6 +80,12 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 			Entity: v,
 		})
 	}
+
+	// Upon retrieving from cache, it may not be in the same order each time
+	// leading to confusions when running trace
+	sort.Slice(tRenderData.Entities, func(i, j int) bool {
+		return tRenderData.Entities[i].Entity.ID < tRenderData.Entities[j].Entity.ID
+	})
 
 	if r.Method == http.MethodPost {
 		action := r.FormValue("btn")
