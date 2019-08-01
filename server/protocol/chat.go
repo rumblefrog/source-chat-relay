@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"encoding/binary"
+	"fmt"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -96,7 +97,7 @@ func (m *ChatMessage) Embed() *discordgo.MessageEmbed {
 		Description: m.Message,
 		Timestamp:   time.Now().Format(time.RFC3339),
 		Author: &discordgo.MessageEmbedAuthor{
-			Name: m.Username,
+			Name: fmt.Sprintf("%s (%s)", m.Username, m.ID),
 			URL:  m.IDType.FormatURL(m.ID),
 		},
 		Footer: &discordgo.MessageEmbedFooter{
