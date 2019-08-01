@@ -23,6 +23,22 @@ func (e *Entity) ReceiveIntersectsWith(chans []int) bool {
 	return false
 }
 
+func (e *Entity) SendIntersectsWith(chans []int) bool {
+	for _, e := range e.SendChannels {
+		for _, v := range chans {
+			if e == 0 || v == 0 {
+				continue
+			}
+
+			if e == v || e == -1 || v == -1 {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func (e *Entity) CanReceiveType(t protocol.MessageType) bool {
 	for _, v := range e.DisabledReceiveTypes {
 		if protocol.MessageType(v) == t {

@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/rumblefrog/source-chat-relay/server/relay"
+
 	"github.com/rumblefrog/source-chat-relay/server/entity"
 
 	packr "github.com/gobuffalo/packr/v2"
@@ -15,13 +17,23 @@ import (
 
 var box *packr.Box
 
+type renderData struct {
+	Relay    *relay.Relay
+	Entities []*renderEntity
+}
+
+type renderEntity struct {
+	Entity      *entity.Entity
+	Highlighted bool
+}
+
 func UIListen() {
 	box = packr.New("template", "./template/dist")
 
 	http.HandleFunc("/", viewHandler)
 	http.HandleFunc("/styles.css", styleHandler)
 
-	logrus.Info("UI listener started")
+	logrus.Info("UI listener started on port 8080")
 
 	logrus.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -37,6 +49,9 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 
 	temp, err := template.New("index").Funcs(template.FuncMap{
 		"humanizeChannelString": entity.HumanizeChannelString,
+		"byteToMB": func(b int) float64 {
+			return float64(b) / (1024 * 1024)
+		},
 	}).Parse(s)
 
 	if err != nil {
@@ -47,7 +62,54 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 
-	err = temp.Execute(w, entity.GetEntities())
+	entities := entity.GetEntities()
+
+	tRenderData := renderData{
+		Relay: relay.Instance,
+	}
+
+	for _, v := range entities {
+		tRenderData.Entities = append(tRenderData.Entities, &renderEntity{
+			Entity: v,
+		})
+	}
+
+	if r.Method == http.MethodPost {
+		action := r.FormValue("btn")
+
+		switch action {
+		case "update":
+			// Since we already retrieved from cache prior (above and on bot ready), this entity should point to the same address
+			// as tRenderData and relay instance entities, therefore the template render should reflect the update
+			tEntity, err := entity.GetEntity(r.FormValue("id"))
+
+			if err != nil {
+				break
+			}
+
+			tEntity.ReceiveChannels = entity.ParseDelimitedChannels(r.FormValue("receiveChannels"))
+			tEntity.SendChannels = entity.ParseDelimitedChannels(r.FormValue("sendChannels"))
+			tEntity.DisabledReceiveTypes = entity.ParseDelimitedChannels(r.FormValue("disabledReceiveTypes"))
+			tEntity.DisabledSendTypes = entity.ParseDelimitedChannels(r.FormValue("disabledSendTypes"))
+
+			tEntity.Propagate()
+		case "trace":
+			for _, v := range tRenderData.Entities {
+				sendChannels := r.FormValue("sendChannels")
+				receiveChannels := r.FormValue("receiveChannels")
+
+				if len(sendChannels) != 0 && v.Entity.ReceiveIntersectsWith(entity.ParseDelimitedChannels(sendChannels)) {
+					v.Highlighted = true
+				}
+
+				if len(receiveChannels) != 0 && v.Entity.SendIntersectsWith(entity.ParseDelimitedChannels(receiveChannels)) {
+					v.Highlighted = true
+				}
+			}
+		}
+	}
+
+	err = temp.Execute(w, tRenderData)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
