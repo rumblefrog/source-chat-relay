@@ -43,5 +43,9 @@ Port = 3306
 Protocol = "tcp"
 
 [UI]
+# The UI has NO authentication
+# If the UI is exposed to the public, any individual can edit your settings
 Enabled = false
+
+# The port to run the UI web server on
 Port = 8080
