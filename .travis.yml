@@ -53,7 +53,7 @@ script:
     - cd $TRAVIS_BUILD_DIR
 
     - go get -u ./server
-    - packr2
+    - cd server && packr2 && cd $TRAVIS_BUILD_DIR
 
     - go build -ldflags "-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/scr-linux-amd64/relay_server/server ./server
     - export GOARCH=arm && export GOARM=7 && go build -ldflags "-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER  -extldflags '-static'" -o build/scr-arm-v7/relay_server/server ./server
