@@ -412,7 +412,20 @@ public void OnConfigsExecuted()
 	delete tFile;
 
 	if (!SocketIsConnected(g_hSocket))
+	{
 		ConnectRelay();
+
+		// Stop, the map start event will emit on authentication
+		return;
+	}
+	
+	// If socket is already connected, emit map start
+
+	char sMap[64];
+
+	GetCurrentMap(sMap, sizeof sMap);
+
+	EventMessage("Map Start", sMap).Dispatch();
 }
 
 void ConnectRelay()
@@ -528,6 +541,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 
 			PrintToServer("Source Chat Relay: Successfully authenticated");
 
+			// If socket wasn't connected prior, do time check see if we are close to map start
 			if (GetGameTime() <= 20.0)
 			{
 				char sMap[64];
