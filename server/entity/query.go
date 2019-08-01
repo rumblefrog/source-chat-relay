@@ -113,6 +113,13 @@ func (entity *Entity) CreateEntity() (sql.Result, error) {
 	)
 }
 
+func (entity *Entity) Delete() (sql.Result, error) {
+	return database.Connection.Exec(
+		"DELETE FROM `relay_entities` WHERE `id` = ?",
+		entity.ID,
+	)
+}
+
 // Upgrading from v1 schema
 func upgradeSchema() {
 	// Ignore errors, if they fail, it doesn't exist or already does
