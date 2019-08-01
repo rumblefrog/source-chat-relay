@@ -80,7 +80,7 @@ func channelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 	} else if err != nil {
 		logrus.WithField("error", err).Warn("Unable to fetch entity")
 
-		ctx.Reply("Unable to fetch entity", err.Error())
+		ctx.Reply("Unable to fetch entity")
 
 		return
 	} else if channel != "" {
