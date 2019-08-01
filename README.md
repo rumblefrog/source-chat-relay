@@ -36,7 +36,7 @@
     </a>
 </p>
 
-<img src="assets/preview.gif">
+<img src="assets/preview_2.gif">
 
 Communicate between Discord & In-Game, monitor server without being in-game, control the flow of messages and user base engagement!
 
