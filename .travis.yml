@@ -14,6 +14,11 @@ node_js:
 matrix:
     fast_finish: true
 
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $HOME/gopath/pkg/mod
+
 addons:
     apt_packages:
       - lib32stdc++6
