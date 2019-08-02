@@ -36,6 +36,13 @@ func channelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 	)
 
 	id := ctx.Args.Get(1)
+
+	if len(id) == 0 {
+		ctx.Reply("Missing ID")
+
+		return
+	}
+
 	channel := strings.TrimSpace(ctx.Args.After(2))
 
 	pid, ok := ParseChannel(id)
@@ -55,7 +62,7 @@ func channelCommand(ctx *exrouter.Context, cmdType ChannelCmdType) {
 
 	tEntity, err := entity.GetEntity(id)
 
-	if err == sql.ErrNoRows && channel != "" {
+	if err == sql.ErrNoRows && len(channel) != 0 {
 		tEntity = &entity.Entity{
 			ID:        id,
 			CreatedAt: time.Now(),

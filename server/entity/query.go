@@ -113,7 +113,7 @@ func (entity *Entity) CreateEntity() (sql.Result, error) {
 	)
 }
 
-func (entity *Entity) Delete() (sql.Result, error) {
+func (entity *Entity) QDelete() (sql.Result, error) {
 	return database.Connection.Exec(
 		"DELETE FROM `relay_entities` WHERE `id` = ?",
 		entity.ID,

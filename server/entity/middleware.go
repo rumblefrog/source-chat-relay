@@ -12,6 +12,18 @@ func (entity *Entity) Insert() error {
 	return nil
 }
 
+func (entity *Entity) Delete() error {
+	_, err := entity.QDelete()
+
+	if err != nil {
+		return err
+	}
+
+	delete(Cache, entity.ID)
+
+	return nil
+}
+
 func (entity *Entity) SetReceiveChannels(channels []int) error {
 	entity.ReceiveChannels = channels
 
