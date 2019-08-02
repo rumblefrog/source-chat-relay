@@ -129,7 +129,7 @@ methodmap BaseMessage < ByteBuffer
 			return;
 
 		// Len required
-		// If len is not included, \0 terminator will not be included
+		// If len is not included, it will stop at the first \0 terminator
 		SocketSend(g_hSocket, sDump, iLen);
 	}
 }
