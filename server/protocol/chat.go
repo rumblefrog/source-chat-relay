@@ -97,11 +97,11 @@ func (m *ChatMessage) Embed() *discordgo.MessageEmbed {
 		Description: m.Message,
 		Timestamp:   time.Now().Format(time.RFC3339),
 		Author: &discordgo.MessageEmbedAuthor{
-			Name: fmt.Sprintf("%s (%s)", m.Username, m.ID),
+			Name: m.Username,
 			URL:  m.IDType.FormatURL(m.ID),
 		},
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: m.BaseMessage.EntityName,
+			Text: fmt.Sprintf("%s | %s", m.BaseMessage.EntityName, m.ID),
 		},
 	}
 }
