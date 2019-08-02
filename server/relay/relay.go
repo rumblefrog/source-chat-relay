@@ -21,6 +21,7 @@ type Relay struct {
 	Bot        chan protocol.Deliverable
 	Listener   net.Listener
 	Statistics RelayStats
+	Closed     bool
 }
 
 type RelayClient struct {
@@ -66,6 +67,10 @@ func (r *Relay) Listen(port int) error {
 
 func (r *Relay) StartRouting() {
 	for {
+		if r.Closed {
+			return
+		}
+
 		select {
 		case message := <-r.Router:
 			if filter.IsInFilter(message.Content()) {
@@ -103,7 +108,12 @@ func (r *Relay) ProcessConnections() {
 		conn, err := r.Listener.Accept()
 
 		if err != nil {
+			if r.Closed {
+				return
+			}
+
 			logrus.WithField("error", err).Warn("Unable to accept connection")
+
 			return
 		}
 
