@@ -106,6 +106,32 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 			tEntity.DisabledSendTypes = entity.ParseDelimitedChannels(r.FormValue("disabledSendTypes"))
 
 			tEntity.Propagate()
+		case "delete":
+			tEntity, err := entity.GetEntity(r.FormValue("id"))
+
+			if err != nil {
+				break
+			}
+
+			index := -1
+
+			for i, v := range tRenderData.Entities {
+				if v.Entity.ID == tEntity.ID {
+					index = i
+				}
+			}
+
+			if index == -1 {
+				break
+			}
+
+			tRenderData.Entities[index] = tRenderData.Entities[len(tRenderData.Entities)-1]
+
+			tRenderData.Entities = tRenderData.Entities[:len(tRenderData.Entities)-1]
+
+			tEntity.Delete()
+
+			delete(entity.Cache, tEntity.ID)
 		case "trace":
 			for _, v := range tRenderData.Entities {
 				sendChannels := r.FormValue("sendChannels")

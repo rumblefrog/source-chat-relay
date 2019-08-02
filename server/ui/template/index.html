@@ -68,7 +68,7 @@
                         <input name="id" type="hidden" value="{{ $value.Entity.ID }}">
 
                         <div>
-                            <label class="block mb-3">{{ $value.Entity.DisplayName }}</label>
+                            <span class="block mb-3">{{ $value.Entity.DisplayName }}</span>
                         </div>
 
                         <div>
@@ -91,8 +91,11 @@
                             <input name="disabledSendTypes" type="text" value="{{ humanizeChannelString $value.Entity.DisabledSendTypes }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         </div>
 
-                        <div>
-                            <button name="btn" type="submit" value="update" class="w-full bg-green-500 hover:bg-green-700 rounded py-2 px-4 text-white mt-4">Save</button>
+                        <div class="flex">
+                            <button name="btn" type="submit" value="update" class="w-full rounded-r-none bg-green-500 hover:bg-green-700 rounded py-2 px-4 text-white mt-4">Save</button>
+                            <button name="btn" type="submit" value="delete" class="bg-red-700 rounded rounded-l-none py-2 px-4 text-white mt-4">
+                                <svg class="fill-current w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M6 2l2-2h4l2 2h4v2H2V2h4zM3 6h14l-1 14H4L3 6zm5 2v10h1V8H8zm3 0v10h1V8h-1z"/></svg>
+                            </button>
                         </div>
                     </form>
                     {{ end }}
