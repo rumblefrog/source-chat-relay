@@ -43,6 +43,9 @@ install:
     - wget https://www.doctormckay.com/download/scripting/include/morecolors.inc -P addons/sourcemod/scripting/include/
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
     - go get -u github.com/gobuffalo/packr/v2/packr2
+    - wget https://github.com/upx/upx/releases/download/v3.95/upx-3.95-amd64_linux.tar.xz
+    - tar -xf upx-3.95-amd64_linux.tar.xz
+    - mv upx-3.95-amd64_linux/upx $TRAVIS_BUILD_DIR/upx
 
 before_script:
     - chmod +x addons/sourcemod/scripting/spcomp
@@ -60,9 +63,9 @@ script:
     - go get -u ./server
     - cd server && packr2 && cd $TRAVIS_BUILD_DIR
 
-    - go build -ldflags "-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/scr-linux-amd64/relay_server/server ./server
-    - export GOARCH=arm && export GOARM=7 && go build -ldflags "-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER  -extldflags '-static'" -o build/scr-arm-v7/relay_server/server ./server
-    - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -ldflags "-X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER  -extldflags '-static'" -o build/scr-windows-amd64/relay_server/server.exe ./server
+    - go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/scr-linux-amd64/relay_server/server ./server
+    - export GOARCH=arm && export GOARM=7 && go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER  -extldflags '-static'" -o build/scr-arm-v7/relay_server/server ./server
+    - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER  -extldflags '-static'" -o build/scr-windows-amd64/relay_server/server.exe ./server
     
     - cd addons/sourcemod/scripting/
     - ./spcomp Source-Chat-Relay -o $TRAVIS_BUILD_DIR/build/game_server/addons/sourcemod/plugins/Source-Chat-Relay.smx
@@ -78,6 +81,10 @@ script:
     - cp -R build/game_server build/scr-windows-amd64/
 
 before_deploy:
+    - ./upx --brute build/scr-linux-amd64/relay_server/server
+    - ./upx --brute build/scr-arm-v7/relay_server/server
+    - ./upx --brute build/scr-windows-amd64/relay_server/server.exe
+
     - cd $TRAVIS_BUILD_DIR/build/scr-linux-amd64/ && tar -czf $TRAVIS_BUILD_DIR/scr-linux-amd64-$SCRVER.tar.gz *
     - cd $TRAVIS_BUILD_DIR/build/scr-arm-v7/ && tar -czf $TRAVIS_BUILD_DIR/scr-arm-v7-$SCRVER.tar.gz *
     - cd $TRAVIS_BUILD_DIR/build/scr-windows-amd64/ && 7zr a $TRAVIS_BUILD_DIR/scr-windows-amd64-$SCRVER.7z *
