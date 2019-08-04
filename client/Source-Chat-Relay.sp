@@ -9,6 +9,9 @@
 
 #define PLUGIN_AUTHOR "Fishy"
 
+#define MAX_EVENT_NAME_LENGTH 128
+#define MAX_COMMAND_LENGTH 512
+
 #pragma newdecls required
 
 char g_sHostname[64];
@@ -30,6 +33,8 @@ ConVar g_cFlag;
 Handle g_hSocket;
 Handle g_hMessageSendForward;
 Handle g_hMessageReceiveForward;
+Handle g_hEventSendForward;
+Handle g_hEventReceiveForward;
 
 enum MessageType
 {
@@ -345,21 +350,35 @@ public void OnPluginStart()
 	SocketSetOption(g_hSocket, DebugMode, 1);
 	#endif
 
-	// ClientIndex, EntityName, ClientID, ClientName, Message
+	// ClientIndex, ClientName, Message
 	g_hMessageSendForward = CreateGlobalForward(
 		"SCR_OnMessageSend",
 		ET_Event,
 		Param_Cell,
 		Param_String,
-		Param_String,
-		Param_String,
 		Param_String);
 
-	// EntityName, ClientName, Message
+	// EntityName, IDType, ID, ClientName, Message
 	g_hMessageReceiveForward = CreateGlobalForward(
 		"SCR_OnMessageReceive",
 		ET_Event,
 		Param_String,
+		Param_Cell,
+		Param_String,
+		Param_String,
+		Param_String);
+
+	// sEvent, sData
+	g_hEventSendForward = CreateGlobalForward(
+		"SCR_OnEventSend",
+		ET_Event,
+		Param_String,
+		Param_String);
+
+	// sEvent, sData
+	g_hEventReceiveForward = CreateGlobalForward(
+		"SCR_OnEventReceive",
+		ET_Event,
 		Param_String,
 		Param_String);
 }
@@ -487,7 +506,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 
 			Action aResult;
 
-			char sEntity[64], sName[MAX_NAME_LENGTH], sMessage[64];
+			char sEntity[64], sID[64], sName[MAX_NAME_LENGTH], sMessage[MAX_COMMAND_LENGTH];
 
 			m.GetEntityName(sEntity, sizeof sEntity);
 			m.GetUsername(sName, sizeof sName);
@@ -500,8 +519,10 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 
 			Call_StartForward(g_hMessageReceiveForward);
 			Call_PushString(sEntity);
-			Call_PushString(sName);
-			Call_PushString(sMessage);
+			Call_PushCell(m.IDType);
+			Call_PushString(sID);
+			Call_PushStringEx(sName, sizeof sName, SM_PARAM_STRING_UTF8 | SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+			Call_PushStringEx(sMessage, sizeof sMessage, SM_PARAM_STRING_UTF8 | SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
 			Call_Finish(aResult);
 
 			if (aResult >= Plugin_Handled)
@@ -516,7 +537,9 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 		{
 			EventMessage m = view_as<EventMessage>(base);
 
-			char sEvent[64], sData[64];
+			Action aResult;
+
+			char sEvent[MAX_EVENT_NAME_LENGTH], sData[MAX_COMMAND_LENGTH];
 
 			m.GetEvent(sEvent, sizeof sEvent);
 			m.GetData(sData, sizeof sData);
@@ -525,8 +548,14 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			StripCharsByBytes(sEvent, sizeof sEvent);
 			StripCharsByBytes(sData, sizeof sData);
 
-			PrintToChatAll("%T", "EventMessage", LANG_SERVER, sEvent, sData);
+			Call_StartForward(g_hEventReceiveForward);
+			Call_PushStringEx(sEvent, sizeof sEvent, SM_PARAM_STRING_UTF8 | SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+			Call_PushStringEx(sData, sizeof sData, SM_PARAM_STRING_UTF8 | SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+			Call_Finish(aResult);
 
+			if (aResult >= Plugin_Handled)
+				return;
+			
 			if (IsSource2009())
 				CPrintToChatAll("{gold}[%s]{white}: {grey}%s", sEvent, sData);
 			else
@@ -605,7 +634,7 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 		if (StrContains(sArgs, g_sPrefix) != 0)
 			return;
 		
-		char sBuffer[MAX_MESSAGE_LENGTH];
+		char sBuffer[MAX_COMMAND_LENGTH];
 		
 		for (int i = strlen(g_sPrefix); i < strlen(sArgs); i++)
 			Format(sBuffer, sizeof sBuffer, "%s%c", sBuffer, sArgs[i]);
@@ -616,27 +645,25 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
 
 void DispatchMessage(int iClient, const char[] sMessage)
 {
-	char sEntity[64], sID[64], sName[MAX_NAME_LENGTH];
+	char sID[64], sName[MAX_NAME_LENGTH], tMessage[MAX_COMMAND_LENGTH];
 
 	Action aResult;
 
-	strcopy(sEntity, sizeof sEntity, g_sHostname);
+	strcopy(tMessage, MAX_COMMAND_LENGTH, sMessage);
 
 	GetClientAuthId(iClient, AuthId_SteamID64, sID, sizeof sID);
 	GetClientName(iClient, sName, sizeof sName);
 
 	Call_StartForward(g_hMessageSendForward);
 	Call_PushCell(iClient);
-	Call_PushString(sEntity);
-	Call_PushString(sID);
-	Call_PushString(sName);
-	Call_PushString(sMessage);
+	Call_PushStringEx(sName, MAX_NAME_LENGTH, SM_PARAM_STRING_UTF8 | SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+	Call_PushStringEx(tMessage, MAX_COMMAND_LENGTH, SM_PARAM_STRING_UTF8 | SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
 	Call_Finish(aResult);
 
 	if (aResult >= Plugin_Handled)
 		return;
 
-	ChatMessage(IdentificationSteam, sID, sName, sMessage).Dispatch();
+	ChatMessage(IdentificationSteam, sID, sName, tMessage).Dispatch();
 }
 
 public int Native_SendMessage(Handle plugin, int numParams)
@@ -664,12 +691,21 @@ public int Native_SendEvent(Handle plugin, int numParams)
 		return ThrowNativeError(SP_ERROR_NATIVE, "Insufficient parameters");
 	}
 
+	Action aResult;
 
-	char sEvent[128], sData[512];
+	char sEvent[MAX_EVENT_NAME_LENGTH], sData[MAX_COMMAND_LENGTH];
 
 	GetNativeString(1, sEvent, sizeof sEvent);
 
 	FormatNativeString(0, 2, 3, sizeof sData, _, sData);
+
+	Call_StartForward(g_hEventSendForward);
+	Call_PushStringEx(sEvent, sizeof sEvent, SM_PARAM_STRING_UTF8 | SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+	Call_PushStringEx(sData, sizeof sData, SM_PARAM_STRING_UTF8 | SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+	Call_Finish(aResult);
+
+	if (aResult >= Plugin_Handled)
+		return 0;
 
 	EventMessage(sEvent, sData).Dispatch();
 
