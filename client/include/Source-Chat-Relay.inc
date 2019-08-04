@@ -77,6 +77,7 @@ native void SCR_SendEvent(const char[] sEvent, const char[] sData, any ...);
 public __pl_Source_Chat_Relay_SetNTVOptional()
 {
 	MarkNativeAsOptional("SCR_SendMessage");
+	MarkNativeAsOptional("SCR_SendEvent");
 }
 #endif
 
