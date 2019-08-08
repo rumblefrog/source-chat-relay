@@ -5,6 +5,7 @@
 ## Getting Started
 
 * [Setup](getting-started/setup.md)
+* [UI](getting-started/ui.md)
 * [Bot-Commands](getting-started/bot-commands.md)
 * [Recommended-Hosts](getting-started/recommended-hosts.md)
 

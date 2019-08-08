@@ -36,11 +36,9 @@ This is the part that everyone gets confused on, so please follow it carefully.
 
 Before actually connecting everything, you should familarize yourself with how the system actually works.
 
-Imagine TV **channels**, you can broadcast on a channel and you can receive on a channel, this system works in a similar fashion.
+The concept is similar to TV **channels**, you can broadcast on a channel and you can view/receive on a channel, with the only difference is that you can may view/receive on multiple channels at once.
 
-Entities are bidirectional \(both direction send/receive\), meaning they have both a **send** and **receive** property to them which you could configure
-
-There are two forms of entities for now: game server and Discord text channel
+Entities are bidirectional \(both direction send/receive\), meaning they are both capable of broadcasting and view/receiving.
 
 ### Connecting
 

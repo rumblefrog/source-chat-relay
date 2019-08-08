@@ -1,0 +1,22 @@
+---
+description: User Interface
+---
+
+# UI
+
+## Enabling UI
+
+You may enable the UI by setting `Enabled = true` within the UI section of your `config.toml`
+
+{% hint style="warning" %}
+The interface has no authentication; if left exposed, any user may change your settings.
+{% endhint %}
+
+## Trace Tool
+
+The trace tool is there to debug routing, which can be tedious and overwhelming for large amount of servers.
+
+To use the tool, simply enter comma delimited channels into either the receiving or the sending field and click Trace.
+
+For each of the receiving channel, it will try to find corresponding servers that has that on send channels and highlight it; for each of the sending channel, it will find corresponding servers that has that on receive channels and highlight it.
+

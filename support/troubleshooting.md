@@ -12,3 +12,5 @@ Ensure that the relay server is running and the Discord bot is online
 
 If else, ensure that you have corrected port forwarded if necessary and that your firewall rules has been configured to allow the traffic
 
+A good way to test remote connectivity is using netcat utility available on Linux
+
