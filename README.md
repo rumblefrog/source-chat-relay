@@ -11,7 +11,7 @@
 - [Prerequisites](#prerequisites)
 - [Getting started](#getting-started)
 - [Alliedmods Thread](#alliedmods-thread)
-- [Credits](#credits)
+- [Natives](#natives)
 - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -44,12 +44,12 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
 
 ## Features
  - Receive and send messages bidrectionally
- - Channel configuration for powerful setups
+ - Channel and type configuration for powerful setups
  - Setup is incrediblily easy with Discord bot commands and simple config files
  - Upon disconnect, game servers will attempt to reconnect at a fixed interval
  - Filter out certain unwanted messages using regex expressions
  - Set ingame prefixes to send a message with ability to configure flag permission for the prefix
- - Native to expand upon the functionality of the plugin
+ - Natives to expand upon the functionality of the plugin (Custom events, team chat only relays, etc)
 
 ## Prerequisites
  - Server to host the relay binary on (with MySQL if not external)
@@ -57,17 +57,16 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
  - A Discord bot token (https://discordapp.com/developers/applications/)
 
 ## Getting started
- - [Setup](https://rumblefrog.gitbook.io/source-chat-relay/getting-started/setup)
+ - [Setup Guide](https://rumblefrog.gitbook.io/source-chat-relay/getting-started/setup)
+
+ > For additional support, feel free to leave a reply on the Alliedmods Thread
 
 ## Alliedmods Thread
  - [Thread](https://forums.alliedmods.net/showthread.php?t=311079)
 
-## Native
+## Natives
 
-A simple message dispatcher native is available within `client/include/`
-
-## Credits
- - Ron for being a human linter
+Message dispatchers and forwards are available within `client/include/`
 
 ## License
 
