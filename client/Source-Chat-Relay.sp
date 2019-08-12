@@ -747,22 +747,28 @@ stock void StripCharsByBytes(char[] sBuffer, int iSize, int iMaxBytes = 3)
 
 	int i = 0;
 	int j = 0;
+	int iBSize = 0;
 
 	while (i < iSize)
 	{
 		iBytes = IsCharMB(sBuffer[i]);
 
+		if (iBytes == 0)
+			iBSize = 1;
+		else
+			iBSize = iBytes;
+
 		if (iBytes <= iMaxBytes)
 		{
-			sClone[j] = sBuffer[i];
+			for (int k = 0; k < iBSize; k++)
+			{
+				sClone[j] = sBuffer[i + k];
 
-			j++;
+				j++;
+			}
 		}
 
-		if (iBytes == 0)
-			i++;
-		else
-			i += iBytes;
+		i += iBSize;
 	}
 
 	Format(sBuffer, iSize, "%s", sClone);
