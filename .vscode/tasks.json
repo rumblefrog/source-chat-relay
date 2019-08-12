@@ -13,17 +13,29 @@
 
             "windows":{
                  "command": "F:\\Sourcemod-Workplace\\spcomp.exe",
+                 "args": [
+                    "${file}",
+                    "-E",
+                    "-O2",
+                    "-v2",
+                    "-iF:\\Sourcemod-Workplace\\include",
+                    "-i${workspaceFolder}\\include",
+                    "-o${workspaceFolder}\\${fileBasenameNoExtension}.smx"
+                ],
             },
 
-            "args": [
-                "${file}",
-                "-E",
-                "-O2",
-                "-v2",
-                "-iF:\\Sourcemod-Workplace\\include",
-                "-i${workspaceFolder}\\client\\include",
-                "-o${workspaceFolder}\\client\\${fileBasenameNoExtension}.smx"
-            ],
+            "linux": {
+                  "command": "/home/fishy/Github/Sourcemod-Workplace/spcomp64",
+                  "args": [
+                    "${file}",
+                    "-E",
+                    "-O2",
+                    "-v2",
+                    "-i/home/fishy/Github/Sourcemod-Workplace/include",
+                    "-i${workspaceFolder}/include",
+                    "-o${workspaceFolder}/${fileBasenameNoExtension}.smx"
+                ],
+            },
 
             "group": {
                 "kind": "build",

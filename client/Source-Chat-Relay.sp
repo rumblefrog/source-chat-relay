@@ -25,10 +25,15 @@ int g_iFlag;
 
 bool g_bFlag;
 
+// Core convars
 ConVar g_cHost;
 ConVar g_cPort;
 ConVar g_cPrefix;
 ConVar g_cFlag;
+
+// Event convars
+ConVar g_cPlayerEvent;
+ConVar g_cMapEvent;
 
 Handle g_hSocket;
 Handle g_hMessageSendForward;
@@ -337,10 +342,13 @@ public void OnPluginStart()
 	
 	g_cFlag = CreateConVar("rf_scr_flag", "", "If prefix is enabled, this admin flag is required to send message using the prefix", FCVAR_PROTECTED);
 
+	// Start basic event convars
+	g_cPlayerEvent = CreateConVar("rf_scr_event_player", "0", "Enable player connect/disconnect events", FCVAR_NONE, true, 0.0, true, 1.0);
+	
+	g_cMapEvent = CreateConVar("rf_scr_event_map", "0", "Enable map start/end events", FCVAR_NONE, true, 0.0, true, 1.0);
+	
 	AutoExecConfig(true, "Source-Server-Relay");
 	
-	// eVer = GetEngineVersion();
-
 	g_hSocket = SocketCreate(SOCKET_TCP, OnSocketError);
 
 	SocketSetOption(g_hSocket, SocketReuseAddr, 1);
@@ -439,12 +447,14 @@ public void OnConfigsExecuted()
 	}
 	
 	// If socket is already connected, emit map start
+	if (g_cMapEvent.BoolValue)
+	{
+		char sMap[64];
 
-	char sMap[64];
+		GetCurrentMap(sMap, sizeof sMap);
 
-	GetCurrentMap(sMap, sizeof sMap);
-
-	EventMessage("Map Start", sMap).Dispatch();
+		EventMessage("Map Start", sMap).Dispatch();
+	}
 }
 
 void ConnectRelay()
@@ -571,7 +581,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			PrintToServer("Source Chat Relay: Successfully authenticated");
 
 			// If socket wasn't connected prior, do time check see if we are close to map start
-			if (GetGameTime() <= 20.0)
+			if (GetGameTime() <= 20.0 && g_cMapEvent.BoolValue)
 			{
 				char sMap[64];
 
@@ -591,6 +601,9 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 
 public void OnClientConnected(int iClient)
 {
+	if (!g_cPlayerEvent.BoolValue)
+		return;
+
 	char sName[MAX_NAME_LENGTH];
 
 	GetClientName(iClient, sName, sizeof sName);
@@ -600,6 +613,9 @@ public void OnClientConnected(int iClient)
 
 public void OnClientDisconnect(int iClient)
 {
+	if (!g_cPlayerEvent.BoolValue)
+		return;
+
 	char sName[MAX_NAME_LENGTH];
 
 	GetClientName(iClient, sName, sizeof sName);
@@ -609,6 +625,9 @@ public void OnClientDisconnect(int iClient)
 
 public void OnMapEnd()
 {
+	if (!g_cMapEvent.BoolValue)
+		return;
+
 	char sMap[64];
 
 	GetCurrentMap(sMap, sizeof sMap);
