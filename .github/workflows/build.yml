@@ -17,18 +17,11 @@ jobs:
         version: ${{ matrix.go-version }}
       id: go
 
-    - name: try create dir
-      run: mkdir fishy
-
     - name: Checkout source
       uses: actions/checkout@master
-      with:
-        path: fishy
 
     - name: Install server dependencies
-      working-directory: ${{ go.module-path }}
       run: go get -v -t -d -u ./server
 
     - name: Build server
-      working-directory: ${{ go.module-path }}
       run: go build ./server
