@@ -11,15 +11,20 @@ jobs:
         go-version: [ '1.12' ]
 
     steps:
-    - uses: actions/checkout@master
-    
     - name: Use go ${{ matrix.go-version }}
       uses: actions/setup-go@v1
       with:
         version: ${{ matrix.go-version }}
+      id: go
+
+    - name: Checkout source
+      uses: actions/checkout@master
+      path: ${{ go.module-path }}
 
     - name: Install server dependencies
+      working-directory: ${{ go.module-path }}
       run: go get -v -t -d -u ./server
 
     - name: Build server
+      working-directory: ${{ go.module-path }}
       run: go build ./server
