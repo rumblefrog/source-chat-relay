@@ -19,8 +19,7 @@ jobs:
         version: ${{ matrix.go-version }}
 
     - name: Install server dependencies
-      run: go get -u ./server
+      run: go get -v -t -d -u ./server
 
     - name: Build server
       run: go build ./server
-      
