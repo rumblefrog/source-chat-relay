@@ -22,7 +22,8 @@ jobs:
 
     - name: Checkout source
       uses: actions/checkout@master
-      path: fishy
+      with:
+        path: fishy
 
     - name: Install server dependencies
       working-directory: ${{ go.module-path }}
