@@ -28,6 +28,14 @@ Download the latest release from [releases](https://github.com/rumblefrog/source
 * Configure the `config.toml.example` on the relay server and rename it to `config.toml`
 * Configure `cfg/sourcemod/Source-Chat-Relay.cfg` on the game server
 
+## Inviting the bot
+
+Copy, replace `CLIENT_ID` with the client ID on your Discord bot application and navigate to it in your browser.
+
+```text
+https://discordapp.com/api/oauth2/authorize?client_id=CLIENT_ID&permissions=8&scope=bot
+```
+
 ## Connecting
 
 This is the part that everyone gets confused on, so please follow it carefully.
