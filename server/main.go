@@ -40,7 +40,11 @@ func (p *program) Start(s service.Service) error {
 	entity.Initialize()
 
 	relay.Instance = relay.NewRelay()
-	relay.Instance.Listen(config.Config.General.Port)
+	err := relay.Instance.Listen(config.Config.General.Port)
+
+	if err != nil {
+		logrus.WithField("error", err).Fatal("Unable to start listener")
+	}
 
 	bot.Initialize()
 
