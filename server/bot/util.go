@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"bytes"
 	"regexp"
 
 	"github.com/Necroforger/dgrouter/exrouter"
@@ -55,12 +54,6 @@ func GetMessageGuild(c *exrouter.Context, m *discordgo.Message) (*discordgo.Guil
 	}
 
 	return guild, nil
-}
-
-func CapitalChannelName(c *discordgo.Channel) string {
-	nameBytes := []byte(c.Name)
-
-	return string(bytes.ToUpper(nameBytes[:1])) + string(nameBytes[1:])
 }
 
 func ParseChannel(arg string) (string, bool) {

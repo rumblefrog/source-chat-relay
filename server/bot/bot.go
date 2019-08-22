@@ -1,6 +1,8 @@
 package bot
 
 import (
+	"strings"
+
 	"github.com/Necroforger/dgrouter"
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/sirupsen/logrus"
@@ -60,7 +62,7 @@ func Initialize() {
 				BaseMessage: protocol.BaseMessage{
 					Type:       protocol.MessageChat,
 					SenderID:   m.ChannelID,
-					EntityName: CapitalChannelName(channel),
+					EntityName: strings.Title(channel.Name),
 				},
 				IDType:   protocol.IdentificationDiscord,
 				ID:       m.Author.ID,
