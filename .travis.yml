@@ -60,6 +60,7 @@ script:
     - cp index.html dist/index.html
     - cd $TRAVIS_BUILD_DIR
 
+    - export CGO_ENABLED=0
     - go get -u ./server
     - cd server && packr2 && cd $TRAVIS_BUILD_DIR
 
