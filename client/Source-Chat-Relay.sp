@@ -30,6 +30,7 @@ ConVar g_cHost;
 ConVar g_cPort;
 ConVar g_cPrefix;
 ConVar g_cFlag;
+ConVar g_cHostname;
 
 // Event convars
 ConVar g_cPlayerEvent;
@@ -342,6 +343,8 @@ public void OnPluginStart()
 	
 	g_cFlag = CreateConVar("rf_scr_flag", "", "If prefix is enabled, this admin flag is required to send message using the prefix", FCVAR_PROTECTED);
 
+	g_cHostname = CreateConVar("rf_scr_hostname", "", "The hostname/displayname to send with messages. If left empty, it will use the server's hostname", FCVAR_NONE);
+
 	// Start basic event convars
 	g_cPlayerEvent = CreateConVar("rf_scr_event_player", "0", "Enable player connect/disconnect events", FCVAR_NONE, true, 0.0, true, 1.0);
 	
@@ -393,7 +396,10 @@ public void OnPluginStart()
 
 public void OnConfigsExecuted()
 {
-	GetConVarString(FindConVar("hostname"), g_sHostname, sizeof g_sHostname);
+	g_cHostname.GetString(g_sHostname, sizeof g_sHostname);
+
+	if (strlen(g_sHostname) == 0)
+		GetConVarString(FindConVar("hostname"), g_sHostname, sizeof g_sHostname);
 
 	g_cHost.GetString(g_sHost, sizeof g_sHost);
 	
