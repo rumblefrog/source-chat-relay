@@ -38,7 +38,7 @@ func Initialize() {
 
 	router := exrouter.New()
 
-	session.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
+	session.AddHandler(func(session *discordgo.Session, m *discordgo.MessageCreate) {
 		if m.Author.Bot && !config.Config.Bot.ListenToBots {
 			return
 		}
@@ -58,6 +58,14 @@ func Initialize() {
 				transformed = m.Content
 			}
 
+			displayname := m.Author.Username
+
+			member, err := session.GuildMember(m.GuildID, m.Author.ID)
+
+			if err == nil {
+				displayname = member.Nick
+			}
+
 			message := &protocol.ChatMessage{
 				BaseMessage: protocol.BaseMessage{
 					Type:       protocol.MessageChat,
@@ -66,7 +74,7 @@ func Initialize() {
 				},
 				IDType:   protocol.IdentificationDiscord,
 				ID:       m.Author.ID,
-				Username: m.Author.Username,
+				Username: displayname,
 				Message:  transformed,
 			}
 
