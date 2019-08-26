@@ -9,18 +9,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func init() {
+func ParseFilters() {
 	if !config.Config.General.Filter {
 		return
 	}
 
 	file, err := os.Open("filter.txt")
 
+	defer file.Close()
+
 	if err != nil {
 		logrus.Warn("Unable to open filter file. Skipping.")
-	}
 
-	defer file.Close()
+		return
+	}
 
 	scanner := bufio.NewScanner(file)
 

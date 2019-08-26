@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/kardianos/service"
+	"github.com/rumblefrog/source-chat-relay/server/filter"
 	"github.com/rumblefrog/source-chat-relay/server/relay"
 	"github.com/rumblefrog/source-chat-relay/server/ui"
 	"github.com/sirupsen/logrus"
@@ -36,6 +37,7 @@ func (p *program) Start(s service.Service) error {
 	logrus.Infof("Server is now running on version %s. Press CTRL-C to exit.", config.SCRVER)
 
 	config.ParseConfig()
+	filter.ParseFilters()
 	database.InitializeDatabase()
 	entity.Initialize()
 
