@@ -62,7 +62,7 @@ func Initialize() {
 
 			member, err := session.GuildMember(m.GuildID, m.Author.ID)
 
-			if err == nil {
+			if err == nil && len(member.Nick) != 0 {
 				displayname = member.Nick
 			}
 
