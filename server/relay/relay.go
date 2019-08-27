@@ -74,7 +74,7 @@ func (r *Relay) StartRouting() {
 		select {
 		case message := <-r.Router:
 			if filter.IsInFilter(message.Content()) {
-				return
+				continue
 			}
 
 			// Iterate connected clients
