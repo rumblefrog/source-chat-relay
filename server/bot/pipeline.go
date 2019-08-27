@@ -18,7 +18,9 @@ func Listen() {
 						continue
 					}
 
-					if channel.ID != message.Author() && tEntity.ReceiveIntersectsWith(entity.DeliverableSendChannels(message)) {
+					if channel.ID != message.Author() &&
+						tEntity.CanReceiveType(message.Type()) &&
+						tEntity.ReceiveIntersectsWith(entity.DeliverableSendChannels(message)) {
 						if !config.Config.Bot.SimpleMessage {
 							RelayBot.ChannelMessageSendEmbed(channel.ID, message.Embed())
 						} else {
