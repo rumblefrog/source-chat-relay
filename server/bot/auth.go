@@ -8,7 +8,7 @@ import (
 
 func Auth(fn exrouter.HandlerFunc) exrouter.HandlerFunc {
 	return func(ctx *exrouter.Context) {
-		guild, err := GetMessageGuild(ctx, ctx.Msg)
+		guild, err := MessageGuild(ctx, ctx.Msg)
 
 		if err != nil {
 			logrus.WithField("error", err).Warn()

@@ -9,7 +9,7 @@ import (
 )
 
 func entitiesCommand(ctx *exrouter.Context) {
-	entities := entity.GetEntities()
+	entities := entity.Entities()
 
 	if len(entities) <= 0 {
 		ctx.Reply("No entities found in database")

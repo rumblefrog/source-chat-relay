@@ -69,7 +69,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 
-	entities := entity.GetEntities()
+	entities := entity.Entities()
 
 	tRenderData := renderData{
 		Relay: relay.Instance,

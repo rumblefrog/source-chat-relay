@@ -40,7 +40,7 @@ func GuildMemberPermissions(member *discordgo.Member, guild *discordgo.Guild) (a
 	return
 }
 
-func GetMessageGuild(c *exrouter.Context, m *discordgo.Message) (*discordgo.Guild, error) {
+func MessageGuild(c *exrouter.Context, m *discordgo.Message) (*discordgo.Guild, error) {
 	channel, err := c.Channel(m.ChannelID)
 
 	if err != nil {

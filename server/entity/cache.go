@@ -32,7 +32,7 @@ func GetEntity(id string) (*Entity, error) {
 	return entity, nil
 }
 
-func GetEntities() (entities []*Entity) {
+func Entities() (entities []*Entity) {
 	for _, e := range Cache {
 		entities = append(entities, e)
 	}
