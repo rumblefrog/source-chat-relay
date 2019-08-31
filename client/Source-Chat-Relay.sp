@@ -448,7 +448,7 @@ public void OnConfigsExecuted()
 	{
 		ConnectRelay();
 
-		// Stop, the map start event will emit on authentication
+		// Stop. The map start event will emit on authentication reply packet
 		return;
 	}
 	
@@ -783,7 +783,7 @@ stock void StripCharsByBytes(char[] sBuffer, int iSize, int iMaxBytes = 3)
 static int localIPRanges[] =
 {
 	10	<< 24,				// 10.
-	127	<< 24 | 1		,	// 127.0.0.1
+	127	<< 24 | 1,			// 127.0.0.1
 	127	<< 24 | 16	<< 16,	// 127.16.
 	192	<< 24 | 168	<< 16,	// 192.168.
 };
@@ -922,8 +922,7 @@ stock bool IsSource2009()
 	if(GetEngineVersion() == Engine_CSS || GetEngineVersion() == Engine_HL2DM || GetEngineVersion() == Engine_DODS || GetEngineVersion() == Engine_TF2)
 	{
 		return true;
-	}
-	else
+	} else
 	{
 		return false;
 	}
