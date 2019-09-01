@@ -36,6 +36,8 @@ func ParseFilters() {
 		Filter = append(Filter, regex)
 	}
 
+	logrus.WithField("count", len(Filter)).Info("Compiled regular expressions")
+
 	if err := scanner.Err(); err != nil {
 		logrus.WithField("error", err).Warn("Unable to scan filter file")
 	}
