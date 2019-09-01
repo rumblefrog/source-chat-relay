@@ -19,7 +19,7 @@
                     "-O2",
                     "-v2",
                     "-iF:\\Sourcemod-Workplace\\include",
-                    "-i${workspaceFolder}\\include",
+                    "-i${workspaceFolder}\\client\\include",
                     "-o${workspaceFolder}\\${fileBasenameNoExtension}.smx"
                 ],
             },
@@ -32,7 +32,7 @@
                     "-O2",
                     "-v2",
                     "-i/home/fishy/Github/Sourcemod-Workplace/include",
-                    "-i${workspaceFolder}/include",
+                    "-i${workspaceFolder}/client/include",
                     "-o${workspaceFolder}/${fileBasenameNoExtension}.smx"
                 ],
             },
