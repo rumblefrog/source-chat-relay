@@ -19,8 +19,11 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
         return;
 
     char sVictim[MAX_NAME_LENGTH], sAttacker[MAX_NAME_LENGTH];
-
-    SCR_SendEvent("%s killed %s", sAttacker, sVictim)
+	
+    GetClientName(iVictim, sVictim, sizeof sVictim);
+    GetClientName(iAttacker, sAttacker, sizeof sAttacker);
+	
+    SCR_SendEvent("Kill Feed", "%s killed %s", sAttacker, sVictim)
 }
 
 stock bool Client_IsValid(int client, bool checkConnected=true)
