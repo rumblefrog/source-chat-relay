@@ -899,7 +899,6 @@ stock void LongToIP(int ip, char[] buffer, int size)
 		);
 }
 
-
 stock bool Client_IsValid(int client, bool checkConnected=true)
 {
 	if (client > 4096) {

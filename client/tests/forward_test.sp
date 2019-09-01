@@ -1,3 +1,7 @@
+/**
+ * Forward interception test
+ */
+
 #include <sourcemod>
 #include <Source-Chat-Relay>
 
