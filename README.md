@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="assets/logo/cloud-computing.svg" width="250">
+    <img src="docs/static/logo/cloud-computing.svg" width="250">
 </p>
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -32,12 +32,12 @@
         <img src="https://img.shields.io/github/license/rumblefrog/source-chat-relay.svg?style=for-the-badge">
     </a>
     <a href="https://www.patreon.com/bePatron?u=962681">
-        <img src="assets/become_a_patron_button.png" height="28">
+        <img src="docs/static/become_a_patron_button.png" height="28">
     </a>
 </p>
 
 <p align="center">
-    <img align="center" src="assets/preview_2.gif">
+    <img align="center" src="docs/src/assets/preview_2.gif">
 </p>
 
 Communicate between Discord & In-Game, monitor server without being in-game, control the flow of messages and user base engagement!
