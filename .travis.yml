@@ -82,7 +82,7 @@ script:
     - cp server/config.toml.example build/scr-windows-amd64/relay_server
     - cp -R build/game_server build/scr-windows-amd64/
 
-    - cd docs && yarn && yarn gatsby build && cd $TRAVIS_BUILD_DIR
+    - cd docs && yarn && yarn gatsby build --prefix-paths && cd $TRAVIS_BUILD_DIR
 
 before_deploy:
     - ./upx --brute build/scr-linux-amd64/relay_server/server

@@ -29,6 +29,7 @@ export const Sidebar = React.forwardRef((props, ref) => {
           onChange={handleChange}
         />
         {menus &&
+          // eslint-disable-next-line
           menus.map(menu => {
             if (!menu.route) return <NavGroup key={menu.id} item={menu} />
             if (menu.route === '/')
