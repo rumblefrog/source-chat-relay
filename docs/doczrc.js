@@ -17,6 +17,7 @@ export default {
             menu: [
                 { name: 'Filters', route: 'filters' },
                 { name: 'Tips and Tricks', route: 'tips-and-tricks' },
+                { name: 'Service', route: 'service' },
                 { name: 'Protocol', route: 'protocol' }
             ]
         }

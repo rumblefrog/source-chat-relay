@@ -1,0 +1,51 @@
+---
+name: Service
+route: service
+---
+
+# Service
+
+For ease of use, a service controller has been baked in to integrate with your system
+
+## Installing and starting the service
+
+```sh
+./server -config /path/to/config.toml -service install
+```
+
+```sh
+./server -service start
+```
+
+## Checking service status
+
+```sh
+./server -service status
+```
+
+## Stopping service
+
+```sh
+./server -service stop
+```
+
+## Restarting service
+
+```sh
+./server -service restart
+```
+
+## Uninstalling service
+
+```sh
+./server -service uninstall
+```
+
+## All the possible control via service 
+
+- status
+- start
+- stop
+- restart
+- install
+- uninstall
