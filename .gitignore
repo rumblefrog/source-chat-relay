@@ -44,3 +44,8 @@ node_modules
 server/ui/template/dist/*
 !server/ui/template/dist/.gitkeep
 *-packr.go
+
+# Docs
+.cache/
+.docz
+public
