@@ -1,4 +1,7 @@
 export default {
+    htmlContext: {
+        favicon: 'favicon.ico'
+    },
     menu: [
         'Home',
         {
