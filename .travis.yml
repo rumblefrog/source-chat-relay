@@ -18,6 +18,7 @@ cache:
   directories:
     - $HOME/.cache/go-build
     - $HOME/gopath/pkg/mod
+    - yarn
 
 addons:
     apt_packages:
