@@ -57,7 +57,7 @@ Communicate between Discord & In-Game, monitor server without being in-game, con
  - A Discord bot token (https://discordapp.com/developers/applications/)
 
 ## Getting started
- - [Setup Guide](https://rumblefrog.gitbook.io/source-chat-relay/getting-started/setup)
+ - [Setup Guide](https://rumblefrog.me/source-chat-relay/setup)
 
  > For additional support, feel free to leave a reply on the Alliedmods Thread
 
