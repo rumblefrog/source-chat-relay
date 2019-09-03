@@ -1,6 +1,11 @@
 {
   "name": "source-chat-relay",
   "description": "Communicate between Discord & In-Game, monitor server without being in-game, control the flow of messages and user base engagement!",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/rumblefrog/source-chat-relay.git",
+    "directory": "docs"
+  },
   "dependencies": {
     "docz": "^2.0.0-rc.28",
     "gatsby": "^2.15.2",
