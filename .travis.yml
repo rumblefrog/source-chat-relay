@@ -85,15 +85,20 @@ script:
     - cd docs && yarn && yarn gatsby build --prefix-paths && cd $TRAVIS_BUILD_DIR
 
 before_deploy:
-    - ./upx --brute build/scr-linux-amd64/relay_server/server
-    - ./upx --brute build/scr-arm-v7/relay_server/server
-    - ./upx --brute build/scr-windows-amd64/relay_server/server.exe
+  - >
+    if ! [ "$BEFORE_DEPLOY_RUN" ]; then
+      export BEFORE_DEPLOY_RUN=1;
 
-    - cd $TRAVIS_BUILD_DIR/build/scr-linux-amd64/ && tar -czf $TRAVIS_BUILD_DIR/scr-linux-amd64-$SCRVER.tar.gz *
-    - cd $TRAVIS_BUILD_DIR/build/scr-arm-v7/ && tar -czf $TRAVIS_BUILD_DIR/scr-arm-v7-$SCRVER.tar.gz *
-    - cd $TRAVIS_BUILD_DIR/build/scr-windows-amd64/ && 7zr a $TRAVIS_BUILD_DIR/scr-windows-amd64-$SCRVER.7z *
+      ./upx --brute build/scr-linux-amd64/relay_server/server
+      ./upx --brute build/scr-arm-v7/relay_server/server
+      ./upx --brute build/scr-windows-amd64/relay_server/server.exe
 
-    - cd $TRAVIS_BUILD_DIR
+      cd $TRAVIS_BUILD_DIR/build/scr-linux-amd64/ && tar -czf $TRAVIS_BUILD_DIR/scr-linux-amd64-$SCRVER.tar.gz *
+      cd $TRAVIS_BUILD_DIR/build/scr-arm-v7/ && tar -czf $TRAVIS_BUILD_DIR/scr-arm-v7-$SCRVER.tar.gz *
+      cd $TRAVIS_BUILD_DIR/build/scr-windows-amd64/ && 7zr a $TRAVIS_BUILD_DIR/scr-windows-amd64-$SCRVER.7z *
+
+      cd $TRAVIS_BUILD_DIR
+    fi
 
 deploy:
     - provider: releases
