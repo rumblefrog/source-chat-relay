@@ -24,7 +24,8 @@ func Listen() {
 						if !config.Config.Bot.SimpleMessage {
 							RelayBot.ChannelMessageSendEmbed(channel.ID, message.Embed())
 						} else {
-							RelayBot.ChannelMessageSend(channel.ID, message.Plain())
+							content := TransformMentions(RelayBot, channel.ID, message.Plain())
+							RelayBot.ChannelMessageSend(channel.ID, content)
 						}
 					}
 				}
