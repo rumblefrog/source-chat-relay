@@ -49,3 +49,9 @@ Enabled = false
 
 # The port to run the UI web server on
 Port = 8080
+
+[Telemetry]
+# A telemetry service that periodically collects anonymous data
+# These data may include (OS, In/Out Traffic Size, Entity Count)
+# The data are used to assist and direct the direction of development
+Enabled = true
