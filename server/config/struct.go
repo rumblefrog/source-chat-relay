@@ -25,9 +25,14 @@ type UIConfig struct {
 	Port    int  `toml:"Port"`
 }
 
+type TelemetryConfig struct {
+	Enabled bool `toml:"Enabled"`
+}
+
 type Config_t struct {
-	General  GeneralConfig
-	Bot      BotConfig
-	Database DatabaseConfig
-	UI       UIConfig
+	General   GeneralConfig
+	Bot       BotConfig
+	Database  DatabaseConfig
+	UI        UIConfig
+	Telemetry TelemetryConfig
 }
