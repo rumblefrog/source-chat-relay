@@ -612,7 +612,10 @@ public void OnClientConnected(int iClient)
 
 	char sName[MAX_NAME_LENGTH];
 
-	GetClientName(iClient, sName, sizeof sName);
+	if (!GetClientName(iClient, sName, sizeof sName))
+	{
+		return;
+	}
 
 	EventMessage("Player Connected", sName).Dispatch();
 }
@@ -624,7 +627,10 @@ public void OnClientDisconnect(int iClient)
 
 	char sName[MAX_NAME_LENGTH];
 
-	GetClientName(iClient, sName, sizeof sName);
+	if (!GetClientName(iClient, sName, sizeof sName))
+	{
+		return;
+	}
 
 	EventMessage("Player Disconnected", sName).Dispatch();
 }
@@ -676,8 +682,15 @@ void DispatchMessage(int iClient, const char[] sMessage)
 
 	strcopy(tMessage, MAX_COMMAND_LENGTH, sMessage);
 
-	GetClientAuthId(iClient, AuthId_SteamID64, sID, sizeof sID);
-	GetClientName(iClient, sName, sizeof sName);
+	if (!GetClientAuthId(iClient, AuthId_SteamID64, sID, sizeof sID))
+	{
+		return;
+	}
+
+	if (!GetClientName(iClient, sName, sizeof sName))
+	{
+		return;
+	}
 
 	Call_StartForward(g_hMessageSendForward);
 	Call_PushCell(iClient);
