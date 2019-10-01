@@ -1,1 +1,3 @@
 docs/* linguist-vendored
+*.sp linguist-language=SourcePawn
+*.inc linguist-language=SourcePawn
