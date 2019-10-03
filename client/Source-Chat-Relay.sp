@@ -528,7 +528,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			m.GetUsername(sName, sizeof sName);
 			m.GetMessage(sMessage, sizeof sMessage);
 
-			// Strip anything beyond 4 bytes for character as chat can't render it
+			// Strip anything beyond 3 bytes for character as chat can't render it
 			StripCharsByBytes(sEntity, sizeof sEntity);
 			StripCharsByBytes(sName, sizeof sName);
 			StripCharsByBytes(sMessage, sizeof sMessage);
@@ -543,6 +543,14 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 
 			if (aResult >= Plugin_Handled)
 				return;
+
+			#if defined DEBUG
+			PrintToConsoleAll("====== Chat Message Packet =====");
+			PrintToConsoleAll("sEntity: %s", sEntity);
+			PrintToConsoleAll("sName: %s", sName);
+			PrintToConsoleAll("sMessage: %s", sMessage);
+			PrintToConsoleAll("====== Chat Message Packet =====");
+			#endif
 
 			if (IsSource2009())
 				CPrintToChatAll("{gold}[%s] {azure}%s{white}: {grey}%s", sEntity, sName, sMessage);
@@ -560,7 +568,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			m.GetEvent(sEvent, sizeof sEvent);
 			m.GetData(sData, sizeof sData);
 
-			// Strip anything beyond 4 bytes for character as chat can't render it
+			// Strip anything beyond 3 bytes for character as chat can't render it
 			StripCharsByBytes(sEvent, sizeof sEvent);
 			StripCharsByBytes(sData, sizeof sData);
 
