@@ -70,7 +70,13 @@ script:
     - export GOARCH=amd64 && export GOOS=windows && go get -d ./server && go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER  -extldflags '-static'" -o build/scr-windows-amd64/relay_server/server.exe ./server
     
     - cd addons/sourcemod/scripting/
-    - ./spcomp Source-Chat-Relay -o $TRAVIS_BUILD_DIR/build/game_server/addons/sourcemod/plugins/Source-Chat-Relay.smx
+    
+    - ./spcomp Source-Chat-Relay.sp -o $TRAVIS_BUILD_DIR/build/game_server/addons/sourcemod/plugins/Source-Chat-Relay.smx
+
+    - ./spcomp tests/event_test.sp
+    - ./spcomp tests/forward_test.sp
+    - ./spcomp tests/service_test.sp
+
     - cd $TRAVIS_BUILD_DIR
     
     - cp server/config.toml.example build/scr-linux-amd64/relay_server
