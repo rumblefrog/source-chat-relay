@@ -552,7 +552,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			PrintToConsoleAll("====== Chat Message Packet =====");
 			#endif
 
-			if (IsSource2009())
+			if (SupportsHexColor())
 				CPrintToChatAll("{gold}[%s] {azure}%s{white}: {grey}%s", sEntity, sName, sMessage);
 			else
 				CPrintToChatAll("\x10[%s] \x0C%s\x01: \x08%s", sEntity, sName, sMessage);
@@ -580,7 +580,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			if (aResult >= Plugin_Handled)
 				return;
 			
-			if (IsSource2009())
+			if (SupportsHexColor())
 				CPrintToChatAll("{gold}[%s]{white}: {grey}%s", sEvent, sData);
 			else
 				CPrintToChatAll("\x10[%s]\x01: \x08%s", sEvent, sData);
@@ -937,13 +937,15 @@ stock bool Client_IsValid(int client, bool checkConnected=true)
 	return true;
 }
 
-stock bool IsSource2009()
+stock bool SupportsHexColor()
 {
-	if(GetEngineVersion() == Engine_CSS || GetEngineVersion() == Engine_HL2DM || GetEngineVersion() == Engine_DODS || GetEngineVersion() == Engine_TF2)
+	EngineVersion e = GetEngineVersion();
+
+	switch (e)
 	{
-		return true;
-	} else
-	{
-		return false;
+		case Engine_CSS, Engine_HL2DM, Engine_DODS, Engine_TF2, Engine_Insurgency:
+			return true;
+		default:
+			return false;
 	}
-} 
+}
