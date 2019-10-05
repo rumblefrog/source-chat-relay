@@ -97,6 +97,14 @@ func Initialize() {
 	})
 
 	router.Group(func(r *exrouter.Route) {
+		r.Cat("message")
+
+		r.Use(Auth)
+
+		r.On("event", eventCommand).Desc("Send an event message")
+	})
+
+	router.Group(func(r *exrouter.Route) {
 		r.Cat("other")
 
 		r.On("about", aboutCommand).Desc("Version, source, stats information").Alias("info")
