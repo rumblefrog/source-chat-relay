@@ -22,25 +22,26 @@ jobs:
         with:
           go-version: "1.13.x"
 
-      - name: Export Go bin paths
+      - name: Install NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+
+      - name: Export bin paths
         run: |
           export GOPATH=$HOME/go
           export GOBIN=$(go env GOPATH)/bin
           export PATH=$PATH:$GOPATH
           export PATH=$PATH:$GOBIN
+          export PATH=$PATH:$(npm bin -g)
           mkdir -p $GOPATH/pkg
           mkdir -p $GOBIN
           mkdir -p $GOPATH/src/github.com/$GITHUB_REPOSITORY
           mv $(pwd)/* $GOPATH/src/github.com/$GITHUB_REPOSITORY
           cd $GOPATH/src/github.com/$GITHUB_REPOSITORY
 
-      - name: Install NodeJS
-        uses: actions/setup-node@v1
-        with:
-          node-version: "12.x"
-
       - name: Install yarn
-        uses: nuxt/actions-yarn@master
+        run: npm i -g yarn
 
       - name: Install PostCSS CLI
         run: yarn global add postcss-cli
@@ -125,8 +126,11 @@ jobs:
         with:
           node-version: "12.x"
 
+      - name: Export npm bin path
+        run: export PATH=$PATH:$(npm bin -g)
+
       - name: Install yarn
-        uses: nuxt/actions-yarn@master
+        run: npm i -g yarn
 
       - name: Install dependencies
         working-directory: docs
