@@ -62,7 +62,7 @@ jobs:
       - name: Process UI
         working-directory: server/ui/template
         run: |
-          yarn
+          yarn install
           postcss styles.css -o dist/styles.css
           cp index.html dist/index.html
 
@@ -130,15 +130,12 @@ jobs:
       - name: Export npm bin path
         run: export PATH=$PATH:$(npm bin -g)
 
-      - name: Remove cmdtest
-        run: sudo apt remove cmdtest
-
       - name: Install yarn
         run: npm i -g yarn
 
       - name: Install dependencies
         working-directory: docs
-        run: yarn
+        run: yarn install
 
       - name: Build documentation
         working-directory: docs
