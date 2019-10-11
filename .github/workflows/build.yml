@@ -31,6 +31,7 @@ jobs:
         run: |
           export GOPATH=$(go env GOPATH)
           export PATH=$PATH:$(go env GOPATH)/bin
+          export GOBIN=$(go env GOPATH)/bin
 
       - name: Install PostCSS CLI
         run: npm i -g postcss-cli
