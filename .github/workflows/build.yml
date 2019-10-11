@@ -36,8 +36,6 @@ jobs:
           export PATH=$PATH:$GOBIN
           mkdir -p $GOPATH/pkg
           mkdir -p $GOBIN
-          ls -la $GOPATH/bin
-          ls -la $GOBIN
 
       - name: Install PostCSS CLI
         run: npm i -g postcss-cli
@@ -47,6 +45,11 @@ jobs:
 
       - name: Install Packr2
         run: go get -u github.com/gobuffalo/packr/v2/packr2
+
+      - name: Print bin ls
+        run: |
+          ls -la $GOPATH/bin
+          ls -la $GOBIN
 
       - name: Install UPX
         run: |
