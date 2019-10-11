@@ -34,12 +34,6 @@ jobs:
           export PATH=$PATH:$GOPATH
           export PATH=$PATH:$GOBIN
           export PATH=$PATH:$(npm bin -g)
-          npm bin -g
-          mkdir -p $GOPATH/pkg
-          mkdir -p $GOBIN
-          mkdir -p $GOPATH/src/github.com/$GITHUB_REPOSITORY
-          mv $(pwd)/* $GOPATH/src/github.com/$GITHUB_REPOSITORY
-          cd $GOPATH/src/github.com/$GITHUB_REPOSITORY
 
       - name: Install yarn
         run: npm i -g yarn
@@ -60,10 +54,8 @@ jobs:
           mv upx-3.95-amd64_linux/upx $GITHUB_WORKSPACE/upx
       
       - name: Process UI
+        working-directory: server/ui/template
         run: |
-          ls -la
-          cd server/ui/template
-          ls -la
           yarn
           postcss styles.css -o dist/styles.css
           cp index.html dist/index.html
@@ -136,9 +128,9 @@ jobs:
         run: npm i -g yarn
 
       - name: Install dependencies
-        working-directory: $GITHUB_WORKSPACE/docs
+        working-directory: docs
         run: yarn
 
       - name: Build documentation
-        working-directory: $GITHUB_WORKSPACE/docs
+        working-directory: docs
         run: yarn gatsby build --prefix-paths
