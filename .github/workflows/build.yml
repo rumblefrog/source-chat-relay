@@ -26,6 +26,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
+      
+      - name: List directories
+        run: ls -la
 
       - name: Export bin paths
         run: |
