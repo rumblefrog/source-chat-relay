@@ -62,6 +62,8 @@ jobs:
       - name: Process UI
         working-directory: ./server/ui/template
         run: |
+          ls -la
+          yarn
           postcss styles.css -o dist/styles.css
           cp index.html dist/index.html
 
