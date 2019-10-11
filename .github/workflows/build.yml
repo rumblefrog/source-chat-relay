@@ -33,13 +33,10 @@ jobs:
           export GOBIN=$(go env GOPATH)/bin
           export PATH=$PATH:$GOPATH
           export PATH=$PATH:$GOBIN
-          export PATH=$PATH:$(npm bin -g)
+          export PATH="$PATH:$(yarn global bin)"
           npm bin -g
           mkdir -p $GOPATH/pkg
           mkdir -p $GOBIN
-
-      - name: Install yarn
-        run: npm i -g yarn
 
       - name: Install PostCSS CLI
         run: yarn global add postcss-cli
