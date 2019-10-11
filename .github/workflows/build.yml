@@ -6,19 +6,11 @@ jobs:
     name: Build & Deploy
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        go: [ '1.13' ]
-
     steps:
     - name: Checkout source
       uses: actions/checkout@master
 
     - name: Use go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{ matrix.go }}
-      id: go
-
-    - name: Build server
-      run: go build ./server
+      uses: cedrickring/golang-action@1.4.1
+      env:
+        PROJECT_PATH: "./server"
