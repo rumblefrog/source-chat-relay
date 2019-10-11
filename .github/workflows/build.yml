@@ -61,6 +61,7 @@ jobs:
       
       - name: Process UI
         run: |
+          ls -la
           cd server/ui/template
           ls -la
           yarn
