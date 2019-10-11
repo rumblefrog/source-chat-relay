@@ -19,9 +19,11 @@ jobs:
 
       - name: Install Golang
         uses: actions/setup-go@v1
-        run: export PATH=$PATH:$(go env GOPATH)/bin
         with:
           go-version: "1.13.x"
+
+      - name: Export Go bin path
+        run: export PATH=$PATH:$(go env GOPATH)/bin
 
       - name: Install NodeJS
         uses: actions/setup-node@v1
