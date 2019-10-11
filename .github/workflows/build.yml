@@ -21,7 +21,7 @@ jobs:
       id: go
 
     - name: Install server dependencies
-      run: go get -u ./server
+      run: cd && go get -u ./server
 
     - name: Build server
       run: go build ./server
