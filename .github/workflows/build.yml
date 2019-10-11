@@ -44,7 +44,7 @@ jobs:
         run: |
           wget https://github.com/upx/upx/releases/download/v3.95/upx-3.95-amd64_linux.tar.xz
           tar -xf upx-3.95-amd64_linux.tar.xz
-          mv upx-3.95-amd64_linux/upx ${{ GITHUB_WORKSPACE }}/upx
+          mv upx-3.95-amd64_linux/upx $GITHUB_WORKSPACE/upx
       
       - name: Process UI
         working-directory: server/ui/template
