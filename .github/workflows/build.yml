@@ -22,8 +22,10 @@ jobs:
         with:
           go-version: "1.13.x"
 
-      - name: Export Go bin path
-        run: export PATH=$PATH:$(go env GOPATH)/bin
+      - name: Export Go bin paths
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          export GOBIN=$(go env GOPATH)/bin
 
       - name: Install NodeJS
         uses: actions/setup-node@v1
@@ -91,7 +93,7 @@ jobs:
 
       - name: Update version file
         working-directory: client
-        run: envsubst < SCR-Version.inc > SCR-Version.inc.temp && mv client/SCR-Version.inc.temp client/SCR-Version.inc
+        run: envsubst < SCR-Version.inc > SCR-Version.inc.temp && mv SCR-Version.inc.temp client/SCR-Version.inc
 
       - name: Move source to scripting
         run: cp -r client/* addons/sourcemod/scripting/
@@ -120,5 +122,9 @@ jobs:
           echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
           sudo apt-get update && sudo apt-get install yarn -y
 
-      - name: Install PostCSS CLI
-        run: yarn global add postcss-cli
+      - name: Install dependencies
+        working-directory: docs
+        run: yarn
+
+      - name: Build documentation
+        run: yarn gatsby build --prefix-paths
