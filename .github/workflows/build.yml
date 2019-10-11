@@ -32,7 +32,7 @@ jobs:
       - name: Install sourcemod
         run: |
           SMLATEST=`curl -s "https://www.sourcemod.net/smdrop/${{ matrix.sm-version }}/sourcemod-latest-linux"`
-          SMPACKAGE="https://www.sourcemod.net/smdrop/$SMVERSION/$SMLATEST"
+          SMPACKAGE="https://www.sourcemod.net/smdrop/${{ matrix.sm-version }}/$SMLATEST"
           wget $SMPACKAGE
           tar -xzf $(basename "$SMPACKAGE")
 
