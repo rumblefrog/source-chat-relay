@@ -40,7 +40,7 @@ jobs:
           node-version: "12.x"
 
       - name: Install yarn
-        run: npm install -g yarn
+        uses: nuxt/actions-yarn@master
 
       - name: Install PostCSS CLI
         run: yarn global add postcss-cli
@@ -126,7 +126,7 @@ jobs:
           node-version: "12.x"
 
       - name: Install yarn
-        run: npm install -g yarn
+        uses: nuxt/actions-yarn@master
 
       - name: Install dependencies
         working-directory: docs
