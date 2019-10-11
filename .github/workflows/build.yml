@@ -21,4 +21,4 @@ jobs:
       id: go
 
     - name: Build server
-      run: go build server
+      run: go build ./server
