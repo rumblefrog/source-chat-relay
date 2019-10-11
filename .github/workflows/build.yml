@@ -47,13 +47,11 @@ jobs:
           wget https://www.doctormckay.com/download/scripting/include/morecolors.inc -P addons/sourcemod/scripting/include/
 
       - name: Permission adjustment
+        working-directory: addons/sourcemod/scripting/
         run: |
-          chmod +x addons/sourcemod/scripting/spcomp
-
-      - name: Navigate to scripting
-        run: |
-          cd addons/sourcemod/scripting/
+          chmod +x spcomp
 
       - name: Build client
+        working-directory: addons/sourcemod/scripting/
         run: |
           ./spcomp Source-Chat-Relay.sp
