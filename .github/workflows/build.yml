@@ -26,9 +26,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
-      
-      - name: List directories
-        run: ls -la
 
       - name: Export bin paths
         run: |
@@ -65,7 +62,6 @@ jobs:
       - name: Process UI
         working-directory: ./server/ui/template
         run: |
-          yarn
           postcss styles.css -o dist/styles.css
           cp index.html dist/index.html
 
