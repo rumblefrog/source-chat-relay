@@ -60,8 +60,8 @@ jobs:
           mv upx-3.95-amd64_linux/upx $GITHUB_WORKSPACE/upx
       
       - name: Process UI
-        working-directory: $HOME/server/ui/template
         run: |
+          cd server/ui/template
           ls -la
           yarn
           postcss styles.css -o dist/styles.css
