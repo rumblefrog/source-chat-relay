@@ -34,6 +34,9 @@ jobs:
           export PATH=$PATH:$GOPATH
           export PATH=$PATH:$GOBIN
           export PATH=$PATH:$(npm bin -g)
+          npm bin -g
+          mkdir -p $GOPATH/pkg
+          mkdir -p $GOBIN
 
       - name: Install yarn
         run: npm i -g yarn
@@ -116,6 +119,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout source
+        uses: actions/checkout@master
+
       - name: Install NodeJS
         uses: actions/setup-node@v1
         with:
