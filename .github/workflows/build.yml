@@ -2,7 +2,7 @@ name: Build & Deploy
 on: [push]
 
 env:
-  SCRVER: $(git describe --always --long --dirty)
+  SCRVER: ${{ github.sha }}
 
 jobs:
   server:
@@ -33,7 +33,7 @@ jobs:
           export GOBIN=$(go env GOPATH)/bin
           export PATH=$PATH:$GOPATH
           export PATH=$PATH:$GOBIN
-          export PATH="$PATH:$(yarn global bin)"
+          export PATH=$PATH:$HOME/.yarn/bin
           npm bin -g
           mkdir -p $GOPATH/pkg
           mkdir -p $GOBIN
