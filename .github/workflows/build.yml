@@ -2,7 +2,7 @@ name: Build & Deploy
 on: [push]
 
 env:
-  SCRVER: ${{ $(git describe --always --long --dirty) }}
+  SCRVER: $(git describe --always --long --dirty)
 
 jobs:
   server:
