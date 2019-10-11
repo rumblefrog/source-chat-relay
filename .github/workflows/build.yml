@@ -18,12 +18,15 @@ jobs:
         uses: actions/checkout@master
 
       - name: Install Golang
-        uses: cedrickring/golang-action@1.4.1
+        uses: actions/setup-go@v1
+        with:
+          go-version: "1.13.x"
+        run: export PATH=$PATH:$(go env GOPATH)/bin
 
       - name: Install NodeJS
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: "12.x"
 
       - name: Install yarn
         run: |
@@ -84,6 +87,10 @@ jobs:
           wget $SMPACKAGE
           tar -xzf $(basename "$SMPACKAGE")
 
+      - name: Update version file
+        working-directory: client
+        run: envsubst < SCR-Version.inc > SCR-Version.inc.temp && mv client/SCR-Version.inc.temp client/SCR-Version.inc
+
       - name: Move source to scripting
         run: cp -r client/* addons/sourcemod/scripting/
 
@@ -96,10 +103,6 @@ jobs:
       - name: Permission adjustment
         working-directory: addons/sourcemod/scripting/
         run: chmod +x spcomp
-
-      - name: Update version file
-        working-directory: addons/sourcemod/scripting/
-        run: envsubst < client/SCR-Version.inc > client/SCR-Version.inc.temp && mv client/SCR-Version.inc.temp client/SCR-Version.inc
 
       - name: Build client
         working-directory: addons/sourcemod/scripting/
