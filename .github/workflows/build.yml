@@ -1,22 +1,70 @@
 name: Build & Deploy
 on: [push]
 
+env:
+  SCRVER: ${{ git describe --always --long --dirty }}
+
 jobs:
   server:
     name: Build Server
     runs-on: ubuntu-latest
 
+    env:
+      GO111MODULE: "on"
+      CGO_ENABLED: 0
+
     steps:
       - name: Checkout source
         uses: actions/checkout@master
 
-      - name: Compile server bin
+      - name: Install Golang
         uses: cedrickring/golang-action@1.4.1
-        env:
-          GO111MODULE: "on"
-          PROJECT_PATH: "./server"
-        with:
-          args: go build
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v1
+          with:
+            node-version: '12.x'
+
+      - name: Install yarn
+      - run: |
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt-get update && sudo apt-get install yarn -y
+
+      - name: Install PostCSS CLI
+        run: yarn global add postcss-cli
+
+      - name: Install Golang Dep
+        run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+
+      - name: Install Packr2
+        run: go get -u github.com/gobuffalo/packr/v2/packr2
+
+      - name: Install UPX
+        run: |
+          wget https://github.com/upx/upx/releases/download/v3.95/upx-3.95-amd64_linux.tar.xz
+          tar -xf upx-3.95-amd64_linux.tar.xz
+          mv upx-3.95-amd64_linux/upx ${{ GITHUB_WORKSPACE }}/upx
+      
+      - name: Process UI
+        working-directory: server/ui/template
+        run: |
+          yarn
+          postcss styles.css -o dist/styles.css
+          cp index.html dist/index.html
+
+      - name: Install server dependencies
+        working-directory: server
+        run: go get -u
+
+      - name: Pack UI files
+        working-directory: server
+        run: packr2
+
+      - name: Build Windows binary
+        working-directory: server
+      - run: go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o server
+
   client:
     name: Build Client
     runs-on: ubuntu-latest
@@ -37,8 +85,7 @@ jobs:
           tar -xzf $(basename "$SMPACKAGE")
 
       - name: Move source to scripting
-        run: |
-          cp -r client/* addons/sourcemod/scripting/
+        run: cp -r client/* addons/sourcemod/scripting/
 
       - name: Fetch plugin dependencies
         run: |
@@ -48,10 +95,25 @@ jobs:
 
       - name: Permission adjustment
         working-directory: addons/sourcemod/scripting/
-        run: |
-          chmod +x spcomp
+        run: chmod +x spcomp
+
+      - name: Update version file
+        working-directory: addons/sourcemod/scripting/
+        run: envsubst < client/SCR-Version.inc > client/SCR-Version.inc.temp && mv client/SCR-Version.inc.temp client/SCR-Version.inc
 
       - name: Build client
         working-directory: addons/sourcemod/scripting/
-        run: |
-          ./spcomp Source-Chat-Relay.sp
+        run: ./spcomp Source-Chat-Relay.sp
+  doc:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install yarn
+      - run: |
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt-get update && sudo apt-get install yarn -y
+
+      - name: Install PostCSS CLI
+        run: yarn global add postcss-cli
