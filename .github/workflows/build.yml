@@ -27,13 +27,12 @@ jobs:
         with:
           node-version: "12.x"
 
-      - name: Export bin paths
+      - name: Export go bin paths
         run: |
           export GOPATH=$HOME/go
           export GOBIN=$(go env GOPATH)/bin
           export PATH=$PATH:$GOPATH
           export PATH=$PATH:$GOBIN
-          export PATH=$PATH:$(npm config get prefix)
           mkdir -p $GOPATH/pkg
           mkdir -p $GOBIN
           mkdir -p $GOPATH/src/github.com/$GITHUB_REPOSITORY
@@ -44,7 +43,7 @@ jobs:
         run: npm i -g yarn
 
       - name: Install PostCSS CLI
-        run: yarn global add postcss-cli
+        run: npm run -g yarn global add postcss-cli
 
       - name: Install Golang Dep
         run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
@@ -61,7 +60,7 @@ jobs:
       - name: Process UI
         working-directory: server/ui/template
         run: |
-          yarn
+          npm run -g yarn
           postcss styles.css -o dist/styles.css
           cp index.html dist/index.html
 
@@ -134,8 +133,8 @@ jobs:
 
       - name: Install dependencies
         working-directory: docs
-        run: yarn
+        run: npm run -g yarn
 
       - name: Build documentation
         working-directory: docs
-        run: yarn gatsby build --prefix-paths
+        run: npm run -g yarn gatsby build --prefix-paths
