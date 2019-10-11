@@ -40,10 +40,7 @@ jobs:
           node-version: "12.x"
 
       - name: Install yarn
-        run: |
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt-get update && sudo apt-get install yarn -y
+        run: npm install -g yarn
 
       - name: Install PostCSS CLI
         run: yarn global add postcss-cli
@@ -123,11 +120,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+
       - name: Install yarn
-        run: |
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt-get update && sudo apt-get install yarn -y
+        run: npm install -g yarn
 
       - name: Install dependencies
         working-directory: docs
