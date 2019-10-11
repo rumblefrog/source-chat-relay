@@ -63,7 +63,7 @@ jobs:
 
       - name: Build Windows binary
         working-directory: server
-      - run: go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o server
+        run: go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o server
 
   client:
     name: Build Client
