@@ -130,6 +130,9 @@ jobs:
       - name: Export npm bin path
         run: export PATH=$PATH:$(npm bin -g)
 
+      - name: Remove cmdtest
+        run: sudo apt remove cmdtest
+
       - name: Install yarn
         run: npm i -g yarn
 
