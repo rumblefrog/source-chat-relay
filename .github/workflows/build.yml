@@ -60,9 +60,9 @@ jobs:
           mv upx-3.95-amd64_linux/upx $GITHUB_WORKSPACE/upx
       
       - name: Process UI
-        working-directory: server/ui/template
+        working-directory: $GITHUB_WORKSPACE/server/ui/template
         run: |
-          yarn install
+          yarn
           postcss styles.css -o dist/styles.css
           cp index.html dist/index.html
 
@@ -134,9 +134,9 @@ jobs:
         run: npm i -g yarn
 
       - name: Install dependencies
-        working-directory: docs
-        run: yarn install
+        working-directory: $GITHUB_WORKSPACE/docs
+        run: yarn
 
       - name: Build documentation
-        working-directory: docs
+        working-directory: $GITHUB_WORKSPACE/docs
         run: yarn gatsby build --prefix-paths
