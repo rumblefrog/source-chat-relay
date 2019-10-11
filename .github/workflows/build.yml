@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Compile server bin
-        uses: cedrickring/golang-action$@1.4.1
+        uses: cedrickring/golang-action@1.4.1
         env:
           GO111MODULE: "on"
           PROJECT_PATH: "./server"
