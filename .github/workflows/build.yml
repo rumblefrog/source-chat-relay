@@ -43,10 +43,13 @@ jobs:
       - name: Install Packr2
         run: go get -u -v github.com/gobuffalo/packr/v2/packr2
 
-      - name: Print bin ls
+      - name: Print ls
         run: |
           echo $GOPATH
           echo $GOBIN
+
+      - name: Print bin ls
+        run: |
           ls -la $GOPATH/bin
           ls -la $GOBIN
 
