@@ -90,10 +90,9 @@ jobs:
 
       - name: Upload plugin artifact
         uses: actions/upload-artifact@master
-        working-directory: addons/sourcemod/scripting/
         with:
           name: Server
-          path: build/
+          path: server/build/
 
   client:
     name: Build Client
@@ -144,10 +143,9 @@ jobs:
 
       - name: Upload plugin artifact
         uses: actions/upload-artifact@master
-        working-directory: addons/sourcemod/scripting/
         with:
           name: Plugin
-          path: build/
+          path: addons/sourcemod/scripting/build/
   doc:
     name: Build Documentation
     runs-on: ubuntu-latest
