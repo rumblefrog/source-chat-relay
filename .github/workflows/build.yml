@@ -89,8 +89,8 @@ jobs:
           go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/windows-server
 
       - name: Upload plugin artifact
-        working-directory: addons/sourcemod/scripting/
         uses: actions/upload-artifact@master
+        working-directory: addons/sourcemod/scripting/
         with:
           name: Server
           path: build/
@@ -143,8 +143,8 @@ jobs:
         run: ./spcomp Source-Chat-Relay.sp -o build/
 
       - name: Upload plugin artifact
-        working-directory: addons/sourcemod/scripting/
         uses: actions/upload-artifact@master
+        working-directory: addons/sourcemod/scripting/
         with:
           name: Plugin
           path: build/
