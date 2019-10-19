@@ -12,6 +12,8 @@ jobs:
     env:
       GO111MODULE: "on"
       CGO_ENABLED: 0
+      GOPATH: ""
+      GOBIN: ""
 
     steps:
       - name: Checkout source
