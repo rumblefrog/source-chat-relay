@@ -139,10 +139,10 @@ jobs:
 
       - name: Build client
         working-directory: addons/sourcemod/scripting/
-        run: ./spcomp Source-Chat-Relay.sp -o build/
+        run: ./spcomp Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
 
       - name: Upload plugin artifact
-        if: matrix.sm-version == "1.10"
+        if: matrix.sm-version == '1.10'
         uses: actions/upload-artifact@master
         with:
           name: Plugin
