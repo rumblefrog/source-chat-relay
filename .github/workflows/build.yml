@@ -36,7 +36,7 @@ jobs:
         run: |
           echo ::set-env name=GOPATH::$(go env GOPATH)
           echo ::set-env name=GOBIN::$(go env GOPATH)/bin
-          echo ::set-env name=PATH::$PATH:$GOBIN
+          echo ::add-path::$GOBIN
           mkdir -p $GOBIN
 
       - name: Install PostCSS CLI
