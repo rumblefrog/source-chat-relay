@@ -88,7 +88,7 @@ jobs:
           export GOOS=windows
           go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/windows-server
 
-      - name: Upload plugin artifact
+      - name: Upload server artifact
         uses: actions/upload-artifact@master
         with:
           name: Server
@@ -142,6 +142,7 @@ jobs:
         run: ./spcomp Source-Chat-Relay.sp -o build/
 
       - name: Upload plugin artifact
+        if: matrix.sm-version == "1.10"
         uses: actions/upload-artifact@master
         with:
           name: Plugin
