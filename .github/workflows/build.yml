@@ -30,8 +30,8 @@ jobs:
       - name: Export bin paths
         run: |
           export GOPATH=$(go env GOPATH)
-          export PATH=$PATH:$(go env GOPATH)/bin
           export GOBIN=$(go env GOPATH)/bin
+          export PATH=$PATH:$GOBIN
           mkdir -p $GOBIN
 
       - name: Install PostCSS CLI
@@ -41,7 +41,9 @@ jobs:
         run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
       - name: Install Packr2
-        run: go get -u -v github.com/gobuffalo/packr/v2/packr2
+        run: |
+          go get -u -v github.com/gobuffalo/packr/v2/packr2
+          ls -la $GOBIN
 
       - name: Print bin ls
         run: |
