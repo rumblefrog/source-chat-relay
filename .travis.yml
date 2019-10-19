@@ -5,6 +5,7 @@ language: go
 env:
   - SMVERSION=1.9
   - SMVERSION=1.10
+  - SMVERSION=1.11
 
 go:
   - "1.12.x"
