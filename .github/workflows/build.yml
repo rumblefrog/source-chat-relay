@@ -19,6 +19,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@master
 
+      - name: Set version env
+        run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
+
       - name: Install Golang
         uses: actions/setup-go@v1
         with:
@@ -31,9 +34,9 @@ jobs:
 
       - name: Export bin paths
         run: |
-          export GOPATH=$(go env GOPATH)
-          export GOBIN=$(go env GOPATH)/bin
-          export PATH=$PATH:$GOBIN
+          echo ::set-env name=GOPATH::$(go env GOPATH)
+          echo ::set-env name=GOBIN::$(go env GOPATH)/bin
+          echo ::set-env name=PATH::$PATH:$GOBIN
           mkdir -p $GOBIN
 
       - name: Install PostCSS CLI
@@ -44,16 +47,6 @@ jobs:
 
       - name: Install Packr2
         run: go get -u -v github.com/gobuffalo/packr/v2/packr2
-
-      - name: Print ls
-        run: |
-          echo $GOPATH
-          echo $GOBIN
-
-      - name: Print bin ls
-        run: |
-          ls -la $GOPATH/bin
-          ls -la $GOBIN
 
       - name: Install UPX
         run: |
@@ -91,6 +84,9 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@master
+
+      - name: Set version env
+        run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
 
       - name: Install sourcemod
         run: |
