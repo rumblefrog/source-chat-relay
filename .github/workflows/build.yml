@@ -79,7 +79,7 @@ jobs:
 
     strategy:
       matrix:
-        sm-version: ["1.9", "1.10"]
+        sm-version: ["1.10", "1.11"]
 
     steps:
       - name: Checkout source
