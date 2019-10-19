@@ -41,12 +41,12 @@ jobs:
         run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
       - name: Install Packr2
-        run: |
-          go get -u -v github.com/gobuffalo/packr/v2/packr2
-          ls -la $GOBIN
+        run: go get -u -v github.com/gobuffalo/packr/v2/packr2
 
       - name: Print bin ls
         run: |
+          echo $GOPATH
+          echo $GOBIN
           ls -la $GOPATH/bin
           ls -la $GOBIN
 
