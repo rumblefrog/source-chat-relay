@@ -12,8 +12,6 @@ jobs:
     env:
       GO111MODULE: "on"
       CGO_ENABLED: 0
-      GOPATH: ""
-      GOBIN: ""
 
     steps:
       - name: Checkout source
@@ -36,8 +34,8 @@ jobs:
         run: |
           echo ::set-env name=GOPATH::$(go env GOPATH)
           echo ::set-env name=GOBIN::$(go env GOPATH)/bin
-          echo ::add-path::$GOBIN
-          mkdir -p $GOBIN
+          echo ::add-path::$(go env GOPATH)/bin
+          mkdir -p $(go env GOPATH)/bin
 
       - name: Install PostCSS CLI
         run: npm i -g postcss-cli
