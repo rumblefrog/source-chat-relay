@@ -67,9 +67,22 @@ jobs:
         working-directory: server
         run: packr2
 
-      - name: Build Windows binary
+      - name: Build Linux binary
         working-directory: server
         run: go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o server
+
+      - name: Build ARMv7 binary
+        working-directory: server
+        run: |
+          export GOARCH=arm
+          export GOARM=7
+          go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o server
+
+      - name: Build Windows binary
+        working-directory: server
+        run: |
+          export GOOS=windows
+          go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o server
 
   client:
     name: Build Client
