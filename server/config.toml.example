@@ -11,6 +11,7 @@ Filter = false
 [Bot]
 # Bot token
 # You may obtain this at https://discordapp.com/developers/applications/
+# Please note that client ID is not the same as bot token
 Token = "Bot Token"
 
 # Instead of an embed sent by the bot
