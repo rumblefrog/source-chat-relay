@@ -8,7 +8,7 @@ env:
   - SMVERSION=1.11
 
 go:
-  - "1.12.x"
+  - "1.13.x"
 
 node_js:
   - "node" # Latest stable
