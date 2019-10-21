@@ -130,8 +130,6 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 			tRenderData.Entities = tRenderData.Entities[:len(tRenderData.Entities)-1]
 
 			tEntity.Delete()
-
-			delete(entity.Cache, tEntity.ID)
 		case "trace":
 			for _, v := range tRenderData.Entities {
 				sendChannels := r.FormValue("sendChannels")
