@@ -20,6 +20,12 @@ export default {
                 { name: 'Service', route: 'service' },
                 { name: 'Protocol', route: 'protocol' }
             ]
+        },
+        {
+            name: 'Support',
+            menu: [
+                { name: 'Troubleshooting', route: 'troubleshooting' },
+            ]
         }
     ],
     themeConfig: {

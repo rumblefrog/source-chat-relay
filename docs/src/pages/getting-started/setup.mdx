@@ -12,6 +12,7 @@ Make sure you have the following before proceeding with the installation
 * A server to host the relay medium on (MySQL required)
 * Source game server with the [socket](https://forums.alliedmods.net/showthread.php?t=67640) extension
 * A Discord bot token ([https://discordapp.com/developers/applications/](https://discordapp.com/developers/applications/))
+    > Please note that client ID and bot token is not the same thing
 
 ## Download
 
@@ -41,19 +42,22 @@ https://discordapp.com/api/oauth2/authorize?client_id=CLIENT_ID&permissions=8&sc
 
 This is the part that everyone gets confused on, so please follow it carefully.
 
-### How the system works \(Prelude\)
+### How the system works (Prelude)
 
 Before actually connecting everything, you should familarize yourself with how the system actually works.
 
 The concept is similar to TV **channels**, you can broadcast on a channel and you can view/receive on a channel, with the only difference is that you can may view/receive on multiple channels at once.
 
-Entities are bidirectional \(both direction send/receive\), meaning they are both capable of broadcasting and view/receiving.
+Entities are bidirectional (both direction send/receive), meaning they are both capable of broadcasting and view/receiving.
 
 ### Connecting
 
-If all goes well and the game server successfully connects to the relay server, you should see an entity from each game server when you run `r/entities` as a command to the Discord bot \(If you don't, see [Troubleshooting](../support/troubleshooting.md)\)
+If all goes well and the game server successfully connects to the relay server, you should see an entity from each game server when you run `r/entities` as a command to the Discord bot (If you don't, see [Troubleshooting](https://rumblefrog.me/source-chat-relay/troubleshooting)
 
 You may now began linking things, copy the entity ID of the game server and use `r/receivechannel` and `r/sendchannel` to configure the receive and send properties
+
+> Note that you cannot use these commands within private message, it must be used within a server
+> Note that you need to have `Link Preview` enabled within your Discord to view the command outputs correctly
 
 Examples:
 
