@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net"
+	"sync"
 
 	"github.com/rumblefrog/source-chat-relay/server/entity"
 	"github.com/rumblefrog/source-chat-relay/server/filter"
@@ -16,6 +17,8 @@ import (
 var Instance *Relay
 
 type Relay struct {
+	clientMu sync.RWMutex
+
 	Clients    map[*RelayClient]bool
 	Router     chan protocol.Deliverable
 	Bot        chan protocol.Deliverable
@@ -76,6 +79,9 @@ func (r *Relay) StartRouting() {
 			if filter.IsInFilter(message.Content()) {
 				continue
 			}
+
+			r.clientMu.Lock()
+			defer r.clientMu.Unlock()
 
 			// Iterate connected clients
 			for client := range r.Clients {
@@ -264,10 +270,16 @@ func (r *Relay) HandlePacket(client *RelayClient, buffer []byte) {
 }
 
 func (r *Relay) AddClient(c *RelayClient) {
+	r.clientMu.Lock()
+	defer r.clientMu.Unlock()
+
 	r.Clients[c] = true
 }
 
 func (r *Relay) RemoveClient(c *RelayClient) {
+	r.clientMu.Lock()
+	defer r.clientMu.Unlock()
+
 	if _, ok := r.Clients[c]; ok {
 		close(c.Data)
 		delete(r.Clients, c)

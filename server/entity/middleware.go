@@ -19,7 +19,10 @@ func (entity *Entity) Delete() error {
 		return err
 	}
 
-	delete(Cache, entity.ID)
+	Cache.Lock()
+	defer Cache.Unlock()
+
+	delete(Cache.Entities, entity.ID)
 
 	return nil
 }

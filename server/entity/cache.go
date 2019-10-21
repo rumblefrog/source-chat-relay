@@ -1,21 +1,37 @@
 package entity
 
-import "github.com/sirupsen/logrus"
+import (
+	"sync"
 
-type EntityCache map[string]*Entity
+	"github.com/sirupsen/logrus"
+)
 
-var Cache EntityCache
+type EntityCache struct {
+	sync.RWMutex
+
+	Entities map[string]*Entity
+}
+
+var Cache *EntityCache
 
 func init() {
-	Cache = make(map[string]*Entity)
+	Cache = &EntityCache{
+		Entities: make(map[string]*Entity),
+	}
 }
 
 func WriteCache(e *Entity) {
-	Cache[e.ID] = e
+	Cache.Lock()
+	defer Cache.Unlock()
+
+	Cache.Entities[e.ID] = e
 }
 
 func GetEntity(id string) (*Entity, error) {
-	val, ok := Cache[id]
+	Cache.RLock()
+	defer Cache.RUnlock()
+
+	val, ok := Cache.Entities[id]
 
 	if ok {
 		return val, nil
@@ -33,7 +49,10 @@ func GetEntity(id string) (*Entity, error) {
 }
 
 func Entities() (entities []*Entity) {
-	for _, e := range Cache {
+	Cache.RLock()
+	defer Cache.RUnlock()
+
+	for _, e := range Cache.Entities {
 		entities = append(entities, e)
 	}
 
