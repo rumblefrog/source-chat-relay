@@ -81,7 +81,6 @@ func (r *Relay) StartRouting() {
 			}
 
 			r.clientMu.Lock()
-			defer r.clientMu.Unlock()
 
 			// Iterate connected clients
 			for client := range r.Clients {
@@ -102,6 +101,8 @@ func (r *Relay) StartRouting() {
 					}
 				}
 			}
+
+			r.clientMu.Unlock()
 
 			// Push to bot channel and it'll iterate Discord channels
 			r.Bot <- message
