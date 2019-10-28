@@ -948,6 +948,4 @@ stock bool SupportsHexColor()
 		default:
 			return false;
 	}
-
-	return false;
 }
