@@ -32,6 +32,10 @@ func ParseBaseMessage(r *packet.PacketReader) (BaseMessage, error) {
 
 	r.SetPos(0)
 
+	if err := r.CanRead(1); err != nil {
+		return m, ErrOutOfBound
+	}
+
 	m.Type = ParseMessageType(r.ReadUint8())
 
 	var ok bool

@@ -35,6 +35,10 @@ func ParseChatMessage(base BaseMessage, r *packet.PacketReader) (*ChatMessage, e
 
 	m.BaseMessage = base
 
+	if err := r.CanRead(1); err != nil {
+		return nil, ErrOutOfBound
+	}
+
 	m.IDType = ParseIdentificationType(r.ReadUint8())
 
 	var ok bool
@@ -87,6 +91,7 @@ func (m *ChatMessage) Plain() string {
 }
 
 func (m *ChatMessage) Embed() *discordgo.MessageEmbed {
+	// TODO: Change coloring as ID may not be numerical in other relay clients
 	idColorBytes := []byte(m.ID)
 
 	// Convert to an int with length of 6

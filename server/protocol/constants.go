@@ -12,6 +12,7 @@ const (
 	MessageAuthenticateResponse
 	MessageChat
 	MessageEvent
+	MessageKV
 	MessageTypeCount
 )
 
