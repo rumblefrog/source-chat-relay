@@ -131,7 +131,7 @@ jobs:
         run: mkdir build
 
       - name: Build client
-        run: spcomp -iincludes client/Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
+        run: spcomp64 -iincludes client/Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
 
       - name: Upload plugin artifact
         if: matrix.sm-version == '1.10'
