@@ -109,37 +109,30 @@ jobs:
       - name: Set version env
         run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
 
-      - name: Install sourcemod
-        run: |
-          SMLATEST=`curl -s "https://www.sourcemod.net/smdrop/${{ matrix.sm-version }}/sourcemod-latest-linux"`
-          SMPACKAGE="https://www.sourcemod.net/smdrop/${{ matrix.sm-version }}/$SMLATEST"
-          wget $SMPACKAGE
-          tar -xzf $(basename "$SMPACKAGE")
+      - name: Setup SourcePawn Compiler
+        uses: rumblefrog/setup-sp@v0.1.0
+        with:
+          version: "1.10.x"
+
+      - name: Create external dependency directory
+        run: mkdir includes
 
       - name: Update version file
         working-directory: client
         run: envsubst < SCR-Version.inc > SCR-Version.inc.temp && mv SCR-Version.inc.temp SCR-Version.inc
 
-      - name: Move source to scripting
-        run: cp -r client/* addons/sourcemod/scripting/
-
       - name: Fetch plugin dependencies
         run: |
-          wget https://raw.githubusercontent.com/nefarius/sm-ext-socket/master/socket.inc -P addons/sourcemod/scripting/include/
-          wget https://raw.githubusercontent.com/rumblefrog/SM-ByteBuffer-Inc/master/bytebuffer.inc -P addons/sourcemod/scripting/include/
-          wget https://www.doctormckay.com/download/scripting/include/morecolors.inc -P addons/sourcemod/scripting/include/
-
-      - name: Permission adjustment
-        working-directory: addons/sourcemod/scripting/
-        run: chmod +x spcomp
+          wget https://raw.githubusercontent.com/nefarius/sm-ext-socket/master/socket.inc -P includes
+          wget https://raw.githubusercontent.com/rumblefrog/SM-ByteBuffer-Inc/master/bytebuffer.inc -P includes
+          wget https://www.doctormckay.com/download/scripting/include/morecolors.inc -P includes
 
       - name: Create build folder
-        working-directory: addons/sourcemod/scripting/
         run: mkdir build
 
       - name: Build client
         working-directory: addons/sourcemod/scripting/
-        run: ./spcomp Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
+        run: spcomp -iincludes Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
 
       - name: Upload plugin artifact
         if: matrix.sm-version == '1.10'
