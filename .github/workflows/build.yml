@@ -110,9 +110,9 @@ jobs:
         run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
 
       - name: Setup SourcePawn Compiler
-        uses: rumblefrog/setup-sp@v0.1.0
+        uses: rumblefrog/setup-sp@v0.1.1
         with:
-          version: "1.10.x"
+          version: ${{ matrix.sm-version }}
 
       - name: Create external dependency directory
         run: mkdir includes
