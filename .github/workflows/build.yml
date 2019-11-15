@@ -130,14 +130,7 @@ jobs:
       - name: Create build folder
         run: mkdir build
 
-      - name: Debug
-        run: |
-          echo $PATH
-          which spcomp
-          ls -lh /opt/hostedtoolcache/sourcepawn/1.10.6454/x64
-
       - name: Build client
-        working-directory: addons/sourcemod/scripting/
         run: spcomp -iincludes client/Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
 
       - name: Upload plugin artifact
@@ -145,7 +138,7 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: Plugin
-          path: addons/sourcemod/scripting/build/
+          path: build/
   doc:
     name: Build Documentation
     runs-on: ubuntu-latest
