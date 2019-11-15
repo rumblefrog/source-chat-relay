@@ -130,11 +130,15 @@ jobs:
       - name: Create build folder
         run: mkdir build
 
-      - name: Build client
-        working-directory: addons/sourcemod/scripting/
+      - name: Debug
         run: |
           echo $PATH
-          spcomp -iincludes Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
+          which spcomp
+          ls -lh /opt/hostedtoolcache/sourcepawn/1.10.6454/x64
+
+      - name: Build client
+        working-directory: addons/sourcemod/scripting/
+        run: spcomp -iincludes Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
 
       - name: Upload plugin artifact
         if: matrix.sm-version == '1.10'
