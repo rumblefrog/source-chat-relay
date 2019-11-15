@@ -119,7 +119,7 @@ jobs:
 
       - name: Update version file
         working-directory: client
-        run: envsubst < SCR-Version.inc > SCR-Version.inc.temp && mv SCR-Version.inc.temp SCR-Version.inc 
+        run: envsubst < SCR-Version.inc > SCR-Version.inc.temp && mv SCR-Version.inc.temp SCR-Version.inc
 
       - name: Fetch plugin dependencies
         run: |
