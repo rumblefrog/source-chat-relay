@@ -131,7 +131,7 @@ jobs:
       - name: Create build folder
         run: mkdir build
 
-      - name: Compile client against SM ${{ steps.cache-boost.outputs.version }}
+      - name: Compile client against SM ${{ steps.setup-sp.outputs.version }}
         run: spcomp64 -iincludes client/Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
 
       - name: Upload plugin artifact
