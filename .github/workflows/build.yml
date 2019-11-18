@@ -110,6 +110,7 @@ jobs:
         run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
 
       - name: Setup SourcePawn Compiler ${{ matrix.sm-version }}
+        id: setup-sp
         uses: rumblefrog/setup-sp@master
         with:
           version: ${{ matrix.sm-version }}
@@ -130,11 +131,11 @@ jobs:
       - name: Create build folder
         run: mkdir build
 
-      - name: Build client
+      - name: Compile client against SM ${{ steps.cache-boost.outputs.version }}
         run: spcomp64 -iincludes client/Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
 
       - name: Upload plugin artifact
-        if: matrix.sm-version == '1.10'
+        if: matrix.sm-version == '1.10.x'
         uses: actions/upload-artifact@master
         with:
           name: Plugin
