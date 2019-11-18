@@ -1,0 +1,168 @@
+name: Build & Deploy
+on: [push]
+
+env:
+  SCRVER: ${{ github.sha }}
+
+jobs:
+  server:
+    name: Build Server
+    runs-on: ubuntu-latest
+
+    env:
+      GO111MODULE: "on"
+      CGO_ENABLED: 0
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@master
+
+      - name: Set version env
+        run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
+
+      - name: Install Golang
+        uses: actions/setup-go@v1
+        with:
+          go-version: "1.13.x"
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+
+      - name: Export bin paths
+        run: |
+          echo ::set-env name=GOPATH::$(go env GOPATH)
+          echo ::set-env name=GOBIN::$(go env GOPATH)/bin
+          echo ::add-path::$(go env GOPATH)/bin
+          mkdir -p $(go env GOPATH)/bin
+
+      - name: Install PostCSS CLI
+        run: npm i -g postcss-cli
+
+      - name: Install Golang Dep
+        run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+
+      - name: Install Packr2
+        run: go get -u -v github.com/gobuffalo/packr/v2/packr2
+
+      - name: Install UPX
+        run: |
+          wget https://github.com/upx/upx/releases/download/v3.95/upx-3.95-amd64_linux.tar.xz
+          tar -xf upx-3.95-amd64_linux.tar.xz
+          mv upx-3.95-amd64_linux/upx $GITHUB_WORKSPACE/upx
+      
+      - name: Process UI
+        working-directory: server/ui/template
+        run: |
+          yarn
+          postcss styles.css -o dist/styles.css
+          cp index.html dist/index.html
+
+      - name: Install server dependencies
+        working-directory: server
+        run: go get -u
+
+      - name: Pack UI files
+        working-directory: server
+        run: packr2
+
+      - name: Create build folder
+        working-directory: server
+        run: mkdir build
+
+      - name: Build Linux binary
+        working-directory: server
+        run: go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/linux-server
+
+      - name: Build ARMv7 binary
+        working-directory: server
+        run: |
+          export GOARCH=arm
+          export GOARM=7
+          go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/armv7-server
+
+      - name: Build Windows binary
+        working-directory: server
+        run: |
+          export GOOS=windows
+          go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/windows-server
+
+      - name: Upload server artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: Server
+          path: server/build/
+
+  client:
+    name: Build Client
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        sm-version: ["1.10.x", "1.11.x"]
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@master
+
+      - name: Set version env
+        run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
+
+      - name: Setup SourcePawn Compiler ${{ matrix.sm-version }}
+        id: setup-sp
+        uses: rumblefrog/setup-sp@master
+        with:
+          version: ${{ matrix.sm-version }}
+
+      - name: Create external dependency directory
+        run: mkdir includes
+
+      - name: Update version file
+        working-directory: client
+        run: envsubst < SCR-Version.inc > SCR-Version.inc.temp && mv SCR-Version.inc.temp SCR-Version.inc
+
+      - name: Fetch plugin dependencies
+        run: |
+          wget https://raw.githubusercontent.com/nefarius/sm-ext-socket/master/socket.inc -P includes
+          wget https://raw.githubusercontent.com/rumblefrog/SM-ByteBuffer-Inc/master/bytebuffer.inc -P includes
+          wget https://www.doctormckay.com/download/scripting/include/morecolors.inc -P includes
+
+      - name: Create build folder
+        run: mkdir build
+
+      - name: Compile client against SM ${{ steps.setup-sp.outputs.version }}
+        run: spcomp64 -iincludes client/Source-Chat-Relay.sp -o build/Source-Chat-Relay.smx
+
+      - name: Upload plugin artifact
+        if: matrix.sm-version == '1.10.x'
+        uses: actions/upload-artifact@master
+        with:
+          name: Plugin
+          path: build/
+  doc:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@master
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+
+      - name: Export npm bin path
+        run: export PATH=$PATH:$(npm bin -g)
+
+      - name: Install yarn
+        run: npm i -g yarn
+
+      - name: Install dependencies
+        working-directory: docs
+        run: yarn
+
+      - name: Build documentation
+        working-directory: docs
+        run: yarn gatsby build --prefix-paths
