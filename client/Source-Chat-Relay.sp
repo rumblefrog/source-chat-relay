@@ -19,7 +19,6 @@ char g_sHost[64] = "127.0.0.1";
 char g_sToken[64];
 char g_sPrefix[8];
 
-// Randomly selected port
 int g_iPort = 57452;
 int g_iFlag;
 
@@ -36,11 +35,16 @@ ConVar g_cHostname;
 ConVar g_cPlayerEvent;
 ConVar g_cMapEvent;
 
+// Socket connection handle
 Handle g_hSocket;
+
+// Forward handles
 Handle g_hMessageSendForward;
 Handle g_hMessageReceiveForward;
 Handle g_hEventSendForward;
 Handle g_hEventReceiveForward;
+
+EngineVersion g_evEngine;
 
 enum MessageType
 {
@@ -392,6 +396,8 @@ public void OnPluginStart()
 		ET_Event,
 		Param_String,
 		Param_String);
+
+	g_evEngine = GetEngineVersion();
 }
 
 public void OnConfigsExecuted()
@@ -552,7 +558,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			PrintToConsoleAll("====== Chat Message Packet =====");
 			#endif
 
-			if (SupportsHexColor())
+			if (SupportsHexColor(g_evEngine))
 				CPrintToChatAll("{gold}[%s] {azure}%s{white}: {grey}%s", sEntity, sName, sMessage);
 			else
 				CPrintToChatAll("\x10[%s] \x0C%s\x01: \x08%s", sEntity, sName, sMessage);
@@ -580,7 +586,7 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			if (aResult >= Plugin_Handled)
 				return;
 			
-			if (SupportsHexColor())
+			if (SupportsHexColor(g_evEngine))
 				CPrintToChatAll("{gold}[%s]{white}: {grey}%s", sEvent, sData);
 			else
 				CPrintToChatAll("\x10[%s]\x01: \x08%s", sEvent, sData);
@@ -758,7 +764,7 @@ public int Native_SendEvent(Handle plugin, int numParams)
 	return 0;
 }
 
-stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
+void GenerateRandomChars(char[] buffer, int buffersize, int len)
 {
 	char charset[] = "adefghijstuv6789!@#$%^klmwxyz01bc2345nopqr&+=";
 	
@@ -766,7 +772,7 @@ stock void GenerateRandomChars(char[] buffer, int buffersize, int len)
 		Format(buffer, buffersize, "%s%c", buffer, charset[GetRandomInt(0, sizeof charset)]);
 }
 
-stock void StripCharsByBytes(char[] sBuffer, int iSize, int iMaxBytes = 3)
+void StripCharsByBytes(char[] sBuffer, int iSize, int iMaxBytes = 3)
 {
 	int iBytes;
 
@@ -809,7 +815,7 @@ static int localIPRanges[] =
 	192	<< 24 | 168	<< 16,	// 192.168.
 };
 
-stock int Server_GetIP(bool public_=true)
+int Server_GetIP(bool public_=true)
 {
 	int ip = 0;
 
@@ -850,7 +856,7 @@ stock int Server_GetIP(bool public_=true)
 	return ip;
 }
 
-stock bool Server_GetIPString(char[] buffer, int size, bool public_=true)
+bool Server_GetIPString(char[] buffer, int size, bool public_=true)
 {
 	int ip;
 
@@ -864,7 +870,7 @@ stock bool Server_GetIPString(char[] buffer, int size, bool public_=true)
 	return true;
 }
 
-stock int Server_GetPort()
+int Server_GetPort()
 {
 	static ConVar cvHostport;
 
@@ -881,7 +887,7 @@ stock int Server_GetPort()
 	return port;
 }
 
-stock bool IsIPLocal(int ip)
+bool IsIPLocal(int ip)
 {
 	int range, bits, move;
 	bool matches;
@@ -908,7 +914,7 @@ stock bool IsIPLocal(int ip)
 	return false;
 }
 
-stock void LongToIP(int ip, char[] buffer, int size)
+void LongToIP(int ip, char[] buffer, int size)
 {
 	Format(
 		buffer, size,
@@ -920,7 +926,7 @@ stock void LongToIP(int ip, char[] buffer, int size)
 		);
 }
 
-stock bool Client_IsValid(int client, bool checkConnected=true)
+bool Client_IsValid(int client, bool checkConnected=true)
 {
 	if (client > 4096) {
 		client = EntRefToEntIndex(client);
@@ -937,10 +943,8 @@ stock bool Client_IsValid(int client, bool checkConnected=true)
 	return true;
 }
 
-stock bool SupportsHexColor()
+bool SupportsHexColor(EngineVersion e)
 {
-	EngineVersion e = GetEngineVersion();
-
 	switch (e)
 	{
 		case Engine_CSS, Engine_HL2DM, Engine_DODS, Engine_TF2, Engine_Insurgency:
