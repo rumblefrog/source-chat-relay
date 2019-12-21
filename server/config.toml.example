@@ -50,3 +50,23 @@ Enabled = false
 
 # The port to run the UI web server on
 Port = 8080
+
+[Messages]
+
+# Format for all events if SimpleMessage is enabled
+EventFormatSimple = "%event%: %data%"
+
+# Map start format if SimpleMessage is enabled
+EventFormatSimpleMapStart = "Map Start: %data%"
+
+# Map end format if SimpleMessage is enabled
+EventFormatSimpleMapEnd = "Map Ended: %data%"
+
+# Player connect format if SimpleMessage is enabled
+EventFormatSimplePlayerConnect = "Player Disconnected: %data%"
+
+# Player disconnect format if SimpleMessage is enabled
+EventFormatSimplePlayerDisconnect = "Player Connected: %data%"
+
+# Player chat format if SimpleMessage is enabled
+EventFormatSimplePlayerChat = "%username%: %message%"

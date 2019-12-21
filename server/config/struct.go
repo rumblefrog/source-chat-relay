@@ -25,9 +25,19 @@ type UIConfig struct {
 	Port    int  `toml:"Port"`
 }
 
+type MsgConfig struct {
+	EventFormatSimple                 string `toml:"EventFormatSimple"`
+	EventFormatSimpleMapStart         string `toml:"EventFormatSimpleMapStart"`
+	EventFormatSimpleMapEnd           string `toml:"EventFormatSimpleMapEnd"`
+	EventFormatSimplePlayerConnect    string `toml:"EventFormatSimplePlayerConnect"`
+	EventFormatSimplePlayerDisconnect string `toml:"EventFormatSimplePlayerDisconnect"`
+	EventFormatSimplePlayerChat       string `toml:"EventFormatSimplePlayerChat"`
+}
+
 type Config_t struct {
 	General  GeneralConfig
 	Bot      BotConfig
 	Database DatabaseConfig
 	UI       UIConfig
+	Messages MsgConfig
 }
