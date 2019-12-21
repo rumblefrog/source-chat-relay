@@ -4,9 +4,11 @@ import (
 	"encoding/binary"
 	"fmt"
 	"time"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rumblefrog/source-chat-relay/server/packet"
+	"github.com/rumblefrog/source-chat-relay/server/config"
 )
 
 type IdentificationType uint8
@@ -83,7 +85,7 @@ func (m *ChatMessage) Marshal() []byte {
 }
 
 func (m *ChatMessage) Plain() string {
-	return m.Username + ": " + m.Message
+	return strings.ReplaceAll(strings.ReplaceAll(config.Config.Messages.EventFormatSimplePlayerChat, "%username%", m.Username), "%message%", m.Message)
 }
 
 func (m *ChatMessage) Embed() *discordgo.MessageEmbed {
