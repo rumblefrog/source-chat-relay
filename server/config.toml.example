@@ -63,10 +63,10 @@ EventFormatSimpleMapStart = "Map Start: %data%"
 EventFormatSimpleMapEnd = "Map Ended: %data%"
 
 # Player connect format if SimpleMessage is enabled
-EventFormatSimplePlayerConnect = "Player Disconnected: %data%"
+EventFormatSimplePlayerConnect = "Player Connected: %data%"
 
 # Player disconnect format if SimpleMessage is enabled
-EventFormatSimplePlayerDisconnect = "Player Connected: %data%"
+EventFormatSimplePlayerDisconnect = "Player Disconnected: %data%"
 
 # Player chat format if SimpleMessage is enabled
 EventFormatSimplePlayerChat = "%username%: %message%"
