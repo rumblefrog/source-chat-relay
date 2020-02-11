@@ -61,15 +61,16 @@ func (m *EventMessage) Marshal() []byte {
 
 func (m *EventMessage) Plain() string {
 
-	if m.Event == "Map Start" {
+	switch m.Event {
+	case "Map Start":
 		return strings.ReplaceAll(config.Config.Messages.EventFormatSimpleMapStart, "%data%", m.Data)
-	} else if m.Event == "Map Ended" {
+	case "Map Ended":
 		return strings.ReplaceAll(config.Config.Messages.EventFormatSimpleMapEnd, "%data%", m.Data)
-	} else if m.Event == "Player Connected" {
+	case "Player Connected":
 		return strings.ReplaceAll(config.Config.Messages.EventFormatSimplePlayerConnect, "%data%", m.Data)
-	} else if m.Event == "Player Disconnected" {					
+	case "Player Disconnected":
 		return strings.ReplaceAll(config.Config.Messages.EventFormatSimplePlayerDisconnect, "%data%", m.Data)
-	} else {
+	default:
 		return strings.ReplaceAll(strings.ReplaceAll(config.Config.Messages.EventFormatSimple, "%data%", m.Data), "%event%", m.Event)
 	}
 
