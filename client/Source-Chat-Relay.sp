@@ -947,7 +947,7 @@ bool SupportsHexColor(EngineVersion e)
 {
 	switch (e)
 	{
-		case Engine_CSS, Engine_HL2DM, Engine_DODS, Engine_TF2, Engine_Insurgency:
+		case Engine_CSS, Engine_HL2DM, Engine_DODS, Engine_TF2, Engine_Insurgency, Engine_Unknown:
 			return true;
 		default:
 			return false;
