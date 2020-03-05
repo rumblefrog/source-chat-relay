@@ -10,7 +10,7 @@ go:
   - "1.13.x"
 
 node_js:
-  - "node" # Latest stable
+  - "13"
 
 matrix:
     fast_finish: true
