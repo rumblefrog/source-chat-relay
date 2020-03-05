@@ -9,9 +9,6 @@ env:
 go:
   - "1.13.x"
 
-node_js:
-  - "13"
-
 matrix:
     fast_finish: true
 
@@ -27,6 +24,7 @@ addons:
       - p7zip
 
 before_install:
+    - nvm install 13
     - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
     - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
     - sudo apt-get update && sudo apt-get install yarn -y
