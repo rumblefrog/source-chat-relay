@@ -2,9 +2,11 @@ package protocol
 
 import (
 	"time"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rumblefrog/source-chat-relay/server/packet"
+	"github.com/rumblefrog/source-chat-relay/server/config"
 )
 
 type EventMessage struct {
@@ -58,7 +60,20 @@ func (m *EventMessage) Marshal() []byte {
 }
 
 func (m *EventMessage) Plain() string {
-	return m.Event + ": " + m.Data
+
+	switch m.Event {
+	case "Map Start":
+		return strings.ReplaceAll(config.Config.Messages.EventFormatSimpleMapStart, "%data%", m.Data)
+	case "Map Ended":
+		return strings.ReplaceAll(config.Config.Messages.EventFormatSimpleMapEnd, "%data%", m.Data)
+	case "Player Connected":
+		return strings.ReplaceAll(config.Config.Messages.EventFormatSimplePlayerConnect, "%data%", m.Data)
+	case "Player Disconnected":
+		return strings.ReplaceAll(config.Config.Messages.EventFormatSimplePlayerDisconnect, "%data%", m.Data)
+	default:
+		return strings.ReplaceAll(strings.ReplaceAll(config.Config.Messages.EventFormatSimple, "%data%", m.Data), "%event%", m.Event)
+	}
+
 }
 
 func (m *EventMessage) Embed() *discordgo.MessageEmbed {
