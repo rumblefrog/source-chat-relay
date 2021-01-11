@@ -2,7 +2,10 @@
 
 #include <sourcemod>
 #include <socket>
-#include <morecolors> // Morecolors defines a max buffer as well as bytebuffer but bytebuffer does if defined check
+#tryinclude <morecolors> // Morecolors defines a max buffer as well as bytebuffer but bytebuffer does if defined check
+#if !defined _colors_included
+	#include <multicolors>
+#endif
 #include <bytebuffer>
 
 #pragma semicolon 1
