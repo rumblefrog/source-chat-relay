@@ -1,0 +1,5 @@
+"Metamod Plugin"
+{
+	"alias"		"shim"
+	"file"		"addons/source-chat-relay"
+}

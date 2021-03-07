@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+    "client",
+]
+
+[profile.release]
+lto = true
