@@ -3,9 +3,12 @@
 
 #include <ISmmPlugin.h>
 #include <eiface.h>
+#include <bindings.h>
 
 class Shim : public ISmmPlugin
 {
+    public:
+        Shim();
 	public:
 		bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlength, bool late);
 		bool Unload(char *error, size_t maxlen);
@@ -18,6 +21,8 @@ class Shim : public ISmmPlugin
 		const char *GetDate();
 		const char *GetLicense();
 		const char *GetLogTag();
+    private:
+        Client *m_Client;
 };
 
 extern Shim g_shim;

@@ -7,8 +7,7 @@ proj_c_flags = [
   '-Wall',
   '-Wno-non-virtual-dtor',
   '-Wno-overloaded-virtual',
-  # '-Werror',
-  '-fpermissive',
+  '-Werror',
 ]
 proj_c_flags_opt = [
   '-O3',
@@ -52,10 +51,6 @@ CSGO = {
   'windows': ['x86'],
   'linux': ['x86', 'x64'],
   'mac': ['x64']
-}
-Source2 = {
-  'windows': ['x86', 'x64'],
-  'linux': ['x64'],
 }
 
 PossibleSDKs = {
