@@ -31,7 +31,7 @@ pub extern fn extension_url() -> *const c_char {
 
 #[no_mangle]
 pub extern fn extension_license() -> *const c_char {
-    c_str!("MIT")
+    c_str!("GPL 3.0")
 }
 
 #[no_mangle]

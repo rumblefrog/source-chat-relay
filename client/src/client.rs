@@ -2,12 +2,22 @@ pub struct Client {
 
 }
 
-impl Client {
-    #[no_mangle]
-    pub extern fn new_client() -> *mut Client {
-        let c = Client {};
-        let b = Box::new(c);
+// impl Client {
+//     #[no_mangle]
+//     pub extern fn new_client() -> *mut Client {
+//         let c = Client { test: 5 };
+//         let b = Box::new(c);
 
-        Box::into_raw(b)
-    }
+//         Box::into_raw(b)
+//     }
+// }
+
+#[no_mangle]
+pub extern fn new_client() -> *mut Client {
+    let c = Client {};
+    let b = Box::new(c);
+
+    Box::into_raw(b)
 }
+
+

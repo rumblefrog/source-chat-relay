@@ -2,6 +2,9 @@ proj_name = 'source-chat-relay'
 proj_srcs = [
   'shim.cpp',
   'libc_compat.cpp',
+  'asm/asm.c',
+  'CDetour/detours.cpp',
+  'util/MemoryUtils.cpp',
 ]
 proj_c_flags = [
   '-Wall',
@@ -180,7 +183,7 @@ class MMSConfig(object):
         cxx.cflags += [
           '-fvisibility=hidden',
           '-fvisibility-inlines-hidden',
-          '-std=c++11',
+        #   '-std=c++11',
         ]
       # apple clang <-> llvm clang version correspondence is just a guess as there is no way to figure it out for real
       if (cxx.version >= 'gcc-4.7' or cxx.version >= 'clang-3.0' or cxx.version >= 'apple-clang-5.1'):
@@ -265,8 +268,6 @@ class MMSConfig(object):
         '_LINUX',
       ]
       cxx.linkflags += ['-shared']
-      cxx.linkflags += ['-L', os.path.join(self.client_path)]
-      cxx.linkflags += ['-l:libclient.a']
 
       if cxx.family == 'gcc':
         cxx.linkflags += ['-static-libgcc']
@@ -288,6 +289,9 @@ class MMSConfig(object):
     compiler = context.cxx.clone()
     compiler.cxxincludes += [
       os.path.join(context.currentSourcePath),
+      os.path.join(context.currentSourcePath, 'CDetour'),
+      os.path.join(context.currentSourcePath, 'util'),
+      os.path.join(context.currentSourcePath, 'asm'),
     ]
 
     defines = ['SE_' + PossibleSDKs[i].define + '=' + PossibleSDKs[i].code for i in PossibleSDKs]
@@ -362,9 +366,7 @@ class MMSConfig(object):
     SetArchFlags(compiler, arch, builder.target.platform)
 
     if builder.target.platform == 'linux':
-      if sdk.name == 'episode1':
-        lib_folder = os.path.join(sdk.path, 'linux_sdk')
-      elif sdk.name in ['sdk2013', 'bms']:
+      if sdk.name in ['sdk2013', 'bms']:
         lib_folder = os.path.join(sdk.path, 'lib', 'public', 'linux32')
       elif arch == 'x64':
         lib_folder = os.path.join(sdk.path, 'lib', 'linux64')
@@ -384,14 +386,10 @@ class MMSConfig(object):
       else:
         compiler.postlink += [compiler.Dep(os.path.join(lib_folder, 'tier1_i486.a'))]
 
-      if sdk.name in ['blade', 'insurgency', 'doi', 'csgo', 'dota']:
-        if arch == 'x64':
-          compiler.postlink += [compiler.Dep(os.path.join(lib_folder, 'interfaces.a'))]
-        else:
-          compiler.postlink += [compiler.Dep(os.path.join(lib_folder, 'interfaces_i486.a'))]
-
       if sdk.name == 'bms':
         compiler.postlink += [compiler.Dep(os.path.join(lib_folder, 'mathlib.a'))]
+
+    compiler.postlink += [compiler.Dep(os.path.join(self.client_path, 'libclient.a'))]
 
     binary = self.LibraryBuilder(compiler, name, arch)
 

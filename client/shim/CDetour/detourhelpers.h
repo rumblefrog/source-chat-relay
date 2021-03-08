@@ -8,7 +8,7 @@
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, version 3.0, as published by the
  * Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
@@ -59,7 +59,7 @@ inline void DoGatePatch(unsigned char *target, void *callback)
 
 	target[0] = IA32_JMP_IMM32;
 	*(int32_t *)(&target[1]) = int32_t((unsigned char *)callback - (target + 5));
-	
+
 	SetMemExec(target, 5);
 }
 

@@ -8,7 +8,7 @@
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU General Public License, version 3.0, as published by the
 * Free Software Foundation.
-* 
+*
 * This program is distributed in the hope that it will be useful, but WITHOUT
 * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
@@ -104,18 +104,18 @@ bool CDetour::CreateDetour()
 	 * We want 5 for our detour jmp, but it could require more.
 	 */
 	detour_restore.bytes = copy_bytes((unsigned char *)detour_address, NULL, OP_JMP_SIZE);
-	
+
 	/* First, save restore bits */
 	memcpy(detour_restore.patch, (unsigned char *)detour_address, detour_restore.bytes);
-	
+
 	/* Patch old bytes in */
 	codegen.alloc(detour_restore.bytes);
 	copy_bytes((unsigned char *)detour_address, codegen.GetData(), detour_restore.bytes);
-	
+
 	/* Return to the original function */
 	jitoffs_t call = IA32_Jump_Imm32(&codegen, 0);
 	IA32_Write_Jump32_Abs(&codegen, call, (unsigned char *)detour_address + detour_restore.bytes);
-	
+
 	codegen.SetRE();
 
 	*trampoline = codegen.GetData();
