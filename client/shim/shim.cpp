@@ -29,9 +29,9 @@ DETOUR_DECL_STATIC4(BroadcastVoiceData, void, IClient *, client, int, bytes, cha
 
 	// xuid isn't populated pre-CS:GO/Protobuf, so get the SteamID from the client instead.
     #ifdef _WIN32
-        uint64_t steamId = *(uint64_t *)((uintptr_t)client + 85);
+        uint64_t steamId = *(uint64_t *)((uintptr_t)client + 92);
     #else
-        uint64_t steamId = *(uint64_t *)((uintptr_t)client + 89);
+        uint64_t steamId = *(uint64_t *)((uintptr_t)client + 96);
     #endif
 
     g_shim.BroadcastVoiceData_Callback(steamId, bytes, data, false);
@@ -139,11 +139,37 @@ bool Shim::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool lat
 
 void Shim::BroadcastVoiceData_Callback(uint64_t steamId, int bytes, const char *data, bool forceSteamVoice)
 {
-    META_LOG(g_PLAPI, "Shim called");
+    if (!data || bytes <= 0) {
+        return;
+    }
+
+#if 0
+	// This is useful for dumping voice data for debugging.
+	static int packet = 0;
+    char filename[64];
+	sprintf(filename, "voice_%lld_%02d.bin", steamId, packet++);
+	FILE *file = fopen(filename, "wb");
+	fwrite(data, bytes, 1, file);
+	fclose(file);
+#endif
+
+    receive_audio(this->m_Client, steamId, bytes, data, forceSteamVoice);
 }
 
 bool Shim::Unload(char *error, size_t maxlen)
 {
+    if (this->m_VoiceDetour)
+    {
+        this->m_VoiceDetour->Destroy();
+        this->m_VoiceDetour = NULL;
+    }
+
+    if (this->m_Client)
+    {
+        free_client(this->m_Client);
+        this->m_Client = NULL;
+    }
+
 	return true;
 }
 
