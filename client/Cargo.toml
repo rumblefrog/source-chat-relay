@@ -14,6 +14,7 @@ crate-type = ["staticlib"]
 crc = "1"
 thiserror = "1"
 byteorder = "1"
+magnum-opus = "0.3"
 
 [build-dependencies]
 cbindgen = "0.18"

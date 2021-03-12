@@ -143,7 +143,7 @@ void Shim::BroadcastVoiceData_Callback(uint64_t steamId, int bytes, const char *
         return;
     }
 
-#if 0
+#if 1
 	// This is useful for dumping voice data for debugging.
 	static int packet = 0;
     char filename[64];
