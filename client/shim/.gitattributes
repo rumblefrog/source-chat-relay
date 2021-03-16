@@ -1,0 +1,4 @@
+asm/* linguist-vendored
+CDetour/* linguist-vendored
+util/* linguist-vendored
+sourcehook_hookmangen.h lingust-vendored

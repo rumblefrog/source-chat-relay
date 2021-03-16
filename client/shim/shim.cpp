@@ -18,7 +18,7 @@ DETOUR_DECL_STATIC4(BroadcastVoiceData, void, IClient *, client, int, bytes, cha
 
 	DETOUR_STATIC_CALL(BroadcastVoiceData)(client, bytes, data, xuid);
 
-#if 0
+#if 1
 	// This is useful for getting the correct m_SteamID offset.
 	char filename[64];
 	sprintf(filename, "voice_%p_client.bin", client);

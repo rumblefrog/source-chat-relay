@@ -67,37 +67,37 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    opus_decoder_ctl(decoder, OPUS_SET_BITRATE(32000));
-    opus_decoder_ctl(decoder, OPUS_SET_SIGNAL(0xBB9));
-    opus_decoder_ctl(decoder, OPUS_SET_DTX(1));
+    // opus_decoder_ctl(decoder, OPUS_SET_BITRATE(32000));
+    // opus_decoder_ctl(decoder, OPUS_SET_SIGNAL(0xBB9));
+    // opus_decoder_ctl(decoder, OPUS_SET_DTX(1));
 
-    opus_int16 out[1024 * 10];
+    opus_int16 out[480 * 1 * sizeof(opus_int16)];
 
-    int frame_size = opus_decode(decoder, hexData, 652, out, 1024 * 4, 0);
+    int frame_size = opus_decode(decoder, hexData, 2, out, 480, 0);
 
-    if (frame_size<0)
+    if (frame_size < 0)
     {
         fprintf(stderr, "decoder failed: %s\n", opus_strerror(frame_size));
         return EXIT_FAILURE;
     }
 
-    FILE *fout = fopen("out_decoded", "w");
+    // FILE *fout = fopen("out_decoded", "w");
 
-    if (fout == NULL)
-    {
-        fprintf(stderr, "failed to open output file: %s\n", strerror(errno));
-        return EXIT_FAILURE;
-    }
+    // if (fout == NULL)
+    // {
+    //     fprintf(stderr, "failed to open output file: %s\n", strerror(errno));
+    //     return EXIT_FAILURE;
+    // }
 
-    unsigned char pcm_bytes[6*960*2*2];
+    // unsigned char pcm_bytes[6*960*2*2];
 
-    for(int i=0;i<2*frame_size;i++)
-    {
-        pcm_bytes[2*i]=out[i]&0xFF;
-        pcm_bytes[2*i+1]=(out[i]>>8)&0xFF;
-    }
+    // for(int i=0;i<2*frame_size;i++)
+    // {
+    //     pcm_bytes[2*i]=out[i]&0xFF;
+    //     pcm_bytes[2*i+1]=(out[i]>>8)&0xFF;
+    // }
 
-    fwrite(pcm_bytes, sizeof(short), frame_size * 2, fout);
+    // fwrite(pcm_bytes, sizeof(short), frame_size * 2, fout);
 
     opus_decoder_destroy(decoder);
 }

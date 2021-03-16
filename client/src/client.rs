@@ -43,8 +43,11 @@ impl Client {
 
                     // self.file.write(&pcm_bytes).unwrap();
 
-                    println!("!!!!! Opus {}", d.len());
+                    println!("!!!!! Opus PLC {}", d.len());
                 },
+                Payload::Opus(d) => {
+                    println!("!!!!! Opus {}", d.len());
+                }
                 Payload::Silence(ns) => println!("!!!!! Silence {}", ns),
                 _ => { /* not interested */ }
             }
