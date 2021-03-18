@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package common;
+
+message Header {
+    google.protobuf.Any payload = 1;
+}
+
+message Identity {
+    enum Type {
+        Unknown = 0;
+        Steam = 1;
+        Discord = 2;
+    }
+
+    Type type = 1;
+
+    uint64 id = 2;
+
+    string name = 3;
+}
+
+// Routing specifiers/intentions
+message Intentions {
+    repeated string topics = 1;
+}
+
+message Payload {
+    // Routing intentions
+
+    Identity identity = 1;
+
+    oneof payload {
+        string text = 3;
+
+        bytes voice = 4;
+    }
+}

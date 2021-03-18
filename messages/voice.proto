@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package voice;
+
+message VoicePayload {
+    common.Intentions intentions = 1;
+
+    common.Identifier identifier = 2;
+
+    repeated OpusFrame frames = 3;
+}
+
+message OpusFrame {
+    oneof frame {
+        OpusDataFrame data = 1;
+        OpusSilenceFrame silence = 2;
+    }
+}
+
+message OpusDataFrame {
+    // Frame index to ensure order of decoding.
+    uint64 index = 1;
+
+    bytes data = 2;
+}
+
+message OpusSilenceFrame {
+    // Number of encoded samples in a single sequence.
+    uint64 samples = 1;
+}

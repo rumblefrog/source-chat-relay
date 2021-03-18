@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package relay;
+
+// This should be the first payload.
+// Required to authenticate prior to sending/receiving additional data.
+message AuthenticateRequest {
+    // Secret token.
+    string token = 1;
+
+    // Internal identifier.
+    // Serves as identifier for logging/metrics.
+    string internal_identifier = 2;
+
+    // Origin identifier.
+    // Serves as identifier for text/voice messages,
+    string origin = 3;
+
+    // List of intentions to receive data from.
+    // If a voice connection is established, it will also subscribe to the same intentions.
+    common.Intentions subscribed_intentions = 4;
+}
+
+message AuthenticateResponse {
+    enum Status {
+        Authorized = 1;
+        Unauthorized = 2;
+    }
+
+    Status status = 1;
+
+    // Authorized routing intentions/specifiers.
+    // Each content (text/voice) payload may route differently.
+    common.Intentions authorized_intentions = 2;
+}
+
+message VoiceConnectionRequest {}
+
+message VoiceConnectionResponse {}
+
+message ChatMessage {
+    common.Intentions intentions = 1;
+
+    common.Identity identity = 2;
+
+    string content = 3;
+}
