@@ -1,11 +1,11 @@
-use std::time::{Instant, Duration};
 use std::io::{Cursor, Seek, SeekFrom};
+use std::time::{Duration, Instant};
 
 use byteorder::{LittleEndian, ReadBytesExt};
 
-use samplerate::{Samplerate, ConverterType};
+use samplerate::{ConverterType, Samplerate};
 
-use magnum_opus::{Channels, Decoder, Encoder, Application};
+use magnum_opus::{Application, Channels, Decoder, Encoder};
 
 use crate::Result;
 
@@ -73,7 +73,7 @@ impl Player {
                 let decoded = if current_frame == prev_frame {
                     self.current_frame = current_frame + 1;
 
-                    self.decode_chunk(&data.get_ref()[pos .. pos + &chunk_len])?
+                    self.decode_chunk(&data.get_ref()[pos..pos + &chunk_len])?
                 } else {
                     self.decode_loss((current_frame - prev_frame) as usize)?
                 };
@@ -136,8 +136,7 @@ impl Player {
     fn decode_chunk(&mut self, data: &[u8]) -> Result<Vec<f32>> {
         let mut out = vec![0.0; FRAME_SIZE];
 
-        self.decoder
-            .decode_float(&data, &mut out, false)?;
+        self.decoder.decode_float(&data, &mut out, false)?;
 
         Ok(out)
     }
@@ -151,8 +150,7 @@ impl Player {
         for _ in 0..samples_loss {
             let mut o = vec![0.0; FRAME_SIZE];
 
-            self.decoder
-                .decode_float(&[], &mut o, false)?;
+            self.decoder.decode_float(&[], &mut o, false)?;
 
             out.append(&mut o);
         }

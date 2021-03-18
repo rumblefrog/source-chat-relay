@@ -1,14 +1,14 @@
-use std::sync::Arc;
-use std::collections::HashMap;
 use std::collections::hash_map::Entry;
+use std::collections::HashMap;
+use std::sync::Arc;
 
 use lazy_static::lazy_static;
 
-use tokio::sync::RwLock;
 use tokio::runtime::Runtime;
+use tokio::sync::RwLock;
 
-use crate::player::Player;
 use crate::packet::{Packet, Payload};
+use crate::player::Player;
 use crate::Result;
 
 lazy_static! {
@@ -25,7 +25,6 @@ pub struct Client {
     players: Arc<RwLock<HashMap<u64, Player>>>,
 
     // temp: Vec<u8>,
-
     temp: Arc<RwLock<Vec<u8>>>,
 }
 
@@ -43,7 +42,12 @@ impl Default for Client {
 }
 
 impl Client {
-    pub async fn receive_audio(&mut self, _id: u64, data: &[u8], _force_steam_voice: bool) -> Result<()> {
+    pub async fn receive_audio(
+        &mut self,
+        _id: u64,
+        data: &[u8],
+        _force_steam_voice: bool,
+    ) -> Result<()> {
         let mut packet = Packet::from_bytes(data)?;
 
         let header = packet.header()?;
@@ -66,7 +70,7 @@ impl Client {
                     Ok(mut d) => {
                         println!("ok transcode {}", d.len());
                         temp.append(&mut d);
-                    },
+                    }
                     Err(e) => println!("{:?}", e),
                 }
             }
