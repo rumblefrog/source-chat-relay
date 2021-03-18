@@ -5,6 +5,15 @@ pub enum Error {
     #[error("IO error {0}")]
     IoError(#[from] std::io::Error),
 
+    #[error("Unable to create opus decoder {0}")]
+    Decoder(#[from] magnum_opus::Error),
+
+    #[error("Unable to decode data {0:?}")]
+    Decode(magnum_opus::ErrorCode),
+
+    #[error("Unable to resample audio {0}")]
+    ResampleError(#[from] samplerate::Error),
+
     #[error("Invalid packet CRC32 (expected: {0:x}) (actual: {1:x}")]
     InvalidPacketChecksum(u32, u32),
 
