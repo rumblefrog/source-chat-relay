@@ -21,7 +21,7 @@ pub struct Player {
 
     last_receive: Instant,
 
-    current_sample: u16,
+    current_frame: u16,
 
     resampler: Samplerate,
 }
@@ -36,7 +36,7 @@ impl Player {
             encoder: Encoder::new(48000, Channels::Stereo, Application::Voip)?,
             decoder: Decoder::new(24000, Channels::Mono)?,
             last_receive: Instant::now(),
-            current_sample: 0,
+            current_frame: 0,
             resampler: Samplerate::new(ConverterType::SincFastest, 24000, 48000, 2)?,
         })
     }
@@ -57,25 +57,25 @@ impl Player {
 
             // End of packet sequence
             if chunk_len == -1 {
-                self.current_sample = 0;
+                self.current_frame = 0;
                 break;
             }
 
-            let current_sample = data.read_u16::<LittleEndian>()?;
-            let prev_sample = self.current_sample;
+            let current_frame = data.read_u16::<LittleEndian>()?;
+            let prev_frame = self.current_frame;
 
             let pos = data.position() as usize;
             let chunk_len = chunk_len as usize;
 
             data.seek(SeekFrom::Current(chunk_len as i64))?;
 
-            if current_sample >= prev_sample {
-                let decoded = if current_sample == prev_sample {
-                    self.current_sample = current_sample + 1;
+            if current_frame >= prev_frame {
+                let decoded = if current_frame == prev_frame {
+                    self.current_frame = current_frame + 1;
 
                     self.decode_chunk(&data.get_ref()[pos .. pos + &chunk_len])?
                 } else {
-                    self.decode_loss((current_sample - prev_sample) as usize)?
+                    self.decode_loss((current_frame - prev_frame) as usize)?
                 };
 
                 for decoded_chunk in decoded.chunks(FRAME_SIZE) {
