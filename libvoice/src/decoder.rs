@@ -38,15 +38,16 @@ impl Decoder {
         for frame in frames {
             match frame {
                 Frame::Data(data) => {
+                    let current_frame = data.index;
                     let previous_frame = self.current_frame;
 
-                    if data.index >= previous_frame {
+                    if current_frame >= previous_frame {
                         let mut decoded = if data.index == previous_frame {
                             self.current_frame = data.index + 1;
 
                             self.decode_frame(&data.data).await?
                         } else {
-                            self.decode_loss((self.current_frame - data.index) as usize).await?
+                            self.decode_loss((current_frame - previous_frame) as usize).await?
                         };
 
                         decoded_data.samples.append(&mut decoded);
