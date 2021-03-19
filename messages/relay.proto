@@ -4,46 +4,113 @@ import "common.proto";
 
 package relay;
 
-// This should be the first payload.
-// Required to authenticate prior to sending/receiving additional data.
+message Version {
+    // 1-byte major, 2-bytes minor, 1-byte patch version number.
+    uint32 version = 1;
+
+    // Release name.
+    string release = 2;
+
+    // Client OS name.
+    string os = 3;
+}
+
+// Sent by the client periodically for alive notification.
+// Server will replicate the same timestamp and its own data to the client.
+message Ping {
+    // Client timestamp.
+    uint64 timestamp = 1;
+
+    // Amount of frames lost.
+    uint32 lost_frames = 2;
+}
+
+message ClientIdentifiers {
+    // Internal identifier.
+    // Serves as identifier for logging/metrics/etc.
+    string internal = 1;
+
+    // Display identifier for text/voice messages,
+    string display = 2;
+}
+
+// Authenticate credentials with the server.
 message AuthenticateRequest {
     // Secret token.
     string token = 1;
 
-    // Internal identifier.
-    // Serves as identifier for logging/metrics.
-    string internal_identifier = 2;
-
-    // Origin identifier.
-    // Serves as identifier for text/voice messages,
-    string origin = 3;
-
-    // List of intentions to receive data from.
-    // If a voice connection is established, it will also subscribe to the same intentions.
-    common.Intentions subscribed_intentions = 4;
+    ClientIdentifiers identifiers = 2;
 }
 
 message AuthenticateResponse {
-    enum Status {
-        Authorized = 1;
-        Unauthorized = 2;
+    message Accepted {
+        string welcome_text = 1;
+
+        common.Intentions authorized_intentions = 2;
     }
 
-    Status status = 1;
+    message Rejected {
+        enum RejectType {
+            Unknown = 0;
+            WrongVersion = 1;
+            InvalidCrendetial = 2;
+        }
 
-    // Authorized routing intentions/specifiers.
-    // Each content (text/voice) payload may route differently.
-    common.Intentions authorized_intentions = 2;
+        RejectType type = 1;
+
+        string reason = 2;
+    }
+
+    oneof status {
+        Accepted accepted = 1;
+        Rejected rejected = 2;
+    }
 }
 
-message VoiceConnectionRequest {}
+// Subscribe to certain intentions to receive data from.
+message SubscribeIntentions {
+    common.Intentions intentions = 1;
+}
 
-message VoiceConnectionResponse {}
+// Request list of clients along with their users.
+// Typically used for late established connections.
+message ClientsRequest {}
 
-message ChatMessage {
+message ClientsResponse {
+    message Client {
+        ClientIdentifiers identifiers = 1;
+
+        repeated User users = 2;
+    }
+
+    repeated Client clients = 1;
+}
+
+// Sent by client to server indicating an user joining a "game server" or "Discord voice server".
+// For Discord voice channel, the bot joining a channel with users will produce multiple joins.
+message UserJoin {
+    common.Identity identity = 1;
+}
+
+// Sent by client to server indicating an user leaving a "game server" or "Discord voice server".
+// For Discord voice channel, the bot leaving a channel with users will produce multiple leaves.
+message UserLeave {
+    common.Identity identity = 2;
+}
+
+message TextMessage {
     common.Intentions intentions = 1;
 
     common.Identity identity = 2;
 
     string content = 3;
+}
+
+// Sent by the server upon successfully authenticated.
+message VoiceSession {
+    // Encryption mode.
+    // Right now only chacha20poly1305 is available.
+    string mode = 1;
+
+    bytes secret_key = 2;
 }

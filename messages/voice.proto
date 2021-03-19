@@ -5,6 +5,14 @@ import "common.proto";
 package voice;
 
 message VoicePayload {
+    // 12 bytes randomly generated nonce.
+    bytes nonce = 1;
+
+    // Encrypted bytes of serialized AudioData message.
+    bytes encrypted_data = 2;
+}
+
+message AudioData {
     common.Intentions intentions = 1;
 
     common.Identity identity = 2;
