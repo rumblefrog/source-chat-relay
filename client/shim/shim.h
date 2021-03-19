@@ -10,7 +10,7 @@ class Shim : public ISmmPlugin
 {
     public:
         Shim();
-        void BroadcastVoiceData_Callback(uint64_t steamId, int bytes, const char *data, bool forceSteamVoice);
+        void BroadcastVoiceData_Callback(int bytes, const char *data);
 	public:
 		bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlength, bool late);
 		bool Unload(char *error, size_t maxlen);

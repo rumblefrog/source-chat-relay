@@ -18,23 +18,7 @@ DETOUR_DECL_STATIC4(BroadcastVoiceData, void, IClient *, client, int, bytes, cha
 
 	DETOUR_STATIC_CALL(BroadcastVoiceData)(client, bytes, data, xuid);
 
-#if 0
-	// This is useful for getting the correct m_SteamID offset.
-	char filename[64];
-	sprintf(filename, "voice_%p_client.bin", client);
-	FILE *file = fopen(filename, "wb");
-	fwrite(client, 1024, 1, file);
-	fclose(file);
-#endif
-
-	// xuid isn't populated pre-CS:GO/Protobuf, so get the SteamID from the client instead.
-    #ifdef _WIN32
-        uint64_t steamId = *(uint64_t *)((uintptr_t)client + 92);
-    #else
-        uint64_t steamId = *(uint64_t *)((uintptr_t)client + 96);
-    #endif
-
-    g_shim.BroadcastVoiceData_Callback(steamId, bytes, data, false);
+    g_shim.BroadcastVoiceData_Callback(bytes, data);
 }
 
 #ifdef _WIN32
@@ -59,20 +43,10 @@ DETOUR_DECL_STATIC2(BroadcastVoiceData_Protobuf, void, IClient *, client, CCLCMs
 
 	META_LOG(g_PLAPI, ">>> SV_BroadcastVoiceData(%p, %p)", client, message);
 
-	// TODO: Gamedata this.
-
 	// If this breaks on Linux only, check the libstdc++ ABI in use, see comment in AMBuilder.
 	std::string *voiceData = *(std::string **)((uintptr_t)message + 8);
 
-	// The xuid in the message is helpfully set to the steamid on CS:GO/Protobuf, which makes finding these offsets quite easy.
-	uint64_t steamId = *(uint64_t *)((uintptr_t)message + 12);
-
-	// CS:GO/Protobuf allows individual clients to choose between Steam or Engine voice encoding, so this can differ per-packet.
-	// Note: this is different from our enum, here 0 = steam, 1 = engine (sv_voicecodec).
-	int voiceFormat = *(int *)((uintptr_t)message + 20);
-
-	bool forceSteamVoice = (voiceFormat == 0);
-    g_shim.BroadcastVoiceData_Callback(steamId, voiceData->size(), voiceData->data(), forceSteamVoice);
+    g_shim.BroadcastVoiceData_Callback(voiceData->size(), voiceData->data());
 }
 
 Shim::Shim()
@@ -137,7 +111,7 @@ bool Shim::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool lat
 	return true;
 }
 
-void Shim::BroadcastVoiceData_Callback(uint64_t steamId, int bytes, const char *data, bool forceSteamVoice)
+void Shim::BroadcastVoiceData_Callback(int bytes, const char *data)
 {
     if (!data || bytes <= 0) {
         return;
@@ -153,7 +127,7 @@ void Shim::BroadcastVoiceData_Callback(uint64_t steamId, int bytes, const char *
 	fclose(file);
 #endif
 
-    receive_audio(this->m_Client, steamId, bytes, data, forceSteamVoice);
+    receive_audio(this->m_Client, bytes, data);
 }
 
 bool Shim::Unload(char *error, size_t maxlen)

@@ -44,9 +44,7 @@ impl Default for Client {
 impl Client {
     pub async fn receive_audio(
         &mut self,
-        _id: u64,
         data: &[u8],
-        _force_steam_voice: bool,
     ) -> Result<()> {
         let mut packet = Packet::from_bytes(data)?;
 
@@ -104,10 +102,8 @@ pub extern "C" fn new_client() -> *mut Client {
 #[no_mangle]
 pub unsafe extern "C" fn receive_audio(
     client: *mut Client,
-    id: u64,
     bytes: i32,
     data: *const std::os::raw::c_char,
-    force_steam_voice: bool,
 ) {
     if !client.is_null() {
         let d = std::slice::from_raw_parts(data as *const u8, bytes as usize).to_owned();
@@ -115,7 +111,7 @@ pub unsafe extern "C" fn receive_audio(
         let client = &mut *client;
 
         RUNTIME.spawn(async move {
-            let _ = client.receive_audio(id, &d, force_steam_voice).await;
+            let _ = client.receive_audio(&d).await;
         });
     }
 }
