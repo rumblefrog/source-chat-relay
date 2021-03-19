@@ -22,11 +22,6 @@ message Identity {
     string name = 3;
 }
 
-// An user part of a connected client
-message User {
-    Identity identity = 1;
-}
-
 // Routing specifiers/intentions
 message Intentions {
     repeated string topics = 1;

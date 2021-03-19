@@ -87,15 +87,19 @@ message ClientsResponse {
 }
 
 // Sent by client to server indicating an user joining a "game server" or "Discord voice server".
-// For Discord voice channel, the bot joining a channel with users will produce multiple joins.
+//
+// For Discord voice channel,
+// the bot joining a "Discord voice channel" with users will produce multiple joins.
 message UserJoin {
     common.Identity identity = 1;
 }
 
 // Sent by client to server indicating an user leaving a "game server" or "Discord voice server".
-// For Discord voice channel, the bot leaving a channel with users will produce multiple leaves.
+//
+// For Discord voice channel,
+// the bot leaving a "Discord voice channel" with users will produce multiple leaves.
 message UserLeave {
-    common.Identity identity = 2;
+    common.Identity identity = 1;
 }
 
 message TextMessage {
