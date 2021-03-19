@@ -7,7 +7,7 @@ package voice;
 message VoicePayload {
     common.Intentions intentions = 1;
 
-    common.Identifier identifier = 2;
+    common.Identity identity = 2;
 
     repeated OpusFrame frames = 3;
 }
@@ -21,7 +21,7 @@ message OpusFrame {
 
 message OpusDataFrame {
     // Frame index to ensure order of decoding.
-    uint64 index = 1;
+    uint32 index = 1;
 
     bytes data = 2;
 }
