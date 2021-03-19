@@ -4,6 +4,7 @@ members = [
     "client",
     "server",
     "libvoice",
+    "libmixer",
 ]
 
 [profile.release]

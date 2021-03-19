@@ -228,6 +228,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03b07a082330a35e43f63177cc01689da34fbffa0105e1246cf0311472cac73a"
 
 [[package]]
+name = "libmixer"
+version = "0.1.0"
+
+[[package]]
 name = "libsamplerate-sys"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
