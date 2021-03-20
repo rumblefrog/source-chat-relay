@@ -1,5 +1,6 @@
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
+use std::ffi::CStr;
 use std::sync::Arc;
 
 use lazy_static::lazy_static;
@@ -17,15 +18,13 @@ lazy_static! {
 
 /// Source Chat Relay client.
 ///
-/// This is only constructed from the shim only.
-pub struct Client {
-    /// Represents all players on the server.
-    ///
-    /// It is garbage-collected on silence packet.
-    players: Arc<RwLock<HashMap<u64, Player>>>,
+/// Measures need to be taken to ensure ptr lifetime on the shim.
+pub struct Client(Arc<RwLock<ClientInner>>);
 
-    // temp: Vec<u8>,
-    temp: Arc<RwLock<Vec<u8>>>,
+struct ClientInner {
+    /// Map of players on the server.
+    /// This will be updated upon client join/leave.
+    players: HashMap<u64, Player>,
 }
 
 // By default *mut T is not safe for send.
@@ -34,28 +33,23 @@ unsafe impl Send for Client {}
 
 impl Default for Client {
     fn default() -> Self {
-        Self {
-            players: Arc::new(RwLock::new(HashMap::new())),
-            temp: Arc::new(RwLock::new(Vec::new())),
-        }
+        Self(Arc::new(RwLock::new(ClientInner {
+            players: HashMap::new(),
+        })))
     }
 }
 
 impl Client {
-    pub async fn receive_audio(
-        &mut self,
-        data: &[u8],
-    ) -> Result<()> {
+    pub async fn receive_audio(&mut self, data: &[u8]) -> Result<()> {
         let mut packet = Packet::from_bytes(data)?;
 
         let header = packet.header()?;
 
         let payload = packet.payload()?;
 
-        let mut players = self.players.write().await;
-        let mut temp = self.temp.write().await;
+        let mut inner = self.0.write().await;
 
-        let player = match players.entry(header.steam_id) {
+        let player = match inner.players.entry(header.steam_id) {
             Entry::Occupied(p) => p.into_mut(),
             Entry::Vacant(v) => v.insert(Player::new()?),
         };
@@ -67,7 +61,6 @@ impl Client {
                 match player.transcode(data) {
                     Ok(mut d) => {
                         println!("ok transcode {}", d.len());
-                        temp.append(&mut d);
                     }
                     Err(e) => println!("{:?}", e),
                 }
@@ -75,16 +68,25 @@ impl Client {
             Payload::Silence(ns) => {
                 println!("!!!!! Silence {}", ns);
 
-                players.retain(|_k, p| !p.is_stale());
-
-                println!("========== written {}", temp.len());
-
-                std::fs::write("out.data", &*temp)?;
-                temp.clear();
-
                 // Silence payload should also be sent on the wire.
             }
         }
+
+        Ok(())
+    }
+
+    pub async fn client_put_in_server(&mut self, steamid: u64, name: &str) -> Result<()> {
+        let mut inner = self.0.write().await;
+
+        inner.players.insert(steamid, Player::new()?);
+
+        Ok(())
+    }
+
+    pub async fn client_disconnect(&mut self, steamid: u64) -> Result<()> {
+        let mut inner = self.0.write().await;
+
+        inner.players.remove(&steamid);
 
         Ok(())
     }
@@ -98,7 +100,6 @@ pub extern "C" fn new_client() -> *mut Client {
     Box::into_raw(b)
 }
 
-// TODO: Remove force_steam_voice
 #[no_mangle]
 pub unsafe extern "C" fn receive_audio(
     client: *mut Client,
@@ -112,6 +113,34 @@ pub unsafe extern "C" fn receive_audio(
 
         RUNTIME.spawn(async move {
             let _ = client.receive_audio(&d).await;
+        });
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn client_put_in_server(
+    client: *mut Client,
+    steamid: u64,
+    name: *const std::os::raw::c_char,
+) {
+    if !client.is_null() {
+        let name = CStr::from_ptr(name).to_string_lossy();
+
+        let client = &mut *client;
+
+        RUNTIME.spawn(async move {
+            let _ = client.client_put_in_server(steamid, &name).await;
+        });
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn client_disconnect(client: *mut Client, steamid: u64) {
+    if !client.is_null() {
+        let client = &mut *client;
+
+        RUNTIME.spawn(async move {
+            let _ = client.client_disconnect(steamid).await;
         });
     }
 }

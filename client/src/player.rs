@@ -1,5 +1,4 @@
 use std::io::{Cursor, Seek, SeekFrom};
-use std::time::{Duration, Instant};
 
 use byteorder::{LittleEndian, ReadBytesExt};
 
@@ -19,8 +18,6 @@ pub struct Player {
 
     decoder: Decoder,
 
-    last_receive: Instant,
-
     current_frame: u16,
 
     resampler: Samplerate,
@@ -35,15 +32,9 @@ impl Player {
         Ok(Self {
             encoder: Encoder::new(48000, Channels::Stereo, Application::Voip)?,
             decoder: Decoder::new(24000, Channels::Mono)?,
-            last_receive: Instant::now(),
             current_frame: 0,
             resampler: Samplerate::new(ConverterType::SincFastest, 24000, 48000, 2)?,
         })
-    }
-
-    pub fn is_stale(&self) -> bool {
-        // Considered stale if last received is more than 10 minutes ago
-        self.last_receive.elapsed() > Duration::from_secs(60 * 10)
     }
 
     pub fn transcode(&mut self, data: &[u8]) -> Result<Vec<u8>> {
@@ -81,37 +72,9 @@ impl Player {
                 for decoded_chunk in decoded.chunks(FRAME_SIZE) {
                     let resampled = self.resample(decoded_chunk)?;
 
-                    println!("resampled len {}", resampled.len());
+                    let mut chunk = self.encode_chunk(&resampled)?;
 
-                    let mut pcm = Vec::with_capacity(FRAME_SIZE * 2);
-
-                    for s in resampled {
-                        pcm.push({
-                            let mut s: f32 = s * 32768.0;
-
-                            if s > 32767.0 {
-                                s = 32767.0
-                            } else if s < -32768.0 {
-                                s = -32768.0
-                            }
-
-                            s as i16
-                        });
-                    }
-
-                    println!("pcm len {}", pcm.len());
-
-                    // let mut chunk = self.encode_chunk(&resampled)?;
-
-                    // 480 * 2 * 2
-                    let mut rem = vec![0u8; 3840];
-
-                    for (i, f) in pcm.iter().enumerate() {
-                        rem[2 * i] = *f as u8;
-                        rem[2 * i + 1] = (*f >> 8) as u8;
-                    }
-
-                    out.append(&mut rem);
+                    out.append(&mut chunk);
                 }
             }
         }

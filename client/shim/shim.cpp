@@ -5,7 +5,13 @@
 
 using namespace SourceHook;
 
+SH_DECL_HOOK1_void(IServerGameClients, ClientDisconnect, SH_NOATTRIB, 0, edict_t *);
+SH_DECL_HOOK2_void(IServerGameClients, ClientPutInServer, SH_NOATTRIB, 0, edict_t *, char const *);
+SH_DECL_HOOK2_void(IServerGameClients, ClientCommand, SH_NOATTRIB, 0, edict_t *, const CCommand &);
+
 Shim g_shim;
+IVEngineServer *engine = NULL;
+IServerGameClients *gameclients = NULL;
 
 PLUGIN_EXPOSE(Shim, g_shim);
 
@@ -49,14 +55,16 @@ DETOUR_DECL_STATIC2(BroadcastVoiceData_Protobuf, void, IClient *, client, CCLCMs
     g_shim.BroadcastVoiceData_Callback(voiceData->size(), voiceData->data());
 }
 
-Shim::Shim()
-{
-    m_Client = NULL;
-}
-
 bool Shim::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool late)
 {
 	PLUGIN_SAVEVARS()
+
+    GET_V_IFACE_CURRENT(GetEngineFactory, engine, IVEngineServer, INTERFACEVERSION_VENGINESERVER);
+    GET_V_IFACE_ANY(GetServerFactory, gameclients, IServerGameClients, INTERFACEVERSION_SERVERGAMECLIENTS);
+
+    SH_ADD_HOOK_MEMFUNC(IServerGameClients, ClientDisconnect, gameclients, this, &Shim::ClientDisconnect, true);
+	SH_ADD_HOOK_MEMFUNC(IServerGameClients, ClientPutInServer, gameclients, this, &Shim::ClientPutInServer, true);
+    SH_ADD_HOOK_MEMFUNC(IServerGameClients, ClientCommand, gameclients, this, &Shim::ClientCommand, false);
 
     void *engineFactory = (void *)g_SMAPI->GetEngineFactory(false);
 
@@ -130,8 +138,42 @@ void Shim::BroadcastVoiceData_Callback(int bytes, const char *data)
     receive_audio(this->m_Client, bytes, data);
 }
 
+void Shim::ClientPutInServer(edict_t *pEntity, char const *playername)
+{
+    if (!pEntity || pEntity->IsFree())
+        return;
+
+    const CSteamID *steamid = engine->GetClientSteamID(pEntity);
+
+    if (!steamid)
+        return;
+
+    client_put_in_server(this->m_Client, steamid->ConvertToUint64(), playername);
+}
+
+void Shim::ClientDisconnect(edict_t *pEntity)
+{
+    if (!pEntity || pEntity->IsFree())
+        return;
+
+    const CSteamID *steamid = engine->GetClientSteamID(pEntity);
+
+    if (!steamid)
+        return;
+
+    client_disconnect(this->m_Client, steamid->ConvertToUint64());
+}
+
+void Shim::ClientCommand(edict_t *pEntity, const CCommand &args)
+{
+}
+
 bool Shim::Unload(char *error, size_t maxlen)
 {
+    SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientDisconnect, gameclients, this, &Shim::ClientDisconnect, true);
+	SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientPutInServer, gameclients, this, &Shim::ClientPutInServer, true);
+    SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientCommand, gameclients, this, &Shim::ClientCommand, false);
+
     if (this->m_VoiceDetour)
     {
         this->m_VoiceDetour->Destroy();

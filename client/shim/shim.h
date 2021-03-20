@@ -3,14 +3,17 @@
 
 #include <ISmmPlugin.h>
 #include <eiface.h>
+#include <steam/steamclientpublic.h>
 #include <bindings.h>
 #include <CDetour/detours.h>
 
 class Shim : public ISmmPlugin
 {
     public:
-        Shim();
         void BroadcastVoiceData_Callback(int bytes, const char *data);
+        void ClientDisconnect(edict_t *pEntity);
+	    void ClientPutInServer(edict_t *pEntity, char const *playername);
+	    void ClientCommand(edict_t *pEntity, const CCommand &args);
 	public:
 		bool Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlength, bool late);
 		bool Unload(char *error, size_t maxlen);
