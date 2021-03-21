@@ -503,6 +503,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "relay"
+version = "0.1.0"
+dependencies = [
+ "bytes",
+ "prost",
+ "prost-build",
+ "prost-types",
+ "tokio",
+]
+
+[[package]]
 name = "remove_dir_all"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -566,6 +577,14 @@ dependencies = [
 [[package]]
 name = "server"
 version = "0.1.0"
+dependencies = [
+ "bytes",
+ "prost",
+ "prost-build",
+ "prost-types",
+ "thiserror",
+ "tokio",
+]
 
 [[package]]
 name = "signal-hook-registry"

@@ -5,6 +5,8 @@ members = [
     "server",
     "libvoice",
     "libmixer",
+    "librelay",
+    "libschema",
 ]
 
 [profile.release]

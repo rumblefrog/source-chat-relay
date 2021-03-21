@@ -1,5 +1,5 @@
 [package]
-name = "server"
+name = "relay"
 version = "0.1.0"
 authors = ["rumblefrog <contact@zhenyangli.me>"]
 edition = "2018"
@@ -8,22 +8,12 @@ edition = "2018"
 
 [dependencies]
 bytes = "1"
-thiserror = "1"
 prost = "0.7"
 prost-types = "0.7"
-tokio_stream = "0.1"
 
 [dependencies.tokio]
 version = "1"
-features = ["full"]
-
-[dependencies.tokio-util]
-version = "0.6"
-features = ["full"]
-
-[dependencies.serde]
-version = "1.0"
-features = ["derive"]
+features = ["rt-multi-thread", "net", "sync", "time"]
 
 [build-dependencies]
 prost-build = "0.7"

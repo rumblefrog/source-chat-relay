@@ -171,7 +171,7 @@ void Shim::ClientCommand(edict_t *pEntity, const CCommand &args)
 bool Shim::Unload(char *error, size_t maxlen)
 {
     SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientDisconnect, gameclients, this, &Shim::ClientDisconnect, true);
-	SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientPutInServer, gameclients, this, &Shim::ClientPutInServer, true);
+    SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientPutInServer, gameclients, this, &Shim::ClientPutInServer, true);
     SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientCommand, gameclients, this, &Shim::ClientCommand, false);
 
     if (this->m_VoiceDetour)
