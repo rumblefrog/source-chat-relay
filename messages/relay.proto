@@ -102,6 +102,18 @@ message UserLeave {
     common.Identity identity = 1;
 }
 
+// Sent by both clients & the server.
+//
+// The server will send this payload for each `UserJoin`.
+//
+// Clients will send this payload to update a user's preference,
+// with the map being only the fields being changed.
+message UserPreferences {
+    common.Identity identity = 1;
+
+    map<string, string> preferences = 2;
+}
+
 message TextMessage {
     common.Intentions intentions = 1;
 
