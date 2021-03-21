@@ -3,10 +3,10 @@
 members = [
     "client",
     "server",
-    "libvoice",
-    "libmixer",
-    "librelay",
-    "libschema",
+    "libs/voice",
+    "libs/mixer",
+    "libs/relay",
+    "libs/schema",
 ]
 
 [profile.release]
