@@ -7,6 +7,7 @@ members = [
     "libs/mixer",
     "libs/relay",
     "libs/schema",
+    "tools/spout",
 ]
 
 [profile.release]

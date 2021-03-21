@@ -1,0 +1,16 @@
+version: '3'
+services:
+  mariadb:
+    image: mariadb
+    volumes:
+      - db-data:/var/lib/mysql/data
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: scr_dev
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
+
+volumes:
+  db-data:
