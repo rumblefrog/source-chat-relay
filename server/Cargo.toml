@@ -11,7 +11,7 @@ bytes = "1"
 thiserror = "1"
 prost = "0.7"
 prost-types = "0.7"
-tokio_stream = "0.1"
+tokio-stream = "0.1"
 
 [dependencies.tokio]
 version = "1"

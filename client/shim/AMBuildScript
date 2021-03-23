@@ -386,9 +386,6 @@ class MMSConfig(object):
       else:
         compiler.postlink += [compiler.Dep(os.path.join(lib_folder, 'tier1_i486.a'))]
 
-      if sdk.name == 'bms':
-        compiler.postlink += [compiler.Dep(os.path.join(lib_folder, 'mathlib.a'))]
-
     compiler.postlink += [compiler.Dep(os.path.join(self.client_path, 'libclient.a'))]
 
     binary = self.LibraryBuilder(compiler, name, arch)
