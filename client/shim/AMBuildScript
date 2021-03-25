@@ -308,14 +308,9 @@ class MMSConfig(object):
     if not builder.options.mms_path:
       raise Exception('Metamod:Source path is missing. Supply a --mms_path flag')
 
-    if sdk.name == 'episode1' or sdk.name == 'darkm':
-      paths.append(['public', 'dlls'])
-      compiler.cxxincludes.append(os.path.join(builder.options.mms_path, 'core-legacy'))
-      compiler.cxxincludes.append(os.path.join(builder.options.mms_path, 'core-legacy', 'sourcehook'))
-    else:
-      paths.append(['public', 'game', 'server'])
-      compiler.cxxincludes.append(os.path.join(builder.options.mms_path, 'core'))
-      compiler.cxxincludes.append(os.path.join(builder.options.mms_path, 'core', 'sourcehook'))
+    paths.append(['public', 'game', 'server'])
+    compiler.cxxincludes.append(os.path.join(builder.options.mms_path, 'core'))
+    compiler.cxxincludes.append(os.path.join(builder.options.mms_path, 'core', 'sourcehook'))
 
     compiler.defines += ['SOURCE_ENGINE=' + sdk.code]
 
@@ -381,10 +376,7 @@ class MMSConfig(object):
         lib_folder = os.path.join(sdk.path, 'lib', 'mac')
 
     if builder.target.platform in ['linux', 'mac']:
-      if sdk.name in ['sdk2013', 'bms'] or arch == 'x64':
-        compiler.postlink += [compiler.Dep(os.path.join(lib_folder, 'tier1.a'))]
-      else:
-        compiler.postlink += [compiler.Dep(os.path.join(lib_folder, 'tier1_i486.a'))]
+      compiler.postlink += [compiler.Dep(os.path.join(lib_folder, 'tier1.a'))]
 
     compiler.postlink += [compiler.Dep(os.path.join(self.client_path, 'libclient.a'))]
 
@@ -393,24 +385,13 @@ class MMSConfig(object):
     dynamic_libs = [] # todo: this whole section is slightly different, but I imagine it is "more correct"
     if builder.target.platform == 'linux':
       compiler.linkflags[0:0] = ['-lm', '-ldl'] # todo: do we need -ldl?
-      if sdk.name in ['css', 'hl2dm', 'dods', 'tf2', 'sdk2013', 'bms', 'nucleardawn', 'l4d2', 'insurgency', 'doi']:
-        dynamic_libs = ['libtier0_srv.so', 'libvstdlib_srv.so']
-      elif arch == 'x64' and sdk.name == 'csgo':
-        dynamic_libs = ['libtier0_client.so', 'libvstdlib_client.so']
-      elif sdk.name in ['l4d', 'blade', 'insurgency', 'doi', 'csgo', 'dota']:
-        dynamic_libs = ['libtier0.so', 'libvstdlib.so']
-      else:
-        dynamic_libs = ['tier0_i486.so', 'vstdlib_i486.so']
+      dynamic_libs = ['libtier0_srv.so', 'libvstdlib_srv.so']
     elif builder.target.platform == 'mac':
       binary.compiler.linkflags.append('-liconv')
       dynamic_libs = ['libtier0.dylib', 'libvstdlib.dylib']
     elif builder.target.platform == 'windows':
       # todo: verify this for MSVC support
       libs = ['tier0', 'tier1', 'vstdlib']
-      if sdk.name in ['swarm', 'blade', 'insurgency', 'doi', 'csgo', 'dota']:
-        libs.append('interfaces')
-      if sdk.name == 'bms':
-        libs.append('mathlib')
       for lib in libs:
         if arch == 'x86':
           lib_path = os.path.join(sdk.path, 'lib', 'public', lib) + '.lib'

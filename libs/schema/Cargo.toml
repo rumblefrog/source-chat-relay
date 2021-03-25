@@ -1,5 +1,5 @@
 [package]
-name = "libschema"
+name = "schema"
 version = "0.1.0"
 authors = ["rumblefrog <contact@zhenyangli.me>"]
 edition = "2018"

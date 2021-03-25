@@ -255,10 +255,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "libschema"
-version = "0.1.0"
-
-[[package]]
 name = "lock_api"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -558,6 +554,10 @@ checksum = "e032b2b24715c4f982f483ea3abdb3c9ba444d9f63e87b2843d6f998f5ba2698"
 dependencies = [
  "libsamplerate-sys",
 ]
+
+[[package]]
+name = "schema"
+version = "0.1.0"
 
 [[package]]
 name = "scopeguard"
