@@ -30,4 +30,6 @@ parser.options.add_option('-s', '--sdks', default='all', dest='sdks',
                             'comma-delimited list of engine names (default: %default)')
 parser.options.add_option('--client-path', type=str, dest='client_path', default=None,
                        help='Client library path')
+parser.options.add_option('--sm-path', type=str, dest='sm_path', default=None,
+                       help='Path to SourceMod')
 parser.Configure()

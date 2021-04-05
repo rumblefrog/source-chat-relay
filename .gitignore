@@ -26,4 +26,5 @@ public
 # Dev env
 hl2sdk-*
 metamod-*
+sourcemod
 .vscode

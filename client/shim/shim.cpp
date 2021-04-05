@@ -168,6 +168,13 @@ void Shim::ClientCommand(edict_t *pEntity, const CCommand &args)
 {
 }
 
+void *Shim::OnMetamodQuery(const char* iface, int *ret)
+{
+    // if (strcmp(iface, SOURCEMOD_NOTICE_EXTENSIONS) == 0) {
+
+    // }
+}
+
 bool Shim::Unload(char *error, size_t maxlen)
 {
     SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientDisconnect, gameclients, this, &Shim::ClientDisconnect, true);
