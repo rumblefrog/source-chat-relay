@@ -13,6 +13,7 @@ use crate::player::Player;
 use crate::Result;
 
 lazy_static! {
+    static ref CLIENT: Client = Client::default();
     static ref RUNTIME: Runtime = Runtime::new().unwrap();
 }
 
@@ -27,10 +28,6 @@ struct ClientInner {
     players: HashMap<u64, Player>,
 }
 
-// By default *mut T is not safe for send.
-// Need to ensure the shim side safety instead.
-unsafe impl Send for Client {}
-
 impl Default for Client {
     fn default() -> Self {
         Self(Arc::new(RwLock::new(ClientInner {
@@ -40,7 +37,7 @@ impl Default for Client {
 }
 
 impl Client {
-    pub async fn receive_audio(&mut self, data: &[u8]) -> Result<()> {
+    pub async fn receive_audio(&self, data: &[u8]) -> Result<()> {
         let mut packet = Packet::from_bytes(data)?;
 
         let header = packet.header()?;
@@ -59,7 +56,7 @@ impl Client {
                 println!("!!!!! Opus PLC {}", data.len());
 
                 match player.transcode(data) {
-                    Ok(mut d) => {
+                    Ok(d) => {
                         println!("ok transcode {}", d.len());
                     }
                     Err(e) => println!("{:?}", e),
@@ -75,15 +72,17 @@ impl Client {
         Ok(())
     }
 
-    pub async fn client_put_in_server(&mut self, steamid: u64, name: &str) -> Result<()> {
+    pub async fn client_put_in_server(&self, steamid: u64, name: &str) -> Result<()> {
         let mut inner = self.0.write().await;
+
+        // TODO: Handle name
 
         inner.players.insert(steamid, Player::new()?);
 
         Ok(())
     }
 
-    pub async fn client_disconnect(&mut self, steamid: u64) -> Result<()> {
+    pub async fn client_disconnect(&self, steamid: u64) -> Result<()> {
         let mut inner = self.0.write().await;
 
         inner.players.remove(&steamid);
@@ -93,63 +92,32 @@ impl Client {
 }
 
 #[no_mangle]
-pub extern "C" fn new_client() -> *mut Client {
-    let c = Client::default();
-    let b = Box::new(c);
-
-    Box::into_raw(b)
-}
-
-#[no_mangle]
 pub unsafe extern "C" fn receive_audio(
-    client: *mut Client,
     bytes: i32,
     data: *const std::os::raw::c_char,
 ) {
-    if !client.is_null() {
-        let d = std::slice::from_raw_parts(data as *const u8, bytes as usize).to_owned();
+    let d = std::slice::from_raw_parts(data as *const u8, bytes as usize).to_owned();
 
-        let client = &mut *client;
-
-        RUNTIME.spawn(async move {
-            let _ = client.receive_audio(&d).await;
-        });
-    }
+    RUNTIME.spawn(async move {
+        let _ = CLIENT.receive_audio(&d).await;
+    });
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn client_put_in_server(
-    client: *mut Client,
     steamid: u64,
     name: *const std::os::raw::c_char,
 ) {
-    if !client.is_null() {
-        let name = CStr::from_ptr(name).to_string_lossy();
+    let name = CStr::from_ptr(name).to_string_lossy();
 
-        let client = &mut *client;
-
-        RUNTIME.spawn(async move {
-            let _ = client.client_put_in_server(steamid, &name).await;
-        });
-    }
+    RUNTIME.spawn(async move {
+        let _ = CLIENT.client_put_in_server(steamid, &name).await;
+    });
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn client_disconnect(client: *mut Client, steamid: u64) {
-    if !client.is_null() {
-        let client = &mut *client;
-
-        RUNTIME.spawn(async move {
-            let _ = client.client_disconnect(steamid).await;
-        });
-    }
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn free_client(client: *mut Client) {
-    if client.is_null() {
-        return;
-    }
-
-    Box::from_raw(client);
+pub unsafe extern "C" fn client_disconnect(steamid: u64) {
+    RUNTIME.spawn(async move {
+        let _ = CLIENT.client_disconnect(steamid).await;
+    });
 }

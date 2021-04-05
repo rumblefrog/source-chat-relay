@@ -89,7 +89,7 @@ bool SM_LoadExtension(char *error, size_t maxlength) {
 
 	/* This could be more dynamic */
 	char path[256];
-	g_SMAPI->PathFormat(path, sizeof(path),  "addons/rcbot2/bin/SCR%s",
+	g_SMAPI->PathFormat(path, sizeof(path),  "addons/scr/bin/SCR%s",
 #if defined __linux__
 		"_i486.so"
 #else

@@ -28,7 +28,6 @@ class Shim : public ISmmPlugin
 		const char *GetLicense();
 		const char *GetLogTag();
     private:
-        Client *m_Client;
         CDetour *m_VoiceDetour;
 };
 

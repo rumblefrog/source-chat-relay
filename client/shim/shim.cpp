@@ -114,8 +114,6 @@ bool Shim::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, bool lat
 
     m_VoiceDetour->EnableDetour();
 
-    m_Client = new_client();
-
 	return true;
 }
 
@@ -135,7 +133,7 @@ void Shim::BroadcastVoiceData_Callback(int bytes, const char *data)
 	fclose(file);
 #endif
 
-    receive_audio(this->m_Client, bytes, data);
+    receive_audio(bytes, data);
 }
 
 void Shim::ClientPutInServer(edict_t *pEntity, char const *playername)
@@ -148,7 +146,7 @@ void Shim::ClientPutInServer(edict_t *pEntity, char const *playername)
     if (!steamid)
         return;
 
-    client_put_in_server(this->m_Client, steamid->ConvertToUint64(), playername);
+    client_put_in_server(steamid->ConvertToUint64(), playername);
 }
 
 void Shim::ClientDisconnect(edict_t *pEntity)
@@ -161,7 +159,7 @@ void Shim::ClientDisconnect(edict_t *pEntity)
     if (!steamid)
         return;
 
-    client_disconnect(this->m_Client, steamid->ConvertToUint64());
+    client_disconnect(steamid->ConvertToUint64());
 }
 
 void Shim::ClientCommand(edict_t *pEntity, const CCommand &args)
@@ -185,12 +183,6 @@ bool Shim::Unload(char *error, size_t maxlen)
     {
         this->m_VoiceDetour->Destroy();
         this->m_VoiceDetour = NULL;
-    }
-
-    if (this->m_Client)
-    {
-        free_client(this->m_Client);
-        this->m_Client = NULL;
     }
 
 	return true;
