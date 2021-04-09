@@ -6,8 +6,9 @@
 #include <steam/steamclientpublic.h>
 #include <bindings.h>
 #include <CDetour/detours.h>
+#include <sm_ext.h>
 
-class Shim : public ISmmPlugin
+class Shim : public ISmmPlugin, public IMetamodListener
 {
     public:
         void BroadcastVoiceData_Callback(int bytes, const char *data);
@@ -27,6 +28,8 @@ class Shim : public ISmmPlugin
 		const char *GetDate();
 		const char *GetLicense();
 		const char *GetLogTag();
+    private:
+        void BindToSourcemod();
     private:
         CDetour *m_VoiceDetour;
 };

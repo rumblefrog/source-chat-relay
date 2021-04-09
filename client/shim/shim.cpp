@@ -168,13 +168,21 @@ void Shim::ClientCommand(edict_t *pEntity, const CCommand &args)
 
 void *Shim::OnMetamodQuery(const char* iface, int *ret)
 {
-    // if (strcmp(iface, SOURCEMOD_NOTICE_EXTENSIONS) == 0) {
+    if (strcmp(iface, SOURCEMOD_NOTICE_EXTENSIONS) == 0) {
+        BindToSourcemod();
+    }
 
-    // }
+    if (ret != NULL) {
+        *ret = IFACE_OK;
+    }
+
+    return NULL;
 }
 
 bool Shim::Unload(char *error, size_t maxlen)
 {
+    SM_UnloadExtension();
+
     SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientDisconnect, gameclients, this, &Shim::ClientDisconnect, true);
     SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientPutInServer, gameclients, this, &Shim::ClientPutInServer, true);
     SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientCommand, gameclients, this, &Shim::ClientCommand, false);
@@ -186,6 +194,17 @@ bool Shim::Unload(char *error, size_t maxlen)
     }
 
 	return true;
+}
+
+void Shim::BindToSourcemod()
+{
+    char error[256];
+
+	if (!SM_LoadExtension(error, sizeof(error))) {
+		char message[512];
+		snprintf(message, sizeof(message), "Could not load as a SourceMod extension: %s\n", error);
+		engine->LogPrint(message);
+	}
 }
 
 const char *Shim::GetLicense()

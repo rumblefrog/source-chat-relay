@@ -31,7 +31,7 @@ void ShimExtension::OnExtensionUnload()
 }
 
 void ShimExtension::OnExtensionsAllLoaded() {}
-void ShimExtension::OnExtensionPauseChange() {}
+void ShimExtension::OnExtensionPauseChange(bool pause) {}
 
 bool ShimExtension::QueryRunning(char *error, size_t maxlength)
 {
@@ -97,7 +97,7 @@ bool SM_LoadExtension(char *error, size_t maxlength) {
 #endif
 	);
 
-	if ((myself = smexts->LoadExternal(&g_RCBotSourceMod, path, "scr.ext", error, maxlength))
+	if ((myself = smexts->LoadExternal(&g_SMExt, path, "scr.ext", error, maxlength))
 			== NULL) {
 		SM_UnsetInterfaces();
 		return false;

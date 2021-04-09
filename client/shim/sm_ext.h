@@ -2,6 +2,7 @@
 #define _INCLUDE_SHIM_SOURCEMOD_EXTENSION_
 
 #include "sm_sdk_config.h"
+#include "shim.h"
 
 using namespace SourceMod;
 

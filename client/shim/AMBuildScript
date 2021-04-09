@@ -1,24 +1,30 @@
 import os
 
 proj_name = 'source-chat-relay'
+
 proj_srcs = [
     'shim.cpp',
+    'sm_sdk_config.cpp',
+    'sm_ext.cpp',
     'libc_compat.cpp',
     'asm/asm.c',
     'CDetour/detours.cpp',
     'util/MemoryUtils.cpp',
 ]
+
 proj_c_flags = [
     '-Wall',
     '-Wno-non-virtual-dtor',
     '-Wno-overloaded-virtual',
     '-Werror',
 ]
+
 proj_c_flags_opt = [
     '-O3',
     '-funroll-loops',
     '-pipe',
 ]
+
 proj_c_flags_dbg = [
     '-g',
     '-ggdb3',
@@ -135,8 +141,8 @@ class MMSConfig(object):
     def detectSM(self):
         if builder.options.sm_path:
             self.sm_path = builder.options.sm_path
-        else
-        raise Exception('SM path not specified')
+        else:
+            raise Exception('SM path not specified')
 
     def detectSDKs(self):
         sdk_list = builder.options.sdks.split(',')
@@ -308,6 +314,10 @@ class MMSConfig(object):
             os.path.join(context.currentSourcePath, 'CDetour'),
             os.path.join(context.currentSourcePath, 'util'),
             os.path.join(context.currentSourcePath, 'asm'),
+            os.path.join(builder.options.sm_path, 'sourcepawn', 'include'),
+            os.path.join(builder.options.sm_path, 'public', 'amtl'),
+            os.path.join(builder.options.sm_path, 'public', 'amtl', 'amtl'),
+            os.path.join(builder.options.sm_path, 'public'),
         ]
 
         defines = ['SE_' + PossibleSDKs[i].define + '=' +
