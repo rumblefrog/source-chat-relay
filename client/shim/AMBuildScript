@@ -85,6 +85,9 @@ def ResolveEnvPath(env, folder):
             head, tail = os.path.split(head)
     return None
 
+def Normalize(path):
+    return os.path.abspath(os.path.normpath(path))
+
 
 def SetArchFlags(compiler, arch, platform):
     if compiler.behavior == 'gcc':
@@ -134,13 +137,13 @@ class MMSConfig(object):
 
     def detectClient(self):
         if builder.options.client_path:
-            self.client_path = builder.options.client_path
+            self.client_path = Normalize(builder.options.client_path)
         else:
             raise Exception('Could not find client library')
 
     def detectSM(self):
         if builder.options.sm_path:
-            self.sm_path = builder.options.sm_path
+            self.sm_path = Normalize(builder.options.sm_path)
         else:
             raise Exception('SM path not specified')
 
@@ -155,8 +158,7 @@ class MMSConfig(object):
             sdk = PossibleSDKs[sdk_name]
             if sdk.shouldBuild(builder.target, self.archs):
                 if builder.options.hl2sdk_root:
-                    sdk_path = os.path.join(
-                        builder.options.hl2sdk_root, sdk.folder)
+                    sdk_path = os.path.join(Normalize(builder.options.hl2sdk_root), sdk.folder)
                 else:
                     sdk_path = ResolveEnvPath(sdk.envvar, sdk.folder)
                 if sdk_path is None:
@@ -314,10 +316,10 @@ class MMSConfig(object):
             os.path.join(context.currentSourcePath, 'CDetour'),
             os.path.join(context.currentSourcePath, 'util'),
             os.path.join(context.currentSourcePath, 'asm'),
-            os.path.join(builder.options.sm_path, 'sourcepawn', 'include'),
-            os.path.join(builder.options.sm_path, 'public', 'amtl'),
-            os.path.join(builder.options.sm_path, 'public', 'amtl', 'amtl'),
-            os.path.join(builder.options.sm_path, 'public'),
+            os.path.join(self.sm_path, 'sourcepawn', 'include'),
+            os.path.join(self.sm_path, 'public', 'amtl'),
+            os.path.join(self.sm_path, 'public', 'amtl', 'amtl'),
+            os.path.join(self.sm_path, 'public'),
         ]
 
         defines = ['SE_' + PossibleSDKs[i].define + '=' +
@@ -336,11 +338,11 @@ class MMSConfig(object):
             raise Exception(
                 'Metamod:Source path is missing. Supply a --mms_path flag')
 
+        mms_path = Normalize(builder.options.mms_path)
+
         paths.append(['public', 'game', 'server'])
-        compiler.cxxincludes.append(
-            os.path.join(builder.options.mms_path, 'core'))
-        compiler.cxxincludes.append(os.path.join(
-            builder.options.mms_path, 'core', 'sourcehook'))
+        compiler.cxxincludes.append(os.path.join(mms_path, 'core'))
+        compiler.cxxincludes.append(os.path.join(mms_path, 'core', 'sourcehook'))
 
         compiler.defines += ['SOURCE_ENGINE=' + sdk.code]
 
@@ -454,6 +456,7 @@ class MMSConfig(object):
 MMS = MMSConfig()
 MMS.detectProductVersion()
 MMS.detectSDKs()
+MMS.detectSM()
 MMS.detectClient()
 MMS.configure()
 

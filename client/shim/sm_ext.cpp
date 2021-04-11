@@ -20,6 +20,8 @@ bool ShimExtension::OnExtensionLoad(
         return false;
     }
 
+    // TODO: Register forwards
+
     sharesys->RegisterLibrary(myself, "SCR");
 
     return true;

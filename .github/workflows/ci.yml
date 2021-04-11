@@ -1,0 +1,65 @@
+name: CI
+
+on: push
+
+jobs:
+  crates:
+    name: Build
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 30
+
+    env:
+      CARGO_TERM_COLOR: always
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Cache cargo registry
+      uses: actions/cache@v2
+      with:
+        path: ~/.cargo/registry
+        key: cargo-registry-${{ hashFiles('Cargo.lock') }}
+        restore-keys: |
+            cargo-registry-
+
+    - name: Cache cargo bin
+      uses: actions/cache@v2
+      with:
+        path: ~/.cargo/bin
+        key: cargo-bin-${{ hashFiles('Cargo.lock') }}
+        restore-keys: |
+            cargo-bin-
+
+    - name: Cache cargo build
+      uses: actions/cache@v2
+      with:
+        path: target
+        key: cargo-buil-target-${{ hashFiles('Cargo.lock') }}
+        restore-keys: |
+            cargo-build-target-
+
+    - name: Cache build
+      id: cache-build
+      uses: actions/cache@v2
+      with:
+        path: build
+        key: build-${{ runner.os }}
+        restore-keys: |
+            build-
+
+    - name: Install latest Rust stable
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: i686-unknown-linux-gnu
+        override: true
+
+    - name: Initialize dependencies
+      run: |
+        chmod +x -R scripts/*
+        ./scripts/ci_init.sh
+
+    - name: Build
+      run: ./scripts/build.sh

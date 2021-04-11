@@ -80,7 +80,7 @@ message ClientsResponse {
     message Client {
         ClientIdentifiers identifiers = 1;
 
-        repeated User users = 2;
+        repeated common.Identity users = 2;
     }
 
     repeated Client clients = 1;
