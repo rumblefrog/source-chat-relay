@@ -23,11 +23,9 @@
 ## Introduction
 
 <p>
-    <a href="https://travis-ci.com/rumblefrog/source-chat-relay">
-        <img src="https://img.shields.io/travis/com/rumblefrog/source-chat-relay.svg?style=for-the-badge">
-    </a>
-    <a href="https://discord.gg/TZ4BsrQ">
-        <img src="https://img.shields.io/discord/443915420324331521.svg?style=for-the-badge">
+    <img src="https://img.shields.io/github/workflow/status/rumblefrog/source-chat-relay/CI?style=for-the-badge">
+    <a href="https://discord.gg/HUc67zN">
+        <img src="https://img.shields.io/discord/335290997317697536.svg?style=for-the-badge">
     </a>
     <a href="https://github.com/rumblefrog/source-chat-relay/issues">
         <img src="https://img.shields.io/github/issues/rumblefrog/source-chat-relay.svg?style=for-the-badge">
