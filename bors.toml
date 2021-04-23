@@ -1,0 +1,5 @@
+status = [
+    "Build",
+]
+
+commit_title = "Auto merge of ${PR_REFS}"
