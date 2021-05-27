@@ -551,7 +551,10 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			Call_Finish(aResult);
 
 			if (aResult >= Plugin_Handled)
+			{
+				base.Close();
 				return;
+			}
 
 			#if defined DEBUG
 			PrintToConsoleAll("====== Chat Message Packet =====");
@@ -587,7 +590,10 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 			Call_Finish(aResult);
 
 			if (aResult >= Plugin_Handled)
+			{
+				base.Close();
 				return;
+			}
 			
 			if (SupportsHexColor(g_evEngine))
 				CPrintToChatAll("{gold}[%s]{white}: {grey}%s", sEvent, sData);
