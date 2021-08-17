@@ -1,4 +1,4 @@
-## This branch is working branch for v3. For the current stable release, the readme is available in [master](https://github.com/rumblefrog/source-chat-relay/blob/1333456609b283a893f6305617818e5a30998181/README.md)
+## This branch is working branch for [v3](https://github.com/rumblefrog/source-chat-relay/discussions/44). For the current stable release, the readme is available in [master](https://github.com/rumblefrog/source-chat-relay/blob/1333456609b283a893f6305617818e5a30998181/README.md)
 
 <p align="center">
     <img src="docs/static/logo/cloud-computing.svg" width="250">
