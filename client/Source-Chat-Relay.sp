@@ -490,6 +490,8 @@ void ConnectRelay()
 public Action Timer_Reconnect(Handle timer)
 {
 	ConnectRelay();
+
+	return Plugin_Continue;
 }
 
 void StartReconnectTimer()
