@@ -653,8 +653,6 @@ public void ePlayerJoinLeave(Handle event, const char[] name, bool dontBroadcast
 		connect = true;
 	}
 
-	LogMessage("%i", iClient);
-
 	if (!Client_IsValid(iClient))
 	{
 		return;
@@ -668,8 +666,11 @@ public void ePlayerJoinLeave(Handle event, const char[] name, bool dontBroadcast
 
 	char sName[MAX_NAME_LENGTH];
 
-	if (!GetClientName(iClient, sName, sizeof sName))
+	GetEventString(event, "name", sName, sizeof(sName), "");
+
+	if (name[0] == '\0')
 	{
+		PrintToServer("client %N has no name (?)", iClient);
 		return;
 	}
 
