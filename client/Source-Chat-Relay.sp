@@ -36,6 +36,7 @@ ConVar g_cHostname;
 
 // Event convars
 ConVar g_cPlayerEvent;
+ConVar g_cBotPlayerEvent;
 ConVar g_cMapEvent;
 
 // Socket connection handle
@@ -355,6 +356,8 @@ public void OnPluginStart()
 	// Start basic event convars
 	g_cPlayerEvent = CreateConVar("rf_scr_event_player", "0", "Enable player connect/disconnect events", FCVAR_NONE, true, 0.0, true, 1.0);
 	
+	g_cBotPlayerEvent = CreateConVar("rf_scr_event_botplayer", "0", "Enable bot player connect/disconnect events", FCVAR_NONE, true, 0.0, true, 1.0);
+
 	g_cMapEvent = CreateConVar("rf_scr_event_map", "0", "Enable map start/end events", FCVAR_NONE, true, 0.0, true, 1.0);
 	
 	AutoExecConfig(true, "Source-Server-Relay");
@@ -401,6 +404,10 @@ public void OnPluginStart()
 		Param_String);
 
 	g_evEngine = GetEngineVersion();
+
+	// hook real player connects and disconnects
+	HookEvent("player_connect", ePlayerJoinLeave);
+	HookEvent("player_disconnect", ePlayerJoinLeave);
 }
 
 public void OnConfigsExecuted()
@@ -493,28 +500,28 @@ void StartReconnectTimer()
 	CreateTimer(10.0, Timer_Reconnect);
 }
 
-public int OnSocketDisconnected(Handle socket, any arg)
+public void OnSocketDisconnected(Handle socket, any arg)
 {	
 	StartReconnectTimer();
-	
+
 	PrintToServer("Source Chat Relay: Socket disconnected");
 }
 
-public int OnSocketError(Handle socket, int errorType, int errorNum, any ary)
-{
+public void OnSocketError(Handle socket, int errorType, int errorNum, any ary)
+{	
 	StartReconnectTimer();
-	
+
 	LogError("Source Chat Relay socket error %i (errno %i)", errorType, errorNum);
 }
 
-public int OnSocketConnected(Handle socket, any arg)
+public void OnSocketConnected(Handle socket, any arg)
 {
 	AuthenticateMessage(g_sToken).Dispatch();
 
 	PrintToServer("Source Chat Relay: Socket Connected");
 }
 
-public int OnSocketReceive(Handle socket, const char[] receiveData, int dataSize, any arg)
+public void OnSocketReceive(Handle socket, const char[] receiveData, int dataSize, any arg)
 {	
 	HandlePackets(receiveData, dataSize);
 }
@@ -628,9 +635,15 @@ public void HandlePackets(const char[] sBuffer, int iSize)
 	base.Close();
 }
 
-public void OnClientConnected(int iClient)
+// player connect/disconnect events
+public void ePlayerJoinLeave(Handle event, const char[] name, bool dontBroadcast)
 {
+	int iClient = GetClientOfUserId(GetEventInt(event, "userid"));
+
 	if (!g_cPlayerEvent.BoolValue)
+		return;
+
+	if (!g_cBotPlayerEvent.BoolValue && IsFakeClient(iClient))
 		return;
 
 	char sName[MAX_NAME_LENGTH];
@@ -640,22 +653,14 @@ public void OnClientConnected(int iClient)
 		return;
 	}
 
-	EventMessage("Player Connected", sName).Dispatch();
-}
-
-public void OnClientDisconnect(int iClient)
-{
-	if (!g_cPlayerEvent.BoolValue)
-		return;
-
-	char sName[MAX_NAME_LENGTH];
-
-	if (!GetClientName(iClient, sName, sizeof sName))
+	if (StrEqual(name, "player_disconnect"))
 	{
-		return;
+		EventMessage("Player Disconnected", sName).Dispatch();
 	}
-
-	EventMessage("Player Disconnected", sName).Dispatch();
+	else
+	{
+		EventMessage("Player Connected", sName).Dispatch();
+	}
 }
 
 public void OnMapEnd()
