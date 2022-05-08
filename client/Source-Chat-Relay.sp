@@ -644,6 +644,7 @@ public void ePlayerJoinLeave(Handle event, const char[] name, bool dontBroadcast
 
 	int userid = GetEventInt(event, "userid");
 	int iClient = GetClientOfUserId(userid);
+	bool bot = view_as<bool>(GetEventInt(event, "bot"));
 
 	// If the userid is 0 that means they're connecting and we need to get their player slot instead
 	if (!iClient)
@@ -653,7 +654,7 @@ public void ePlayerJoinLeave(Handle event, const char[] name, bool dontBroadcast
 		connect = true;
 	}
 
-	if (!Client_IsValid(iClient))
+	if (!Client_IsValid(iClient), false)
 	{
 		return;
 	}
@@ -661,7 +662,7 @@ public void ePlayerJoinLeave(Handle event, const char[] name, bool dontBroadcast
 	if (!g_cPlayerEvent.BoolValue)
 		return;
 
-	if (!g_cBotPlayerEvent.BoolValue && IsFakeClient(iClient))
+	if (!g_cBotPlayerEvent.BoolValue && bot)
 		return;
 
 	char sName[MAX_NAME_LENGTH];
