@@ -501,14 +501,14 @@ void StartReconnectTimer()
 }
 
 public void OnSocketDisconnected(Handle socket, any arg)
-{	
+{
 	StartReconnectTimer();
 
 	PrintToServer("Source Chat Relay: Socket disconnected");
 }
 
 public void OnSocketError(Handle socket, int errorType, int errorNum, any ary)
-{	
+{
 	StartReconnectTimer();
 
 	LogError("Source Chat Relay socket error %i (errno %i)", errorType, errorNum);
@@ -522,7 +522,7 @@ public void OnSocketConnected(Handle socket, any arg)
 }
 
 public void OnSocketReceive(Handle socket, const char[] receiveData, int dataSize, any arg)
-{	
+{
 	HandlePackets(receiveData, dataSize);
 }
 
