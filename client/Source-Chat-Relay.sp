@@ -654,7 +654,7 @@ public void ePlayerJoinLeave(Handle event, const char[] name, bool dontBroadcast
 		connect = true;
 	}
 
-	if (!Client_IsValid(iClient), false)
+	if (!Client_IsValid(iClient, false))
 	{
 		return;
 	}
