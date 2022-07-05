@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 thiserror = "1"
 bytes = "1"
-prost = "0.7"
+prost = "0.10"
 prost-types = "0.7"
 magnum-opus = "0.3"
 
