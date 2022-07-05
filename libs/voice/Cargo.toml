@@ -14,4 +14,4 @@ prost-types = "0.7"
 magnum-opus = "0.3"
 
 [build-dependencies]
-prost-build = "0.7"
+prost-build = "0.8"
