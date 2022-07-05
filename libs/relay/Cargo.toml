@@ -16,4 +16,4 @@ version = "1"
 features = ["rt-multi-thread", "net", "sync", "time"]
 
 [build-dependencies]
-prost-build = "0.7"
+prost-build = "0.8"
