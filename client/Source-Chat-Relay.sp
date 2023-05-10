@@ -778,7 +778,7 @@ void GenerateRandomChars(char[] buffer, int buffersize, int len)
 	char charset[] = "adefghijstuv6789!@#$%^klmwxyz01bc2345nopqr&+=";
 	
 	for (int i = 0; i < len; i++)
-		Format(buffer, buffersize, "%s%c", buffer, charset[GetRandomInt(0, sizeof charset)]);
+		Format(buffer, buffersize, "%s%c", buffer, charset[GetRandomInt(0, sizeof charset - 1)]);
 }
 
 void StripCharsByBytes(char[] sBuffer, int iSize, int iMaxBytes = 3)
