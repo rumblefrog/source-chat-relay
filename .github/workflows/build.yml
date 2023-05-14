@@ -18,7 +18,8 @@ jobs:
         uses: actions/checkout@master
 
       - name: Set version env
-        run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
+        run: |
+          echo "SCRVER=$(git describe --always --long --dirty)" >> "$GITHUB_ENV"
 
       - name: Install Golang
         uses: actions/setup-go@v1
@@ -32,10 +33,13 @@ jobs:
 
       - name: Export bin paths
         run: |
-          echo ::set-env name=GOPATH::$(go env GOPATH)
-          echo ::set-env name=GOBIN::$(go env GOPATH)/bin
-          echo ::add-path::$(go env GOPATH)/bin
-          mkdir -p $(go env GOPATH)/bin
+          echo "GOPATH=$(go env GOPATH)" >> "$GITHUB_ENV"
+          echo "GOBIN=$(go env GOPATH)/bin" >> "$GITHUB_ENV"
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Create bin paths
+        run: |
+          mkdir -p $GOBIN
 
       - name: Install PostCSS CLI
         run: npm i -g postcss-cli
@@ -73,20 +77,20 @@ jobs:
 
       - name: Build Linux binary
         working-directory: server
-        run: go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/linux-server
+        run: go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=${{ env.SCRVER }} -extldflags '-static'" -o build/linux-server
 
       - name: Build ARMv7 binary
         working-directory: server
         run: |
           export GOARCH=arm
           export GOARM=7
-          go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/armv7-server
+          go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=${{ env.SCRVER }} -extldflags '-static'" -o build/armv7-server
 
       - name: Build Windows binary
         working-directory: server
         run: |
           export GOOS=windows
-          go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/windows-server
+          go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=${{ env.SCRVER }} -extldflags '-static'" -o build/windows-server
 
       - name: Upload server artifact
         uses: actions/upload-artifact@master
@@ -107,7 +111,8 @@ jobs:
         uses: actions/checkout@master
 
       - name: Set version env
-        run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
+        run: |
+          echo "SCRVER=$(git describe --always --long --dirty)" >> "$GITHUB_ENV"
 
       - name: Setup SourcePawn Compiler ${{ matrix.sm-version }}
         id: setup-sp
