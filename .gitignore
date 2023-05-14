@@ -49,3 +49,10 @@ server/ui/template/dist/*
 .cache/
 .docz
 public
+
+# Python
+.venv
+
+# Sourceknight
+.sourceknight
+*.smx
