@@ -22,6 +22,9 @@ vendor/*
 
 .vscode/*
 
+# IDEA
+.idea/*
+
 # Config
 
 *.toml
