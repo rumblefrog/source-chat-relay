@@ -16,7 +16,7 @@ var (
 	RoleRegex            = regexp.MustCompile("(?:<@&)?([0-9]+)>?")
 )
 
-func GuildMemberPermissions(member *discordgo.Member, guild *discordgo.Guild) (apermissions int) {
+func GuildMemberPermissions(member *discordgo.Member, guild *discordgo.Guild) (apermissions int64) {
 	if member.User.ID == guild.OwnerID {
 		apermissions = discordgo.PermissionAll
 		return
