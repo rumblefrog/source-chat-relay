@@ -15,20 +15,20 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
 
       - name: Set version env
         run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
 
       - name: Install Golang
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v4
         with:
-          go-version: "1.13.x"
+          go-version: "1.13.15"
 
       - name: Install NodeJS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: "12.x"
+          node-version: "18.4.0"
 
       - name: Export bin paths
         run: |
@@ -44,7 +44,7 @@ jobs:
         run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
       - name: Install Packr2
-        run: go get -u -v github.com/gobuffalo/packr/v2/packr2
+        run: go get github.com/gobuffalo/packr/v2/packr2@v2.6.0
 
       - name: Install UPX
         run: |
@@ -61,7 +61,7 @@ jobs:
 
       - name: Install server dependencies
         working-directory: server
-        run: go get -u
+        run: go get
 
       - name: Pack UI files
         working-directory: server
@@ -89,7 +89,7 @@ jobs:
           go build -ldflags "-s -w -X github.com/rumblefrog/source-chat-relay/server/config.SCRVER=$SCRVER -extldflags '-static'" -o build/windows-server
 
       - name: Upload server artifact
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v3
         with:
           name: Server
           path: server/build/
@@ -104,14 +104,14 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
 
       - name: Set version env
         run: echo ::set-env name=SCRVER::$(git describe --always --long --dirty)
 
       - name: Setup SourcePawn Compiler ${{ matrix.sm-version }}
         id: setup-sp
-        uses: rumblefrog/setup-sp@master
+        uses: rumblefrog/setup-sp@v1.2.2
         with:
           version: ${{ matrix.sm-version }}
 
@@ -136,7 +136,7 @@ jobs:
 
       - name: Upload plugin artifact
         if: matrix.sm-version == '1.10.x'
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v3
         with:
           name: Plugin
           path: build/
@@ -146,12 +146,12 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
 
       - name: Install NodeJS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: "12.x"
+          node-version: "12.22.12"
 
       - name: Export npm bin path
         run: export PATH=$PATH:$(npm bin -g)
