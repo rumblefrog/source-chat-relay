@@ -48,7 +48,7 @@ jobs:
         run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
       - name: Install Packr2
-        run: go get github.com/gobuffalo/packr/v2/packr2@v2.6.0
+        run: go install github.com/gobuffalo/packr/v2@v2.8.3
 
       - name: Install UPX
         run: |
