@@ -1,6 +1,6 @@
 module github.com/rumblefrog/source-chat-relay/server
 
-go 1.21
+go 1.24.0
 
 require (
 	github.com/BurntSushi/toml v0.3.1
@@ -23,8 +23,8 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/rogpeppe/go-internal v1.3.1 // indirect
 	github.com/stretchr/testify v1.4.0 // indirect
-	golang.org/x/crypto v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
-	golang.org/x/term v0.1.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/term v0.37.0 // indirect
 	google.golang.org/appengine v1.6.2 // indirect
 )
